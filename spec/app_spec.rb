@@ -1,19 +1,19 @@
-require_relative '../router'
+require_relative '../app'
 require 'rack/request'
 
-RSpec.describe Router do
+RSpec.describe APP do
   it 'handles /' do
-    app = Rack::MockRequest.new(Router)
+    app = Rack::MockRequest.new(APP)
 
-    response = app.get('/')
+    response = app.get("https://#{Prius.get(:host)}/")
 
     expect(response.status).to eq(200)
   end
 
   it 'handles /api/slack/messages' do
-    app = Rack::MockRequest.new(Router)
+    app = Rack::MockRequest.new(APP)
 
-    response = app.post('/api/slack/messages', params: {
+    response = app.post("https://#{Prius.get(:host)}/api/slack/messages", params: {
                           token: 'L8v9uEsAb7tLOct7FLovRBEU',
                           team_id: 'T0001',
                           team_domain: 'example',
@@ -26,6 +26,6 @@ RSpec.describe Router do
                         })
 
     expect(response.status).to eq(200)
-    expect(response.body).to eq('Visit https://gc-me-local.herokuapp.com to authorise!')
+    expect(response.body).to include('https://gc-me-local.herokuapp.com/authorise')
   end
 end

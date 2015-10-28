@@ -10,6 +10,6 @@ end
 
 require_relative 'config/prius'
 
-require './router'
+require './app'
 
-run Router
+run APP
