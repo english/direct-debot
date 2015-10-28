@@ -1,6 +1,11 @@
 require 'bundler/setup'
 Bundler.setup(:default, :test)
 
+require 'dotenv'
+Dotenv.load
+
+require_relative '../config/prius'
+
 require 'pry'
 
 RSpec.configure do |config|

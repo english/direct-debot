@@ -5,6 +5,8 @@ ruby '2.2.3'
 gem 'puma', '~> 2.14.0'
 gem 'lotus-router', '~> 0.4.3'
 gem 'coach', '~> 0.2.3'
+gem 'dotenv', '~> 2.0.2'
+gem 'prius', '~> 1.0.0'
 
 group :development, :test do
   gem 'rspec', '~> 3.3.0'
