@@ -75,6 +75,7 @@ GEM
     rails-html-sanitizer (1.0.2)
       loofah (~> 2.0)
     rainbow (2.0.0)
+    rake (10.4.2)
     rspec (3.3.0)
       rspec-core (~> 3.3.0)
       rspec-expectations (~> 3.3.0)
@@ -114,6 +115,7 @@ DEPENDENCIES
   pry-doc
   puma (~> 2.14.0)
   rack
+  rake
   rspec (~> 3.3.0)
   rubocop
 

@@ -15,6 +15,7 @@ end
 
 group :development do
   gem 'rubocop'
+  gem 'rake'
 end
 
 group :test do
