@@ -113,6 +113,7 @@ DEPENDENCIES
   pry-byebug
   pry-doc
   puma (~> 2.14.0)
+  rack
   rspec (~> 3.3.0)
   rubocop
 

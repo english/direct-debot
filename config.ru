@@ -1,3 +1,6 @@
-require './server'
+require 'bundler/setup'
+Bundler.setup(:default, ENV.fetch('RACK_ENV', 'development'))
 
-run Server
+require './router'
+
+run Router
