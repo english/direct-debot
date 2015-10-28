@@ -5,7 +5,6 @@ ruby '2.2.3'
 gem 'puma', '~> 2.14.0'
 gem 'lotus-router', '~> 0.4.3'
 gem 'coach', '~> 0.2.3'
-gem 'dotenv', '~> 2.0.2'
 gem 'prius', '~> 1.0.0'
 
 group :development, :test do
@@ -13,6 +12,7 @@ group :development, :test do
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-doc'
+  gem 'dotenv', '~> 2.0.2'
 end
 
 group :development do
