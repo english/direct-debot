@@ -8,8 +8,7 @@ if ENV['RACK_ENV'] == 'development'
   Dotenv.load
 end
 
-require_relative 'config/prius'
+require './config/prius'
+require './application'
 
-require './app'
-
-run APP
+run Application.build

@@ -2,7 +2,7 @@ require 'bundler/setup'
 Bundler.setup(:default, :test)
 
 require 'dotenv'
-Dotenv.load
+Dotenv.load('.env.test')
 
 require_relative '../config/prius'
 
