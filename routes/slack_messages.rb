@@ -22,7 +22,9 @@ module Routes
                                                  scope: 'full_access',
                                                  initial_view: 'signup')
 
-      [200, {}, [url]]
+      formatted_url = "<#{url}>"
+
+      [200, {}, [formatted_url]]
     end
 
     def redirect_uri
