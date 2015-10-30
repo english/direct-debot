@@ -1,3 +1,4 @@
+# rubocop:disable Lint/HandleExceptions
 begin
   require 'rubocop/rake_task'
   require 'rspec/core/rake_task'
@@ -8,3 +9,4 @@ begin
   task default: ['rubocop:auto_correct', :test]
 rescue LoadError
 end
+# rubocop:enable Lint/HandleExceptions
