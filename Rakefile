@@ -10,3 +10,7 @@ begin
 rescue LoadError
 end
 # rubocop:enable Lint/HandleExceptions
+
+task deploy: [:rubocop, :test] do
+  sh 'git push heroku master'
+end
