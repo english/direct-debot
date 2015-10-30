@@ -18,12 +18,18 @@ module Routes
       # TODO: add `state` parameter
       #       fetch user email from slack to prefill
       #       check if already authorised
-      redirect_uri = router.url(:gc_callback)
       url = oauth_client.auth_code.authorize_url(redirect_uri: redirect_uri,
                                                  scope: 'full_access',
                                                  initial_view: 'signup')
 
       [200, {}, [url]]
+    end
+
+    def redirect_uri
+      uri = URI.parse(router.url(:gc_callback))
+      uri.port = nil
+
+      uri.to_s
     end
   end
 end

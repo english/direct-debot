@@ -29,7 +29,7 @@ RSpec.describe Application do
                       '?client_id=gc_client_id' \
                       '&initial_view=signup' \
                       '&redirect_uri=' \
-                        'https%3A%2F%2Fgc-me.test%3A80%2Fapi%2Fgc%2Fcallback' \
+                        'https%3A%2F%2Fgc-me.test%2Fapi%2Fgc%2Fcallback' \
                       '&response_type=code' \
                       '&scope=full_access'
 
