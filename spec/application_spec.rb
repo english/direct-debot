@@ -31,7 +31,7 @@ RSpec.describe Application do
                       '&redirect_uri=' \
                         'https%3A%2F%2Fgc-me.test%2Fapi%2Fgc%2Fcallback' \
                       '&response_type=code' \
-                      '&scope=full_access>'
+                      '&scope=full_access|Click me!>'
 
     expect(response.body).to include(expected_body)
   end

@@ -21,10 +21,10 @@ module Routes
       url = oauth_client.auth_code.authorize_url(redirect_uri: redirect_uri,
                                                  scope: 'full_access',
                                                  initial_view: 'signup')
+      label = 'Click me!'
+      payload = "<#{url}|#{label}>"
 
-      formatted_url = "<#{url}>"
-
-      [200, {}, [formatted_url]]
+      [200, {}, [payload]]
     end
 
     def redirect_uri
