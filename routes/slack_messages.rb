@@ -20,7 +20,7 @@ module Routes
       #       check if already authorised
       url = oauth_client.auth_code.authorize_url(redirect_uri: redirect_uri,
                                                  scope: 'full_access',
-                                                 initial_view: 'signup')
+                                                 initial_view: 'login')
       label = 'Click me!'
       payload = "<#{url}|#{label}>"
 

@@ -27,7 +27,7 @@ RSpec.describe Application do
 
     expected_body = '<https://connect.gocardless.test/oauth/authorize' \
                       '?client_id=gc_client_id' \
-                      '&initial_view=signup' \
+                      '&initial_view=login' \
                       '&redirect_uri=' \
                         'https%3A%2F%2Fgc-me.test%2Fapi%2Fgc%2Fcallback' \
                       '&response_type=code' \
