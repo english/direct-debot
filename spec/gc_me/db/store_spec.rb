@@ -8,9 +8,23 @@ RSpec.describe GCMe::DB::Store do
   before { Sequel::Migrator.run(db, 'lib/gc_me/db/migrations') }
   subject(:store) { GCMe::DB::Store.new(db) }
 
-  it 'persists Store records' do
-    expect { store.create_slack_user!(gc_access_token: 'x', slack_user_id: 'y') }.
+  it 'persists slack_user records' do
+    slack_user = { gc_access_token: 'x', slack_user_id: 'y' }
+
+    expect { store.create_slack_user!(slack_user) }.
       to change { store.count_slack_users! }.
       by(1)
+
+    expect(store.all_slack_users.last).to eq(slack_user)
+  end
+
+  context 'when a slack user already exists' do
+    it 'overwrites the existing row' do
+      store.create_slack_user!(gc_access_token: 'abc', slack_user_id: 'USER')
+      store.create_slack_user!(gc_access_token: 'xyz', slack_user_id: 'USER')
+
+      expect(store.all_slack_users).
+        to eq([{ gc_access_token: 'xyz', slack_user_id: 'USER' }])
+    end
   end
 end

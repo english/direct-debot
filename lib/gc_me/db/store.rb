@@ -7,8 +7,15 @@ module GCMe
         @db = db
       end
 
+      def all_slack_users
+        @db.from(:slack_users).all
+      end
+
       def create_slack_user!(attrs)
-        @db.from(:slack_users).insert(attrs)
+        @db.transaction do
+          @db.from(:slack_users).where(slack_user_id: attrs.fetch(:slack_user_id)).delete
+          @db.from(:slack_users).insert(attrs)
+        end
       end
 
       def count_slack_users!
