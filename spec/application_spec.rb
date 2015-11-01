@@ -8,15 +8,16 @@ require_relative '../db/store'
 RSpec.describe Application do
   subject!(:app) { Rack::MockRequest.new(Application.build(db)) }
   let(:db) { Sequel.connect(Prius.get(:database_url)) }
+  let(:base_url) { "https://#{Prius.get(:host)}" }
 
   it 'handles /' do
-    response = app.get("https://#{Prius.get(:host)}/")
+    response = app.get("#{base_url}/")
 
     expect(response.status).to eq(200)
   end
 
   it 'handles /api/slack/messages' do
-    response = app.post("https://#{Prius.get(:host)}/api/slack/messages", params: {
+    response = app.post("#{base_url}/api/slack/messages", params: {
                           token: 'L8v9uEsAb7tLOct7FLovRBEU',
                           team_id: 'T0001',
                           team_domain: 'example',
@@ -65,7 +66,7 @@ RSpec.describe Application do
                 })
 
     expect do
-      url = "https://#{Prius.get(:host)}/api/gc/callback?" \
+      url = "#{base_url}/api/gc/callback?" \
             'code=6NJiqXzT7HcgEGsAZXUmaBfB&&state=q8wEr9yMohTP'
       response = app.get(url)
 
