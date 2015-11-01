@@ -10,6 +10,7 @@ gem 'oauth2', '~> 1.0.0'
 gem 'gocardless_pro', '~> 1.0.2'
 gem 'rack'
 gem 'json_schema', '~> 0.7.0'
+gem 'sequel', '~> 4.27.0'
 
 group :development, :test do
   gem 'rspec', '~> 3.3.0'
@@ -17,6 +18,7 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-doc'
   gem 'dotenv', '~> 2.0.2'
+  gem 'sqlite3', '~> 1.3.11'
 end
 
 group :development do
