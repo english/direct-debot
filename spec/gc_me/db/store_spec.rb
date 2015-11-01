@@ -23,8 +23,7 @@ RSpec.describe GCMe::DB::Store do
       store.create_slack_user!(gc_access_token: 'abc', slack_user_id: 'USER')
       store.create_slack_user!(gc_access_token: 'xyz', slack_user_id: 'USER')
 
-      expect(store.all_slack_users).
-        to eq([{ gc_access_token: 'xyz', slack_user_id: 'USER' }])
+      expect(store.all_slack_users.last.fetch(:gc_access_token)).to eq('xyz')
     end
   end
 end
