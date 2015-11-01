@@ -12,6 +12,10 @@ gem 'rack'
 gem 'json_schema', '~> 0.7.0'
 gem 'sequel', '~> 4.27.0'
 
+group :production do
+  gem 'pg', '~> 0.18.3'
+end
+
 group :development, :test do
   gem 'rspec', '~> 3.3.0'
   gem 'pry'
