@@ -2,7 +2,7 @@ require 'coach'
 
 module Middleware
   # Exposes `oauth_client` to middlewares downsteam, allowing for injection if required
-  class OauthClientProvider < Coach::Middleware
+  class OAuthClientProvider < Coach::Middleware
     provides :oauth_client
 
     def call

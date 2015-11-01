@@ -8,7 +8,7 @@ module Routes
   # or
   #   /gc-me authorise
   class SlackMessages < Coach::Middleware
-    uses Middleware::OauthClientProvider
+    uses Middleware::OAuthClientProvider
     uses Middleware::RouterProvider
 
     requires :oauth_client
