@@ -2,7 +2,7 @@ require 'oauth2'
 require 'prius'
 
 # Builds an OAuth2::Client based off environment variables
-module OauthClient
+module OAuthClient
   def self.build
     client_id         = Prius.get(:gc_client_id)
     client_secret     = Prius.get(:gc_client_secret)

@@ -8,7 +8,9 @@ if ENV['RACK_ENV'] == 'development'
   Dotenv.load
 end
 
+require 'prius'
 require './config/prius'
 require './application'
 
-run Application.build
+db = Sequel.connect(Prius.get(:database_url))
+run Application.build(db)

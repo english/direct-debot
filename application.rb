@@ -1,19 +1,27 @@
 require 'lotus/router'
 require 'coach'
+require 'prius'
 require_relative 'lib/oauth_client'
 require_relative 'middleware/injector'
 require_relative 'routes/index'
 require_relative 'routes/slack_messages'
 require_relative 'routes/gc_callback'
+require_relative 'db/store'
+
+Sequel.extension(:migration)
 
 # This is where the magic happens
 module Application
-  def self.build
-    router = build_router
-    oauth_client = OauthClient.build
+  def self.build(db)
+    router       = build_router
+    oauth_client = OAuthClient.build
+
+    Sequel::Migrator.run(db, 'db/migrations')
 
     Rack::Builder.new do
-      use Middleware::Injector, router: router, oauth_client: oauth_client
+      use Middleware::Injector, router: router,
+                                oauth_client: oauth_client,
+                                store: DB::Store.new(db)
       run router
     end
   end

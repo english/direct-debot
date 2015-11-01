@@ -1,14 +1,51 @@
 require 'coach'
 require 'json'
+require_relative '../middleware/json_schema'
+require_relative '../middleware/oauth_client_provider'
+require_relative '../middleware/router_provider'
+require_relative '../middleware/store_provider'
 
 module Routes
-  # Handles Slack messages in the format of
-  #   /gc-me <amount> from <user>
-  # or
-  #   /gc-me authorise
+  # GET https://localhost/callback HTTP/1.1
+  #   code=6NJiqXzT7HcgEGsAZXUmaBfB&
+  #   state=q8wEr9yMohTP
   class GCCallback < Coach::Middleware
+    SCHEMA = {
+      'type' => 'object',
+      'required' => %w(code state),
+      'additionalProperties': false,
+      'properties' => {
+        'code' => { 'type' => 'string' },
+        'state' => { 'type' => 'string' }
+      }
+    }
+
+    uses Middleware::JSONSchema, schema: SCHEMA
+    uses Middleware::OAuthClientProvider
+    uses Middleware::RouterProvider
+    uses Middleware::StoreProvider
+
+    requires :oauth_client
+    requires :router
+    requires :store
+
     def call
-      [200, {}, [request.params.to_h.to_json]]
+      code  = params.fetch('code')
+      state = params.fetch('state')
+
+      access_token = oauth_client.auth_code.get_token(code, redirect_uri: redirect_uri)
+      store.create_slack_user!(gc_access_token: access_token.token, slack_user_id: state)
+
+      [200, {}, ['Gotcha!']]
+    end
+
+    private
+
+    def redirect_uri
+      uri = URI.parse(router.url(:gc_callback))
+      uri.port = nil
+
+      uri.to_s
     end
   end
 end

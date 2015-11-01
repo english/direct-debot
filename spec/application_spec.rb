@@ -1,11 +1,13 @@
 require 'rack/request'
 require 'webmock'
 require 'webmock/rspec'
+require 'sequel'
 require_relative '../application'
-require_relative '../models/slack_user'
+require_relative '../db/store'
 
 RSpec.describe Application do
-  subject(:app) { Rack::MockRequest.new(Application.build) }
+  subject!(:app) { Rack::MockRequest.new(Application.build(db)) }
+  let(:db) { Sequel.connect(Prius.get(:database_url)) }
 
   it 'handles /' do
     response = app.get("https://#{Prius.get(:host)}/")
@@ -56,10 +58,10 @@ RSpec.describe Application do
     }
 
     request = stub_request(:post, 'https://connect.gocardless.test/oauth/access_token').
-              with(body: request_body).
-              to_return(status: 200, body: response_body.to_json, headers: {
-                          'Content-Type' => 'application/json'
-                        })
+      with(body: request_body).
+      to_return(status: 200, body: response_body.to_json, headers: {
+                  'Content-Type' => 'application/json'
+                })
 
     expect do
       url = "https://#{Prius.get(:host)}/api/gc/callback?" \
@@ -67,7 +69,7 @@ RSpec.describe Application do
       response = app.get(url)
 
       expect(response.body).to include('Gotcha!')
-    end.to change { SlackUser.count }.by(1)
+    end.to change { DB::Store.new(db).count_slack_users! }.by(1)
 
     expect(request).to have_been_requested
   end
