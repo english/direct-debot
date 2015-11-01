@@ -1,5 +1,8 @@
-require_relative '../application'
 require 'rack/request'
+require 'webmock'
+require 'webmock/rspec'
+require_relative '../application'
+require_relative '../models/slack_user'
 
 RSpec.describe Application do
   subject(:app) { Rack::MockRequest.new(Application.build) }
@@ -34,5 +37,38 @@ RSpec.describe Application do
                       '&scope=full_access|Click me!>'
 
     expect(response.body).to include(expected_body)
+  end
+
+  it 'handles /api/gc/callback' do
+    request_body = {
+      client_id: 'gc_client_id',
+      client_secret: 'gc_client_secret',
+      code: '6NJiqXzT7HcgEGsAZXUmaBfB',
+      grant_type: 'authorization_code',
+      redirect_uri: 'https://gc-me.test/api/gc/callback'
+    }
+
+    response_body = {
+      access_token: 'e72e16c7e42f292c6912e7710c123347ae178b4a',
+      scope: 'full_access',
+      token_type: 'bearer',
+      organisation_id: 'OR123'
+    }
+
+    request = stub_request(:post, 'https://connect.gocardless.test/oauth/access_token').
+              with(body: request_body).
+              to_return(status: 200, body: response_body.to_json, headers: {
+                          'Content-Type' => 'application/json'
+                        })
+
+    expect do
+      url = "https://#{Prius.get(:host)}/api/gc/callback?" \
+            'code=6NJiqXzT7HcgEGsAZXUmaBfB&&state=q8wEr9yMohTP'
+      response = app.get(url)
+
+      expect(response.body).to include('Gotcha!')
+    end.to change { SlackUser.count }.by(1)
+
+    expect(request).to have_been_requested
   end
 end
