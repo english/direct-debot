@@ -3,3 +3,6 @@ Metrics/LineLength:
 
 Style/DotPosition:
   EnforcedStyle: trailing
+
+Style/MultilineOperationIndentation:
+  EnforcedStyle: indented
