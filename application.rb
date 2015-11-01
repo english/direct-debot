@@ -1,4 +1,5 @@
 require 'lotus/router'
+require 'sequel'
 require 'oauth2'
 require 'coach'
 require 'prius'
