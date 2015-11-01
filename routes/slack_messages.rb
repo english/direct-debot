@@ -18,7 +18,10 @@ module Routes
       # TODO: add `state` parameter
       #       fetch user email from slack to prefill
       #       check if already authorised
+      slack_user_id = params.fetch('user_id')
+
       url = oauth_client.auth_code.authorize_url(redirect_uri: redirect_uri,
+                                                 state: slack_user_id,
                                                  scope: 'full_access',
                                                  initial_view: 'login')
       label = 'Click me!'
