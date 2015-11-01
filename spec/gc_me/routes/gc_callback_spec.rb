@@ -1,13 +1,12 @@
 require 'active_support/concern'
 require 'action_dispatch/http/request'
 require 'oauth2'
-require 'uri'
 require 'lotus/router'
-require_relative '../../routes/gc_callback'
-require_relative '../../db/store'
+require_relative '../../../lib/gc_me/routes/gc_callback'
+require_relative '../../../lib/gc_me/db/store'
 
-RSpec.describe Routes::GCCallback do
-  subject(:gc_callback) { Routes::GCCallback.new(context) }
+RSpec.describe GCMe::Routes::GCCallback do
+  subject(:gc_callback) { GCMe::Routes::GCCallback.new(context) }
 
   let(:context) do
     {
@@ -20,7 +19,7 @@ RSpec.describe Routes::GCCallback do
 
   let(:params) { { 'code' => 'the-code', 'state' => 'slack-user-id' } }
   let(:oauth_client) { instance_double(OAuth2::Client, auth_code: auth_code_strategy) }
-  let(:store) { instance_double(DB::Store) }
+  let(:store) { instance_double(GCMe::DB::Store) }
   let(:router) { instance_double(Lotus::Router) }
   let(:auth_code_strategy) { instance_double(OAuth2::Strategy::AuthCode) }
   let(:access_token) { instance_double(OAuth2::AccessToken, token: 'gc-token') }

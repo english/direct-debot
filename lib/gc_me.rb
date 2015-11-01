@@ -3,22 +3,22 @@ require 'sequel'
 require 'oauth2'
 require 'coach'
 require 'prius'
-require_relative 'middleware/injector'
-require_relative 'routes/index'
-require_relative 'routes/slack_messages'
-require_relative 'routes/gc_callback'
-require_relative 'db/store'
+require_relative 'gc_me/middleware/injector'
+require_relative 'gc_me/routes/index'
+require_relative 'gc_me/routes/slack_messages'
+require_relative 'gc_me/routes/gc_callback'
+require_relative 'gc_me/db/store'
 
 Sequel.extension(:migration)
 
 # This is where the magic happens
-module Application
+module GCMe
   def self.build(db)
     router       = build_router
     oauth_client = build_oauth_client
     store        = DB::Store.new(db)
 
-    Sequel::Migrator.run(db, 'db/migrations')
+    Sequel::Migrator.run(db, 'lib/gc_me/db/migrations')
 
     Rack::Builder.new do
       use Middleware::Injector, router: router,

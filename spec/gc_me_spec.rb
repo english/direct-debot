@@ -1,33 +1,34 @@
 require 'rack/request'
 require 'webmock'
 require 'webmock/rspec'
+require 'prius'
 require 'sequel'
-require_relative '../application'
-require_relative '../db/store'
+require_relative '../lib/gc_me'
+require_relative '../lib/gc_me/db/store'
 
-RSpec.describe Application do
-  subject!(:app) { Rack::MockRequest.new(Application.build(db)) }
+RSpec.describe GCMe do
+  subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(db)) }
   let(:db) { Sequel.connect(Prius.get(:database_url)) }
   let(:base_url) { "https://#{Prius.get(:host)}" }
 
   it 'handles /' do
-    response = app.get("#{base_url}/")
+    response = gc_me.get("#{base_url}/")
 
     expect(response.status).to eq(200)
   end
 
   it 'handles /api/slack/messages' do
-    response = app.post("#{base_url}/api/slack/messages", params: {
-                          token: 'L8v9uEsAb7tLOct7FLovRBEU',
-                          team_id: 'T0001',
-                          team_domain: 'example',
-                          channel_id: 'C2147483705',
-                          channel_name: 'test',
-                          user_id: 'U2147483697',
-                          user_name: 'Steve',
-                          command: '/gc-me',
-                          text: 'authorise'
-                        })
+    response = gc_me.post("#{base_url}/api/slack/messages", params: {
+                            token: 'L8v9uEsAb7tLOct7FLovRBEU',
+                            team_id: 'T0001',
+                            team_domain: 'example',
+                            channel_id: 'C2147483705',
+                            channel_name: 'test',
+                            user_id: 'U2147483697',
+                            user_name: 'Steve',
+                            command: '/gc-me',
+                            text: 'authorise'
+                          })
 
     expect(response.status).to eq(200)
 
@@ -68,10 +69,10 @@ RSpec.describe Application do
     expect do
       url = "#{base_url}/api/gc/callback?" \
             'code=6NJiqXzT7HcgEGsAZXUmaBfB&&state=q8wEr9yMohTP'
-      response = app.get(url)
+      response = gc_me.get(url)
 
       expect(response.body).to include('Gotcha!')
-    end.to change { DB::Store.new(db).count_slack_users! }.by(1)
+    end.to change { GCMe::DB::Store.new(db).count_slack_users! }.by(1)
 
     expect(request).to have_been_requested
   end
