@@ -1,6 +1,5 @@
 require 'lotus/router'
 require 'sequel'
-require 'oauth2'
 require 'coach'
 require 'prius'
 require_relative 'gc_me/middleware/injector'
@@ -15,7 +14,7 @@ Sequel.extension(:migration)
 module GCMe
   def self.build(db)
     router       = build_router
-    oauth_client = build_oauth_client
+    oauth_client = build_oauth_client(router)
     store        = DB::Store.new(db)
 
     Sequel::Migrator.run(db, 'lib/gc_me/db/migrations')
@@ -42,15 +41,13 @@ module GCMe
     end
   end
 
-  private_class_method def self.build_oauth_client
-    client_id         = Prius.get(:gc_client_id)
-    client_secret     = Prius.get(:gc_client_secret)
-    connect_url       = Prius.get(:gc_connect_url)
-    authorize_path    = Prius.get(:gc_connect_authorize_path)
-    access_token_path = Prius.get(:gc_connect_access_token_path)
+  private_class_method def self.build_oauth_client(router)
+    # strip port from url
+    redirect_uri = URI.
+      parse(router.url(:gc_callback)).
+      tap { |uri| uri.port = nil }.
+      to_s
 
-    OAuth2::Client.new(client_id, client_secret, site: connect_url,
-                                                 authorize_url: authorize_path,
-                                                 token_url: access_token_path)
+    OAuthClient.new(Prius, redirect_uri)
   end
 end

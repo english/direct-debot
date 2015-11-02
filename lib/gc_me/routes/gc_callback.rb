@@ -34,29 +34,10 @@ module GCMe
         code  = params.fetch('code')
         state = params.fetch('state')
 
-        access_token = create_access_token!(code)
-        create_user!(access_token, state)
+        access_token = oauth_client.create_access_token!(code)
+        store.create_slack_user!(gc_access_token: access_token, slack_user_id: state)
 
         [200, {}, ['Gotcha!']]
-      end
-
-      private
-
-      def create_access_token!(code)
-        oauth_client.auth_code.get_token(code, redirect_uri: redirect_uri)
-      end
-
-      def create_user!(access_token, state)
-        user_attributes = { gc_access_token: access_token.token, slack_user_id: state }
-
-        store.create_slack_user!(user_attributes)
-      end
-
-      def redirect_uri
-        uri = URI.parse(router.url(:gc_callback))
-        uri.port = nil
-
-        uri.to_s
       end
     end
   end

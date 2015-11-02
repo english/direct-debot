@@ -1,7 +1,6 @@
 require 'active_support/concern'
 require 'action_dispatch/http/request'
-require 'oauth2'
-require 'lotus/router'
+require_relative '../../../lib/gc_me/oauth_client'
 require_relative '../../../lib/gc_me/routes/gc_callback'
 require_relative '../../../lib/gc_me/db/store'
 
@@ -12,28 +11,19 @@ RSpec.describe GCMe::Routes::GCCallback do
     {
       request: instance_double(ActionDispatch::Request, params: params),
       oauth_client: oauth_client,
-      store: store,
-      router: router
+      store: store
     }
   end
 
   let(:params) { { 'code' => 'the-code', 'state' => 'slack-user-id' } }
-  let(:oauth_client) { instance_double(OAuth2::Client, auth_code: auth_code_strategy) }
+  let(:oauth_client) { instance_double(GCMe::OAuthClient) }
   let(:store) { instance_double(GCMe::DB::Store) }
-  let(:router) { instance_double(Lotus::Router) }
-  let(:auth_code_strategy) { instance_double(OAuth2::Strategy::AuthCode) }
-  let(:access_token) { instance_double(OAuth2::AccessToken, token: 'gc-token') }
 
   it 'creates a Store with a gc_access_token and store_id' do
-    allow(router).
-      to receive(:url).
-      with(:gc_callback).
-      and_return('https://gc-me.test:80/api/gc_callback')
-
-    expect(auth_code_strategy).
-      to receive(:get_token).
-      with('the-code', redirect_uri: 'https://gc-me.test/api/gc_callback').
-      and_return(access_token)
+    expect(oauth_client).
+      to receive(:create_access_token!).
+      with('the-code').
+      and_return('gc-token')
 
     expect(store).
       to receive(:create_slack_user!).

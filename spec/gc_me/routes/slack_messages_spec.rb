@@ -5,16 +5,11 @@ require 'json_schema'
 require_relative '../../../lib/gc_me/routes/slack_messages'
 require_relative '../../../lib/gc_me/db/store'
 
+RSpec::Matchers.define :validate do |data|
+  match { |schema| schema.validate(data).first }
+end
+
 RSpec.describe GCMe::Routes::SlackMessages do
-  # token=gIkuvaNzQIHg97ATvDxqgjtO
-  # team_id=T0001
-  # team_domain=example
-  # channel_id=C2147483705
-  # channel_name=test
-  # user_id=U2147483697
-  # user_name=Steve
-  # command=/weather
-  # text=94070
   context 'schema validation' do
     let(:valid_params) do
       {
@@ -32,46 +27,43 @@ RSpec.describe GCMe::Routes::SlackMessages do
 
     let(:schema) { JsonSchema.parse!(GCMe::Routes::SlackMessages::SCHEMA) }
 
-    context 'with an authorise message' do
-      it 'is happy' do
-        params = valid_params.merge(text: 'authorise')
-        valid, * = schema.validate(params)
-
-        expect(valid).to be(true)
-      end
-
-      it "isn't lenient" do
-        params = valid_params.merge(text: 'authorize')
-        valid, * = schema.validate(params)
-
-        expect(valid).to be(true)
-      end
+    it 'knows what valid params are' do
+      expect(schema).to validate(valid_params)
     end
 
-    context 'with a transaction message' do
-      it 'is happy' do
-        amounts = ['10', '0.1', '1.50']
-        valid_currencies = ['€', '£']
-        invalid_currencies = ['', 'a', '$', '£']
+    it "validates 'authorise' messages" do
+      expect(schema).to validate(valid_params.merge('text' => 'authorise'))
+      expect(schema).to_not validate(valid_params.merge('text' => 'authorize'))
+    end
 
-        build_schema = -> (currency, amount) do
-          params = valid_params.merge(text: "#{currency}#{amount} from @jane")
-          valid, * = schema.validate(params)
+    it "validates 'payment' messages" do
+      valid_amounts      = ['10', '0.1', '1.50']
+      valid_currencies   = ['€', '£']
+      invalid_currencies = ['', 'a', '$']
 
-          valid
-        end
+      valid_currencies.product(valid_amounts).each do |(currency, amount)|
+        data = valid_params.merge('text' => "#{currency}#{amount} from someone")
 
-        valid_currencies.product(amounts).map(&build_schema).each do |valid|
-          expect(valid).to be(true)
-        end
-
-        invalid_currencies.product(amounts).map(&build_schema).each do |valid|
-          expect(valid).to be(false)
-        end
+        expect(schema).to validate(data)
       end
 
-      context 'with a slack name'
-      context 'with an email'
+      invalid_currencies.product(valid_amounts).each do |(currency, amount)|
+        data = valid_params.merge('text' => "#{currency}#{amount} from someone")
+
+        expect(schema).to_not validate(data)
+      end
     end
   end
+
+  # describe 'given an authorise message' do
+  #   it 'returns a gc oauth link' do
+
+  #   end
+  # end
+
+  # describe 'given a payment message' do
+  #   it '' do
+
+  #   end
+  # end
 end
