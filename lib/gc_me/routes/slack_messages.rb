@@ -1,6 +1,6 @@
 require 'coach'
-require_relative '../middleware/router_provider'
 require_relative '../middleware/oauth_client_provider'
+require_relative '../middleware/store_provider'
 require_relative '../middleware/json_schema'
 
 module GCMe
@@ -32,19 +32,54 @@ module GCMe
 
       uses Middleware::JSONSchema, schema: SCHEMA
       uses Middleware::OAuthClientProvider
-      uses Middleware::RouterProvider
+      uses Middleware::StoreProvider
 
       requires :oauth_client
-      requires :router
+      requires :store
+
+      CURRENCIES = {
+        '£' => 'GBP',
+        '€' => 'EUR'
+      }
 
       def call
         slack_user_id = params.fetch('user_id')
 
-        url = oauth_client.authorise_url(slack_user_id)
-        label = 'Click me!'
-        payload = "<#{url}|#{label}>"
+        message = params.fetch('text')
 
-        [200, {}, [payload]]
+        if message == 'authorise'
+          url = oauth_client.authorise_url(slack_user_id)
+          label = 'Click me!'
+          payload = "<#{url}|#{label}>"
+
+          [200, {}, [payload]]
+        else
+          slack_user = store.find_slack_user(params.fetch('user_id'))
+
+          if slack_user
+            amount, recipient = message.split(' from ')
+            currency, *amount = amount.chars
+            currency = CURRENCIES.fetch(currency)
+            pence = (BigDecimal.new(amount.join) * 100).to_i
+
+            client = GoCardlessPro::Client.new(access_token: slack_user.fetch(:gc_access_token))
+
+            customer = client.customers.list.records.
+              find { |customer| customer.email == recipient }
+
+            mandate = client.
+              mandates.
+              list(params: { customer: customer.id }).
+              records.
+              first
+
+            client.payments.create(amount: pence, currency: currency, links: { mandate: mandate.id })
+
+            [200, {}, ['success!']]
+          else
+            [200, {}, ['You need to authorise first!']]
+          end
+        end
       end
     end
   end

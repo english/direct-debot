@@ -11,6 +11,10 @@ module GCMe
         @db.from(:slack_users).all
       end
 
+      def find_slack_user(slack_user_id)
+        @db.from(:slack_users).where(slack_user_id: slack_user_id).first
+      end
+
       def create_slack_user!(attrs)
         @db.transaction do
           @db.from(:slack_users).where(slack_user_id: attrs.fetch(:slack_user_id)).delete

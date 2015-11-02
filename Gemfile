@@ -11,6 +11,7 @@ gem 'gocardless_pro', '~> 1.0.2'
 gem 'rack'
 gem 'json_schema', '~> 0.7.0'
 gem 'sequel', '~> 4.27.0'
+gem 'gocardless_pro', '~> 1.0.2'
 
 group :production do
   gem 'pg', '~> 0.18.3'
