@@ -9,7 +9,7 @@ end
 require 'prius'
 require 'sequel'
 require './config/prius'
-require './lib/gc-me'
+require './lib/gc_me'
 
 db = Sequel.connect(Prius.get(:database_url))
 run GCMe.build(db)
