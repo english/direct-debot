@@ -3,6 +3,7 @@ require 'action_dispatch/http/request'
 require 'json_schema'
 require 'gocardless_pro'
 require_relative '../../../lib/gc_me/oauth_client'
+require_relative '../../../lib/gc_me/gc_client'
 require_relative '../../../lib/gc_me/db/store'
 require_relative '../../../lib/gc_me/routes/slack_messages'
 
@@ -62,11 +63,13 @@ RSpec.describe GCMe::Routes::SlackMessages do
     {
       request: instance_double(ActionDispatch::Request, params: params),
       store: store,
-      oauth_client: oauth_client
+      oauth_client: oauth_client,
+      gc_client: gc_client
     }
   end
 
   let(:oauth_client) { instance_double(GCMe::OAuthClient) }
+  let(:gc_client) { instance_double(GCMe::GCClient) }
   let(:store) { instance_double(GCMe::DB::Store) }
 
   describe 'given an authorise message' do
@@ -99,7 +102,7 @@ RSpec.describe GCMe::Routes::SlackMessages do
       end
 
       it 'sends an error message' do
-        status, _headers, body = slack_messages.call
+        _status, _headers, body = slack_messages.call
 
         expect(body.first).to eq('You need to authorise first!')
       end
@@ -115,56 +118,9 @@ RSpec.describe GCMe::Routes::SlackMessages do
             with('slack-user-id').
             and_return(slack_user_id: 'slack-user-id', gc_access_token: 'access-token')
 
-          gc_client = instance_double(GoCardlessPro::Client)
-
-          expect(GoCardlessPro::Client).
-            to receive(:new).
-            with(access_token: 'access-token').
-            and_return(gc_client)
-
-          gc_customers_service =
-            instance_double(GoCardlessPro::Services::CustomersService)
-
           expect(gc_client).
-            to receive(:customers).
-            and_return(gc_customers_service)
-
-          customer = instance_double(GoCardlessPro::Resources::Customer,
-                                     id: 'CU123',
-                                     email: 'someone@example.com')
-
-          # TODO: paginate using `all`
-          expect(gc_customers_service).
-            to receive(:list).
-            and_return(instance_double(GoCardlessPro::ListResponse, records: [customer]))
-
-          gc_mandates_service = instance_double(GoCardlessPro::Services::MandatesService)
-
-          mandate = instance_double(GoCardlessPro::Resources::Mandate, id: 'MD123')
-
-          expect(gc_client).
-            to receive(:mandates).
-            and_return(gc_mandates_service)
-
-          # TODO: paginate using `all`
-          expect(gc_mandates_service).
-            to receive(:list).
-            with(params: { customer: 'CU123' }).
-            and_return(instance_double(GoCardlessPro::ListResponse, records: [mandate]))
-
-          gc_payments_service = instance_double(GoCardlessPro::Services::PaymentsService)
-
-          expect(gc_client).
-            to receive(:payments).
-            and_return(gc_payments_service)
-
-          expect(gc_payments_service).
-            to receive(:create).
-            with(
-              amount: 1000,
-              currency: 'GBP',
-              links: { mandate: 'MD123' }
-            )
+            to receive(:create_payment).
+            with('GBP', 1000, 'someone@example.com', 'access-token')
 
           slack_messages.call
         end

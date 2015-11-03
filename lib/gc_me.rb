@@ -7,6 +7,8 @@ require_relative 'gc_me/routes/index'
 require_relative 'gc_me/routes/slack_messages'
 require_relative 'gc_me/routes/gc_callback'
 require_relative 'gc_me/db/store'
+require_relative 'gc_me/oauth_client'
+require_relative 'gc_me/gc_client'
 
 Sequel.extension(:migration)
 
@@ -15,14 +17,14 @@ module GCMe
   def self.build(db)
     router       = build_router
     oauth_client = build_oauth_client(router)
-    store        = DB::Store.new(db)
 
     Sequel::Migrator.run(db, 'lib/gc_me/db/migrations')
 
     Rack::Builder.new do
       use Middleware::Injector, router: router,
                                 oauth_client: oauth_client,
-                                store: store
+                                store: DB::Store.new(db),
+                                gc_client: GCClient.new(Prius.get(:gc_environment).to_sym)
       run router
     end
   end
