@@ -40,4 +40,24 @@ RSpec.describe GCMe::GCClient do
     GCMe::GCClient.new(:live).
       create_payment('GBP', 1000, 'someone@example.com', 'access-token')
   end
+
+  it "raises if the customer doesn't exist" do
+    gc_customers_service = instance_double(GoCardlessPro::Services::CustomersService)
+
+    gc_client = instance_double(GoCardlessPro::Client, customers: gc_customers_service)
+
+    expect(GoCardlessPro::Client).
+      to receive(:new).
+      with(environment: :live, access_token: 'access-token').
+      and_return(gc_client)
+
+    expect(gc_customers_service).
+      to receive(:list).
+      and_return(instance_double(GoCardlessPro::ListResponse, records: []))
+
+    client = GCMe::GCClient.new(:live)
+
+    expect { client.create_payment('GBP', 1000, 'someone@example.com', 'access-token') }.
+      to raise_error(GCMe::GCClient::CustomerNotFoundError, /someone@example\.com/)
+  end
 end

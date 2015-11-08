@@ -3,6 +3,9 @@ require 'gocardless_pro'
 module GCMe
   # wraps the GoCardlessPro::Client
   class GCClient
+    class CustomerNotFoundError < StandardError
+    end
+
     def initialize(environment)
       @environment = environment
     end
@@ -24,6 +27,7 @@ module GCMe
 
     def get_mandate(client, email)
       customer = get_customer(client, email)
+      raise CustomerNotFoundError, "GC customer #{email} not found" unless customer
 
       client.mandates.list(params: { customer: customer.id }).records.first
     end

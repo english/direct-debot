@@ -63,30 +63,46 @@ module GCMe
       end
 
       def handle_payment_message(slack_user_id, message)
+        message = PaymentMessage.parse(message)
         slack_user = store.find_slack_user(slack_user_id)
 
-        return [200, {}, ['You need to authorise first!']] unless slack_user
-
-        access_token = slack_user.fetch(:gc_access_token)
-        currency, pence, email = parse_message(message)
-
-        gc_client.create_payment(currency, pence, email, access_token)
-
-        [200, {}, ['success!']]
+        PaymentMessageRequest.new(gc_client, slack_user, message).response
       end
 
-      CURRENCIES = {
-        '£' => 'GBP',
-        '€' => 'EUR'
-      }
+      PaymentMessage = Struct.new(:currency, :pence, :email) do
+        CURRENCIES = {
+          '£' => 'GBP',
+          '€' => 'EUR'
+        }
 
-      def parse_message(message)
-        amount, email = message.split(' from ')
-        currency, *pounds = amount.chars
-        currency = CURRENCIES.fetch(currency)
-        pence = (BigDecimal.new(pounds.join) * 100).to_i
+        def self.parse(string)
+          amount, email = string.split(' from ')
+          currency, *pounds = amount.chars
+          currency = CURRENCIES.fetch(currency)
+          pence = (BigDecimal.new(pounds.join) * 100).to_i
 
-        [currency, pence, email]
+          new(currency, pence, email)
+        end
+      end
+
+      class PaymentMessageRequest
+        def initialize(gc_client, slack_user, message)
+          @gc_client = gc_client
+          @slack_user = slack_user
+          @message = message
+        end
+
+        def response
+          return [200, {}, ['You need to authorise first!']] unless @slack_user
+
+          access_token = @slack_user.fetch(:gc_access_token)
+
+          @gc_client.create_payment(@message.currency, @message.pence, @message.email,
+                                    access_token)
+          [200, {}, ['success!']]
+        rescue GCMe::GCClient::CustomerNotFoundError
+          [200, {}, ["#{@message.email} is not a customer of yours!"]]
+        end
       end
     end
   end
