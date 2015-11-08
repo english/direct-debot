@@ -8,30 +8,47 @@ require_relative '../middleware/parse_payment_message'
 require_relative '../middleware/store_provider'
 
 module GCMe
-  class HandleAuthorize < Coach::Middleware
-    uses Middleware::OAuthClientProvider
-
-    requires :oauth_client
-
-    def call
-      message = params.fetch('text')
-
-      return next_middleware.call unless message == 'authorise'
-
-      url  = oauth_client.authorise_url(params.fetch('user_id'))
-      body = SlackLink.new(url, 'Click me!').to_s
-
-      [200, {}, [body]]
-    end
-  end
-
-  SlackLink = Struct.new(:url, :label) do
-    def to_s
-      "<#{url}|#{label}>"
-    end
-  end
-
   module Routes
+    class HandleAuthorize < Coach::Middleware
+      uses Middleware::OAuthClientProvider
+
+      requires :oauth_client
+
+      def call
+        message = params.fetch('text')
+
+        return next_middleware.call unless message == 'authorise'
+
+        url  = oauth_client.authorise_url(params.fetch('user_id'))
+        body = SlackLink.new(url, 'Click me!').to_s
+
+        [200, {}, [body]]
+      end
+    end
+
+    SlackLink = Struct.new(:url, :label) do
+      def to_s
+        "<#{url}|#{label}>"
+      end
+    end
+
+    class HandlePayment < Coach::Middleware
+      uses Middleware::GCClientProvider
+      uses Middleware::ParsePaymentMessage
+      uses Middleware::GetGCMandate
+
+      requires :gc_client
+      requires :payment_message
+      requires :gc_mandate
+
+      def call
+        gc_client.create_payment(gc_mandate, payment_message.currency,
+                                 payment_message.pence)
+
+        [200, {}, ['success!']]
+      end
+    end
+
     # Handles Slack messages in the format of
     #   /gc-me <amount> from <user>
     # or
@@ -59,20 +76,7 @@ module GCMe
 
       uses Middleware::JSONSchema, schema: SCHEMA
       uses HandleAuthorize
-      uses Middleware::GCClientProvider
-      uses Middleware::ParsePaymentMessage
-      uses Middleware::GetGCMandate
-
-      requires :gc_client
-      requires :payment_message
-      requires :gc_mandate
-
-      def call
-        gc_client.create_payment(gc_mandate, payment_message.currency,
-                                 payment_message.pence)
-
-        [200, {}, ['success!']]
-      end
+      uses HandlePayment
     end
   end
 end

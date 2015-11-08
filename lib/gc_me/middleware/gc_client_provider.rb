@@ -1,6 +1,8 @@
 require 'coach'
-require_relative '../middleware/gc_environment_provider'
-require_relative '../middleware/get_gc_access_token'
+require 'gocardless_pro'
+require_relative 'gc_environment_provider'
+require_relative 'get_gc_access_token'
+require_relative '../gc_client'
 
 module GCMe
   module Middleware
@@ -15,9 +17,10 @@ module GCMe
       provides :gc_client
 
       def call
-        client = GCClient.new(gc_environment, gc_access_token)
+        pro_client = GoCardlessPro::Client.new(environment: gc_environment,
+                                               access_token: gc_access_token)
 
-        provide(gc_client: client)
+        provide(gc_client: GCClient.new(pro_client))
 
         next_middleware.call
       end

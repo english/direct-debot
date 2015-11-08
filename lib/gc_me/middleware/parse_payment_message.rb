@@ -6,7 +6,7 @@ module GCMe
       provides :payment_message
 
       def call
-        text = params.fetch(:text)
+        text = params.fetch('text')
 
         provide(payment_message: PaymentMessage.parse(text))
 

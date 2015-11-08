@@ -56,23 +56,21 @@ RSpec.describe GCMe::Routes::SlackMessages::SCHEMA do
   end
 end
 
-RSpec.describe GCMe::Routes::SlackMessages do
-  subject(:slack_messages) { GCMe::Routes::SlackMessages.new(context) }
+RSpec.describe GCMe::Routes::HandleAuthorize do
+  subject(:handle_authorise) do
+    GCMe::Routes::HandleAuthorize.new(context, next_middleware)
+  end
+  let(:oauth_client) { instance_double(GCMe::OAuthClient) }
+  let(:next_middleware) { -> () {} }
 
   let(:context) do
     {
       request: instance_double(ActionDispatch::Request, params: params),
-      store: store,
-      oauth_client: oauth_client,
-      gc_client: gc_client
+      oauth_client: oauth_client
     }
   end
 
-  let(:oauth_client) { instance_double(GCMe::OAuthClient) }
-  let(:gc_client) { instance_double(GCMe::GCClient) }
-  let(:store) { instance_double(GCMe::DB::Store) }
-
-  describe 'given an authorise message' do
+  context 'when given an authorise message' do
     let(:params) { { 'user_id' => 'slack-user-id', 'text' => 'authorise' } }
 
     it 'returns a gc oauth link' do
@@ -81,88 +79,39 @@ RSpec.describe GCMe::Routes::SlackMessages do
         with('slack-user-id').
         and_return('https://authorise-url')
 
-      status, _headers, body = slack_messages.call
+      status, _headers, body = handle_authorise.call
 
       expect(status).to eq(200)
       expect(body.first).to eq('<https://authorise-url|Click me!>')
     end
   end
 
-  describe 'given a payment message' do
-    let(:params) do
-      { 'user_id' => 'slack-user-id', 'text' => '£10 from someone@example.com' }
+  context 'when not given an authorise message' do
+    let(:params) { { 'user_id' => 'slack-user-id', 'text' => 'bla' } }
+
+    it 'calls the next middleware' do
+      expect(next_middleware).to receive(:call)
+      handle_authorise.call
     end
+  end
+end
 
-    context "when the user hasn't already authorised" do
-      before do
-        expect(store).
-          to receive(:find_slack_user).
-          with('slack-user-id').
-          and_return(nil)
-      end
+RSpec.describe GCMe::Routes::HandlePayment do
+  it 'creates a payment' do
+    gc_client       = instance_double(GCMe::GCClient)
+    payment_message = double(currency: 'GBP', pence: 1)
+    gc_mandate      = double
 
-      it 'sends an error message' do
-        _status, _headers, body = slack_messages.call
+    slack_messages = GCMe::Routes::HandlePayment.new(gc_client: gc_client,
+                                                     payment_message: payment_message,
+                                                     gc_mandate: gc_mandate)
 
-        expect(body.first).to eq('You need to authorise first!')
-      end
-    end
+    expect(gc_client).
+      to receive(:create_payment).
+      with(gc_mandate, 'GBP', 1)
 
-    context 'when the access token has been disabled'
+    status, * = slack_messages.call
 
-    context 'with a recipient that exists' do
-      context 'and has an active mandate' do
-        it 'creates a gc payment against that customer' do
-          expect(store).
-            to receive(:find_slack_user).
-            with('slack-user-id').
-            and_return(slack_user_id: 'slack-user-id', gc_access_token: 'access-token')
-
-          expect(gc_client).
-            to receive(:create_payment).
-            with('GBP', 1000, 'someone@example.com', 'access-token')
-
-          slack_messages.call
-        end
-      end
-
-      context "but doesn't have an active mandate" do
-        it 'sends an error message' do
-          expect(store).
-            to receive(:find_slack_user).
-            with('slack-user-id').
-            and_return(slack_user_id: 'slack-user-id', gc_access_token: 'access-token')
-
-          expect(gc_client).
-            to receive(:create_payment).
-            with('GBP', 1000, 'someone@example.com', 'access-token').
-            and_raise(GCMe::GCClient::ActiveMandateNotFoundError)
-
-          status, _headers, body = slack_messages.call
-
-          expect(status).to eq(200)
-          expect(body).to eq(['someone@example.com does not have an active mandate!'])
-        end
-      end
-    end
-
-    context "with a recipient that doesn't exist" do
-      it 'sends an error message' do
-        expect(store).
-          to receive(:find_slack_user).
-          with('slack-user-id').
-          and_return(slack_user_id: 'slack-user-id', gc_access_token: 'access-token')
-
-        expect(gc_client).
-          to receive(:create_payment).
-          with('GBP', 1000, 'someone@example.com', 'access-token').
-          and_raise(GCMe::GCClient::CustomerNotFoundError)
-
-        status, _headers, body = slack_messages.call
-
-        expect(status).to eq(200)
-        expect(body).to eq(['someone@example.com is not a customer of yours!'])
-      end
-    end
+    expect(status).to eq(200)
   end
 end

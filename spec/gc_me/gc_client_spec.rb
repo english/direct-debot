@@ -2,101 +2,58 @@ require 'gocardless_pro'
 require_relative '../../lib/gc_me/gc_client'
 
 RSpec.describe GCMe::GCClient do
+  def build_customer(attrs)
+    instance_double(GoCardlessPro::Resources::Customer, attrs)
+  end
+
+  def build_mandate(attrs)
+    instance_double(GoCardlessPro::Resources::Mandate, attrs)
+  end
+
+  def build_list_response(records)
+    instance_double(GoCardlessPro::ListResponse, records: records)
+  end
+
+  it 'gets an active mandates' do
+    pro_client        = instance_double(GoCardlessPro::Client)
+    customer          = build_customer(id: 'CU123')
+    active_mandate    = build_mandate(status: 'active')
+    cancelled_mandate = build_mandate(status: 'cancelled')
+    mandates          = build_list_response([active_mandate, cancelled_mandate])
+
+    expect(pro_client).
+      to receive_message_chain(:mandates, :list).
+      with(params: { customer: 'CU123' }).
+      and_return(mandates)
+
+    gc_client = GCMe::GCClient.new(pro_client)
+
+    expect(gc_client.get_active_mandate(customer)).to eq(active_mandate)
+  end
+
+  it 'gets a customer' do
+    pro_client = instance_double(GoCardlessPro::Client)
+    customer   = build_customer(email: 'someone@example.com')
+    customers  = build_list_response([customer])
+
+    expect(pro_client).
+      to receive_message_chain(:customers, :list).
+      and_return(customers)
+
+    gc_client = GCMe::GCClient.new(pro_client)
+
+    expect(gc_client.get_customer('someone@example.com')).to eq(customer)
+  end
+
   it 'creates payments' do
-    gc_customers_service = instance_double(GoCardlessPro::Services::CustomersService)
-    gc_mandates_service  = instance_double(GoCardlessPro::Services::MandatesService)
-    gc_payments_service  = instance_double(GoCardlessPro::Services::PaymentsService)
+    pro_client = instance_double(GoCardlessPro::Client)
+    mandate    = build_mandate(id: 'MA123')
 
-    gc_client = instance_double(GoCardlessPro::Client, customers: gc_customers_service,
-                                                       mandates: gc_mandates_service,
-                                                       payments: gc_payments_service)
+    expect(pro_client).
+      to receive_message_chain(:payments, :create).
+      with(params: { amount: 1, currency: 'GBP', links: { mandate: 'MA123' } })
 
-    expect(GoCardlessPro::Client).
-      to receive(:new).
-      with(environment: :live, access_token: 'access-token').
-      and_return(gc_client)
-
-    customer = instance_double(GoCardlessPro::Resources::Customer,
-                               id: 'CU123',
-                               email: 'someone@example.com')
-
-    # TODO: paginate using `all`
-    expect(gc_customers_service).
-      to receive(:list).
-      and_return(instance_double(GoCardlessPro::ListResponse, records: [customer]))
-
-    mandate = instance_double(GoCardlessPro::Resources::Mandate,
-                              id: 'MD123',
-                              status: 'active')
-
-    # TODO: paginate using `all`
-    expect(gc_mandates_service).
-      to receive(:list).
-      with(params: { customer: 'CU123' }).
-      and_return(instance_double(GoCardlessPro::ListResponse, records: [mandate]))
-
-    expect(gc_payments_service).
-      to receive(:create).
-      with(params: { amount: 1000, currency: 'GBP', links: { mandate: 'MD123' } })
-
-    GCMe::GCClient.new(:live).
-      create_payment('GBP', 1000, 'someone@example.com', 'access-token')
-  end
-
-  it "raises if the customer doesn't exist" do
-    gc_customers_service = instance_double(GoCardlessPro::Services::CustomersService)
-
-    gc_client = instance_double(GoCardlessPro::Client, customers: gc_customers_service)
-
-    expect(GoCardlessPro::Client).
-      to receive(:new).
-      with(environment: :live, access_token: 'access-token').
-      and_return(gc_client)
-
-    expect(gc_customers_service).
-      to receive(:list).
-      and_return(instance_double(GoCardlessPro::ListResponse, records: []))
-
-    client = GCMe::GCClient.new(:live)
-
-    expect { client.create_payment('GBP', 1000, 'someone@example.com', 'access-token') }.
-      to raise_error(GCMe::GCClient::CustomerNotFoundError, /someone@example\.com/)
-  end
-
-  it "raises if an active mandate doesn't exist" do
-    gc_customers_service = instance_double(GoCardlessPro::Services::CustomersService)
-    gc_mandates_service  = instance_double(GoCardlessPro::Services::MandatesService)
-
-    gc_client = instance_double(GoCardlessPro::Client, customers: gc_customers_service,
-                                                       mandates: gc_mandates_service)
-
-    expect(GoCardlessPro::Client).
-      to receive(:new).
-      with(environment: :live, access_token: 'access-token').
-      and_return(gc_client)
-
-    customer = instance_double(GoCardlessPro::Resources::Customer,
-                               id: 'CU123',
-                               email: 'someone@example.com')
-
-    # TODO: paginate using `all`
-    expect(gc_customers_service).
-      to receive(:list).
-      and_return(instance_double(GoCardlessPro::ListResponse, records: [customer]))
-
-    mandate = instance_double(GoCardlessPro::Resources::Mandate,
-                              id: 'MD123',
-                              status: 'failed')
-
-    # TODO: paginate using `all`
-    expect(gc_mandates_service).
-      to receive(:list).
-      with(params: { customer: 'CU123' }).
-      and_return(instance_double(GoCardlessPro::ListResponse, records: [mandate]))
-
-    client = GCMe::GCClient.new(:live)
-
-    expect { client.create_payment('GBP', 1000, 'someone@example.com', 'access-token') }.
-      to raise_error(GCMe::GCClient::ActiveMandateNotFoundError, /someone@example\.com/)
+    gc_client = GCMe::GCClient.new(pro_client)
+    gc_client.create_payment(mandate, 'GBP', 1)
   end
 end

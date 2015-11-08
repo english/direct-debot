@@ -1,10 +1,7 @@
-require 'gocardless_pro'
-
 module GCMe
   class GCClient
-    def initialize(environment, access_token)
-      @client = GoCardlessPro::Client.new(environment: environment,
-                                          access_token: access_token)
+    def initialize(client)
+      @client = client
     end
 
     def get_customer(email)
