@@ -24,7 +24,7 @@ module GCMe
       use Middleware::Injector, router: router,
                                 oauth_client: oauth_client,
                                 store: DB::Store.new(db),
-                                gc_client: GCClient.new(Prius.get(:gc_environment).to_sym)
+                                gc_environment: Prius.get(:gc_environment).to_sym
       run router
     end
   end
