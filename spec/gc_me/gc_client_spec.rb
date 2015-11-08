@@ -25,7 +25,9 @@ RSpec.describe GCMe::GCClient do
       to receive(:list).
       and_return(instance_double(GoCardlessPro::ListResponse, records: [customer]))
 
-    mandate = instance_double(GoCardlessPro::Resources::Mandate, id: 'MD123')
+    mandate = instance_double(GoCardlessPro::Resources::Mandate,
+                              id: 'MD123',
+                              status: 'active')
 
     # TODO: paginate using `all`
     expect(gc_mandates_service).
@@ -59,5 +61,42 @@ RSpec.describe GCMe::GCClient do
 
     expect { client.create_payment('GBP', 1000, 'someone@example.com', 'access-token') }.
       to raise_error(GCMe::GCClient::CustomerNotFoundError, /someone@example\.com/)
+  end
+
+  it "raises if an active mandate doesn't exist" do
+    gc_customers_service = instance_double(GoCardlessPro::Services::CustomersService)
+    gc_mandates_service  = instance_double(GoCardlessPro::Services::MandatesService)
+
+    gc_client = instance_double(GoCardlessPro::Client, customers: gc_customers_service,
+                                                       mandates: gc_mandates_service)
+
+    expect(GoCardlessPro::Client).
+      to receive(:new).
+      with(environment: :live, access_token: 'access-token').
+      and_return(gc_client)
+
+    customer = instance_double(GoCardlessPro::Resources::Customer,
+                               id: 'CU123',
+                               email: 'someone@example.com')
+
+    # TODO: paginate using `all`
+    expect(gc_customers_service).
+      to receive(:list).
+      and_return(instance_double(GoCardlessPro::ListResponse, records: [customer]))
+
+    mandate = instance_double(GoCardlessPro::Resources::Mandate,
+                              id: 'MD123',
+                              status: 'failed')
+
+    # TODO: paginate using `all`
+    expect(gc_mandates_service).
+      to receive(:list).
+      with(params: { customer: 'CU123' }).
+      and_return(instance_double(GoCardlessPro::ListResponse, records: [mandate]))
+
+    client = GCMe::GCClient.new(:live)
+
+    expect { client.create_payment('GBP', 1000, 'someone@example.com', 'access-token') }.
+      to raise_error(GCMe::GCClient::ActiveMandateNotFoundError, /someone@example\.com/)
   end
 end

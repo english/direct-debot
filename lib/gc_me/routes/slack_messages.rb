@@ -85,11 +85,13 @@ module GCMe
         end
       end
 
+      # Handle a 'payment message' request either by creating a GC payment and returing a
+      # successful response, or by returning an appropriate failure response.
       class PaymentMessageRequest
         def initialize(gc_client, slack_user, message)
-          @gc_client = gc_client
+          @gc_client  = gc_client
           @slack_user = slack_user
-          @message = message
+          @message    = message
         end
 
         def response
@@ -102,6 +104,8 @@ module GCMe
           [200, {}, ['success!']]
         rescue GCMe::GCClient::CustomerNotFoundError
           [200, {}, ["#{@message.email} is not a customer of yours!"]]
+        rescue GCMe::GCClient::ActiveMandateNotFoundError
+          [200, {}, ["#{@message.email} does not have an active mandate!"]]
         end
       end
     end

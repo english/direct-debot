@@ -25,7 +25,7 @@ RSpec.describe 'creating a payment' do
                   'Content-Type' => 'application/json'
                 })
 
-    mandates_response = { mandates: [{ id: 'MA123' }] }.to_json
+    mandates_response = { mandates: [{ id: 'MA123', status: 'active' }] }.to_json
 
     mandates_request =
       stub_request(:get, 'https://api-sandbox.gocardless.com/mandates?customer=CU123').

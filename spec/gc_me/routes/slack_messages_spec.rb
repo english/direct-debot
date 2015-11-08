@@ -127,7 +127,22 @@ RSpec.describe GCMe::Routes::SlackMessages do
       end
 
       context "but doesn't have an active mandate" do
-        it 'sends an error message'
+        it 'sends an error message' do
+          expect(store).
+            to receive(:find_slack_user).
+            with('slack-user-id').
+            and_return(slack_user_id: 'slack-user-id', gc_access_token: 'access-token')
+
+          expect(gc_client).
+            to receive(:create_payment).
+            with('GBP', 1000, 'someone@example.com', 'access-token').
+            and_raise(GCMe::GCClient::ActiveMandateNotFoundError)
+
+          status, _headers, body = slack_messages.call
+
+          expect(status).to eq(200)
+          expect(body).to eq(['someone@example.com does not have an active mandate!'])
+        end
       end
     end
 

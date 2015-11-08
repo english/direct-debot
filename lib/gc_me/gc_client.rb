@@ -6,6 +6,9 @@ module GCMe
     class CustomerNotFoundError < StandardError
     end
 
+    class ActiveMandateNotFoundError < StandardError
+    end
+
     def initialize(environment)
       @environment = environment
     end
@@ -14,22 +17,25 @@ module GCMe
       client = GoCardlessPro::Client.new(environment: @environment,
                                          access_token: access_token)
 
-      mandate = get_mandate(client, email)
+      mandate = get_active_mandate(client, email)
 
-      client.payments.create(params: {
-                               amount: pence,
-                               currency: currency,
-                               links: { mandate: mandate.id }
-                             })
+      unless mandate
+        fail ActiveMandateNotFoundError, "Active GC mandate for #{email} not found"
+      end
+
+      attributes = { amount: pence, currency: currency, links: { mandate: mandate.id } }
+
+      client.payments.create(params: attributes)
     end
 
     private
 
-    def get_mandate(client, email)
+    def get_active_mandate(client, email)
       customer = get_customer(client, email)
-      raise CustomerNotFoundError, "GC customer #{email} not found" unless customer
+      fail CustomerNotFoundError, "GC customer #{email} not found" unless customer
 
-      client.mandates.list(params: { customer: customer.id }).records.first
+      client.mandates.list(params: { customer: customer.id }).records.
+        find { |mandate| mandate.status == 'active' }
     end
 
     def get_customer(client, email)
