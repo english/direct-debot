@@ -1,11 +1,9 @@
 require 'coach'
 require_relative '../middleware/gc_client_provider'
-require_relative '../middleware/get_gc_access_token'
 require_relative '../middleware/get_gc_mandate'
 require_relative '../middleware/json_schema'
 require_relative '../middleware/oauth_client_provider'
 require_relative '../middleware/parse_payment_message'
-require_relative '../middleware/store_provider'
 
 module GCMe
   # Middlewares and route handler that process 'authorise' and 'payment' messages
