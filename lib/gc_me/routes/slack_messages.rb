@@ -8,7 +8,9 @@ require_relative '../middleware/parse_payment_message'
 require_relative '../middleware/store_provider'
 
 module GCMe
+  # Middlewares and route handler that process 'authorise' and 'payment' messages
   module Routes
+    # If the message is 'authorise'
     class HandleAuthorize < Coach::Middleware
       uses Middleware::OAuthClientProvider
 
@@ -32,6 +34,8 @@ module GCMe
       end
     end
 
+    # Assumes that the message text is a 'payment' one and processes it accordingly by
+    # creating a payment
     class HandlePayment < Coach::Middleware
       uses Middleware::GCClientProvider
       uses Middleware::ParsePaymentMessage

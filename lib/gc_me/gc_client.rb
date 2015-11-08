@@ -1,4 +1,5 @@
 module GCMe
+  # wrapper around the GoCardlessPro client
   class GCClient
     def initialize(client)
       @client = client

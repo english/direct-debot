@@ -2,6 +2,7 @@ require 'coach'
 
 module GCMe
   module Middleware
+    # Parses the payment request text into a struct of :currency, :pence and :email
     class ParsePaymentMessage < Coach::Middleware
       provides :payment_message
 

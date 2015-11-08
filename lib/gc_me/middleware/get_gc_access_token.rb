@@ -3,6 +3,9 @@ require_relative 'store_provider'
 
 module GCMe
   module Middleware
+    # Fetches the gc_access_token from the stored slack user.
+    # If the slack user is not already authorised (in the store) then an error response is
+    # returned.
     class GetGCAccessToken < Coach::Middleware
       uses Middleware::StoreProvider
 
