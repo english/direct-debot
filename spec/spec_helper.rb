@@ -4,9 +4,11 @@ Bundler.setup(:default, :test)
 require 'dotenv'
 Dotenv.load('.env.test')
 
+require 'sequel'
+require 'pry'
 require_relative '../config/prius'
 
-require 'pry'
+Sequel.extension(:migration)
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
@@ -57,4 +59,18 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
+
+  db = Sequel.connect(Prius.get(:database_url))
+
+  config.before(:suite) do
+    Sequel::Migrator.run(db, 'lib/gc_me/db/migrations')
+    db[:slack_users].truncate
+  end
+
+  config.around(:each) do |example|
+    db.transaction(&example)
+  end
+
+  config.add_setting :db
+  config.db = db
 end

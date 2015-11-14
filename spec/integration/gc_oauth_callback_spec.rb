@@ -7,7 +7,7 @@ require_relative '../../lib/gc_me'
 RSpec.describe 'GC oauth callback' do
   subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(db)) }
 
-  let(:db) { Sequel.connect(Prius.get(:database_url)) }
+  let(:db) { RSpec.configuration.db }
   let(:base_url) { "https://#{Prius.get(:host)}" }
 
   it 'handles /api/gc/callback' do

@@ -8,7 +8,7 @@ require_relative '../../lib/gc_me/db/store'
 RSpec.describe 'creating a payment' do
   subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(db)) }
 
-  let(:db) { Sequel.connect(Prius.get(:database_url)) }
+  let(:db) { RSpec.configuration.db }
   let(:base_url) { "https://#{Prius.get(:host)}" }
   let(:store) { GCMe::DB::Store.new(db) }
 
