@@ -9,3 +9,9 @@ To authorise `gc-me` to create payments on your behalf, in Slack:
 To take a payment from one of your existing customers (TO BE IMPLEMENTED):
 
 > /gc-me £10 from my-existing-customer@example.com
+
+## Todo
+
+- paginate through all customers/mandates
+- create a Redirect Flow for adding new customers
+- add customers via slack username
