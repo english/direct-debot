@@ -21,8 +21,7 @@ module GCMe
     Sequel::Migrator.run(db, 'lib/gc_me/db/migrations')
 
     Rack::Builder.new do
-      use Middleware::Injector, router: router,
-                                oauth_client: oauth_client,
+      use Middleware::Injector, oauth_client: oauth_client,
                                 store: DB::Store.new(db),
                                 gc_environment: Prius.get(:gc_environment).to_sym
       run router
@@ -38,8 +37,10 @@ module GCMe
 
     Lotus::Router.new(opts) do
       get '/', to: Coach::Handler.new(Routes::Index)
-      post '/api/slack/messages', to: Coach::Handler.new(Routes::SlackMessages)
-      get '/api/gc/callback', to: Coach::Handler.new(Routes::GCCallback), as: :gc_callback
+      post '/api/slack/messages',
+           to: Coach::Handler.new(Routes::SlackMessages)
+      get '/api/gc/callback', to: Coach::Handler.new(Routes::GCCallback),
+                              as: :gc_callback
     end
   end
 
