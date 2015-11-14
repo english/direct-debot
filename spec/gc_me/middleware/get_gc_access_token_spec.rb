@@ -11,9 +11,10 @@ RSpec.describe GCMe::Middleware::GetGCAccessToken do
       request         = instance_double(ActionDispatch::Request,
                                         params: { 'user_id' => 'slack-user-id' })
 
-      context = { store: store, request: request }
+      context = { request: request }
 
-      subject = GCMe::Middleware::GetGCAccessToken.new(context, next_middleware)
+      subject = GCMe::Middleware::GetGCAccessToken.new(context, next_middleware,
+                                                       store: store)
 
       expect(store).
         to receive(:find_slack_user).
@@ -37,9 +38,10 @@ RSpec.describe GCMe::Middleware::GetGCAccessToken do
       request         = instance_double(ActionDispatch::Request,
                                         params: { 'user_id' => 'slack-user-id' })
 
-      context = { store: store, request: request }
+      context = { request: request }
 
-      subject = GCMe::Middleware::GetGCAccessToken.new(context, next_middleware)
+      subject = GCMe::Middleware::GetGCAccessToken.new(context, next_middleware,
+                                                       store: store)
 
       expect(store).
         to receive(:find_slack_user).

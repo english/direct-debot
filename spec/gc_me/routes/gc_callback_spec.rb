@@ -5,13 +5,12 @@ require_relative '../../../lib/gc_me/routes/gc_callback'
 require_relative '../../../lib/gc_me/db/store'
 
 RSpec.describe GCMe::Routes::GCCallback do
-  subject(:gc_callback) { GCMe::Routes::GCCallback.new(context) }
+  subject(:gc_callback) { GCMe::Routes::GCCallback.new(context, nil, store: store) }
 
   let(:context) do
     {
       request: instance_double(ActionDispatch::Request, params: params),
-      oauth_client: oauth_client,
-      store: store
+      oauth_client: oauth_client
     }
   end
 

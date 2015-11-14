@@ -35,7 +35,10 @@ module GCMe
     # Assumes that the message text is a 'payment' one and processes it accordingly by
     # creating a payment
     class HandlePayment < Coach::Middleware
-      uses Middleware::GCClientProvider
+      uses Middleware::GCClientProvider, -> (config) do
+        config.slice(:store, :gc_environment)
+      end
+
       uses Middleware::ParsePaymentMessage
       uses Middleware::GetGCMandate
 
@@ -59,7 +62,7 @@ module GCMe
       TEXT_PATTERN = '^(authorise)|(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$'
 
       SCHEMA = {
-        'type' => 'object',
+        'type'     => 'object',
         'required' => %w(token team_id team_domain channel_id channel_name user_id
                          user_name command text),
         'additionalProperties': false,
@@ -78,7 +81,7 @@ module GCMe
 
       uses Middleware::JSONSchema, schema: SCHEMA
       uses HandleAuthorize
-      uses HandlePayment
+      uses HandlePayment, -> (config) { config.slice(:store, :gc_environment) }
     end
   end
 end

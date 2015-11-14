@@ -7,7 +7,6 @@ module GCMe
     # Fetches the GC customer by email.
     # If the customer doesn't exist, and error message is returned
     class GetGCCustomer < Coach::Middleware
-      uses Middleware::GCClientProvider
       uses Middleware::ParsePaymentMessage
 
       requires :gc_client

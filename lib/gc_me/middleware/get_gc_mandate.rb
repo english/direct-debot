@@ -7,7 +7,6 @@ module GCMe
     # Fetches the active GC mandate by customer.
     # If an active mandate doesn't exist, and error message is returned
     class GetGCMandate < Coach::Middleware
-      uses Middleware::GCClientProvider
       uses Middleware::GetGCCustomer
 
       requires :gc_customer

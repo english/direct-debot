@@ -2,7 +2,6 @@ require 'coach'
 require 'json'
 require_relative '../middleware/json_schema'
 require_relative '../middleware/oauth_client_provider'
-require_relative '../middleware/store_provider'
 
 module GCMe
   module Routes
@@ -22,12 +21,11 @@ module GCMe
 
       uses Middleware::JSONSchema, schema: SCHEMA
       uses Middleware::OAuthClientProvider
-      uses Middleware::StoreProvider
 
       requires :oauth_client
-      requires :store
 
       def call
+        store = config.fetch(:store)
         code  = params.fetch('code')
         state = params.fetch('state')
 

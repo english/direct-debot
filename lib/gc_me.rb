@@ -10,25 +10,21 @@ require_relative 'gc_me/db/store'
 require_relative 'gc_me/oauth_client'
 require_relative 'gc_me/gc_client'
 
-Sequel.extension(:migration)
-
 # This is where the magic happens
 module GCMe
   def self.build(db)
-    router       = build_router
+    store        = DB::Store.new(db)
+    router       = build_router(store)
     oauth_client = build_oauth_client(router)
-
-    Sequel::Migrator.run(db, 'lib/gc_me/db/migrations')
 
     Rack::Builder.new do
       use Middleware::Injector, oauth_client: oauth_client,
-                                store: DB::Store.new(db),
-                                gc_environment: Prius.get(:gc_environment).to_sym
+                                store: store
       run router
     end
   end
 
-  private_class_method def self.build_router
+  private_class_method def self.build_router(store)
     opts = { host: Prius.get(:host) }
 
     unless Prius.get(:rack_env) == 'development'
@@ -38,9 +34,12 @@ module GCMe
     Lotus::Router.new(opts) do
       get '/', to: Coach::Handler.new(Routes::Index)
       post '/api/slack/messages',
-           to: Coach::Handler.new(Routes::SlackMessages)
-      get '/api/gc/callback', to: Coach::Handler.new(Routes::GCCallback),
-                              as: :gc_callback
+           to: Coach::Handler.new(Routes::SlackMessages,
+                                  store: store,
+                                  gc_environment: Prius.get(:gc_environment).to_sym)
+      get '/api/gc/callback',
+          to: Coach::Handler.new(Routes::GCCallback, store: store),
+          as: :gc_callback
     end
   end
 
