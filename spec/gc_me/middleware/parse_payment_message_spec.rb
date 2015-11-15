@@ -1,13 +1,11 @@
-require 'active_support/concern'
-require 'action_dispatch/http/request'
 require_relative '../../../lib/gc_me/middleware/parse_payment_message'
 
 RSpec.describe GCMe::Middleware::ParsePaymentMessage do
   it 'provides a parsed payment message' do
     next_middleware = double
-    params          = { 'text' => '£10 from someone@example.com' }
-    request         = instance_double(ActionDispatch::Request, params: params)
-    context         = { request: request }
+    context = {
+      request: double(params: { 'text' => '£10 from someone@example.com' })
+    }
 
     subject = GCMe::Middleware::ParsePaymentMessage.new(context, next_middleware)
 

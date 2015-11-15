@@ -1,16 +1,10 @@
-require 'active_support/concern'
-require 'action_dispatch/http/request'
 require_relative '../../../lib/gc_me/middleware/json_schema'
 
 RSpec.describe GCMe::Middleware::JSONSchema do
   subject(:middleware) do
-    GCMe::Middleware::JSONSchema.new(context, next_middleware, schema: schema)
-  end
+    context = { request: double(params: params) }
 
-  let(:context) do
-    {
-      request: instance_double(ActionDispatch::Request, params: params)
-    }
+    GCMe::Middleware::JSONSchema.new(context, next_middleware, schema: schema)
   end
 
   let(:next_middleware) { -> {} }

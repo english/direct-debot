@@ -1,5 +1,3 @@
-require 'active_support/concern'
-require 'action_dispatch/http/request'
 require 'json_schema'
 require 'gocardless_pro'
 require_relative '../../../lib/gc_me/oauth_client'
@@ -58,12 +56,10 @@ end
 
 RSpec.describe GCMe::Routes::HandleAuthorize do
   subject(:handle_authorise) do
+    context = { request: double(params: params) }
+
     GCMe::Routes::HandleAuthorize.new(context, next_middleware,
                                       oauth_client: oauth_client)
-  end
-
-  let(:context) do
-    { request: instance_double(ActionDispatch::Request, params: params) }
   end
 
   let(:oauth_client) { instance_double(GCMe::OAuthClient) }

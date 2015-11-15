@@ -1,5 +1,3 @@
-require 'active_support/concern'
-require 'action_dispatch/http/request'
 require_relative '../../../lib/gc_me/middleware/get_gc_access_token'
 require_relative '../../../lib/gc_me/db/store'
 
@@ -8,10 +6,8 @@ RSpec.describe GCMe::Middleware::GetGCAccessToken do
     it 'provides the slack user from the store' do
       store           = instance_double(GCMe::DB::Store)
       next_middleware = double
-      request         = instance_double(ActionDispatch::Request,
-                                        params: { 'user_id' => 'slack-user-id' })
 
-      context = { request: request }
+      context = { request: double(params: { 'user_id' => 'slack-user-id' }) }
 
       subject = GCMe::Middleware::GetGCAccessToken.new(context, next_middleware,
                                                        store: store)
@@ -35,10 +31,8 @@ RSpec.describe GCMe::Middleware::GetGCAccessToken do
     it 'responds with an error message' do
       store           = instance_double(GCMe::DB::Store)
       next_middleware = double
-      request         = instance_double(ActionDispatch::Request,
-                                        params: { 'user_id' => 'slack-user-id' })
 
-      context = { request: request }
+      context = { request: double(params: { 'user_id' => 'slack-user-id' }) }
 
       subject = GCMe::Middleware::GetGCAccessToken.new(context, next_middleware,
                                                        store: store)

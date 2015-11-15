@@ -1,16 +1,12 @@
-require 'active_support/concern'
-require 'action_dispatch/http/request'
 require_relative '../../../lib/gc_me/oauth_client'
 require_relative '../../../lib/gc_me/routes/gc_callback'
 require_relative '../../../lib/gc_me/db/store'
 
 RSpec.describe GCMe::Routes::GCCallback do
   subject(:gc_callback) do
-    GCMe::Routes::GCCallback.new(context, nil, store: store, oauth_client: oauth_client)
-  end
+    context = { request: double(params: params) }
 
-  let(:context) do
-    { request: instance_double(ActionDispatch::Request, params: params) }
+    GCMe::Routes::GCCallback.new(context, nil, store: store, oauth_client: oauth_client)
   end
 
   let(:params) { { 'code' => 'the-code', 'state' => 'slack-user-id' } }
