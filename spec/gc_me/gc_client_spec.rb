@@ -10,21 +10,16 @@ RSpec.describe GCMe::GCClient do
     instance_double(GoCardlessPro::Resources::Mandate, attrs)
   end
 
-  def build_list_response(records)
-    instance_double(GoCardlessPro::ListResponse, records: records)
-  end
-
   it 'gets an active mandates' do
     pro_client        = instance_double(GoCardlessPro::Client)
     customer          = build_customer(id: 'CU123')
     active_mandate    = build_mandate(status: 'active')
     cancelled_mandate = build_mandate(status: 'cancelled')
-    mandates          = build_list_response([active_mandate, cancelled_mandate])
 
     expect(pro_client).
-      to receive_message_chain(:mandates, :list).
+      to receive_message_chain(:mandates, :all).
       with(params: { customer: 'CU123' }).
-      and_return(mandates)
+      and_return([active_mandate, cancelled_mandate])
 
     gc_client = GCMe::GCClient.new(pro_client)
 
@@ -34,11 +29,10 @@ RSpec.describe GCMe::GCClient do
   it 'gets a customer' do
     pro_client = instance_double(GoCardlessPro::Client)
     customer   = build_customer(email: 'someone@example.com')
-    customers  = build_list_response([customer])
 
     expect(pro_client).
-      to receive_message_chain(:customers, :list).
-      and_return(customers)
+      to receive_message_chain(:customers, :all).
+      and_return([customer])
 
     gc_client = GCMe::GCClient.new(pro_client)
 
