@@ -55,10 +55,11 @@ RSpec.configure do |config|
     db[:slack_users].truncate
   end
 
+  config.before(:each) do
+    @db = db
+  end
+
   config.around(:each) do |example|
     db.transaction(&example)
   end
-
-  config.add_setting :db
-  config.db = db
 end

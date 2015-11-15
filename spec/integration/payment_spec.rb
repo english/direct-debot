@@ -1,16 +1,14 @@
 require 'rack/request'
-require 'sequel'
 require 'webmock/rspec'
 require 'prius'
 require_relative '../../lib/gc_me'
 require_relative '../../lib/gc_me/db/store'
 
 RSpec.describe 'creating a payment' do
-  subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(db)) }
+  subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(@db)) }
 
-  let(:db) { RSpec.configuration.db }
   let(:base_url) { Prius.get(:host) }
-  let(:store) { GCMe::DB::Store.new(db) }
+  let(:store) { GCMe::DB::Store.new(@db) }
 
   it 'handles /api/slack/messages with a payment message' do
     store.create_slack_user!(slack_user_id: 'U2147483697',

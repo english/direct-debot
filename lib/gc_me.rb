@@ -1,5 +1,4 @@
 require 'lotus/router'
-require 'sequel'
 require 'coach'
 require 'prius'
 require_relative 'gc_me/middleware/injector'

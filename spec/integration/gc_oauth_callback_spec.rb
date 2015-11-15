@@ -1,13 +1,11 @@
 require 'rack/request'
-require 'sequel'
 require 'webmock/rspec'
 require 'prius'
 require_relative '../../lib/gc_me'
 
 RSpec.describe 'GC oauth callback' do
-  subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(db)) }
+  subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(@db)) }
 
-  let(:db) { RSpec.configuration.db }
   let(:base_url) { Prius.get(:host) }
 
   it 'handles /api/gc/callback' do
@@ -38,7 +36,7 @@ RSpec.describe 'GC oauth callback' do
       response = gc_me.get(url)
 
       expect(response.body).to include('Gotcha!')
-    end.to change { GCMe::DB::Store.new(db).count_slack_users! }.by(1)
+    end.to change { GCMe::DB::Store.new(@db).count_slack_users! }.by(1)
 
     expect(request).to have_been_requested
   end
