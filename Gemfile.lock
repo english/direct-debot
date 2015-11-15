@@ -1,5 +1,7 @@
-PATH
-  remote: ~/projects/gc/coach
+GIT
+  remote: git://github.com/gocardless/coach.git
+  revision: c028681723de16e959b212f250d11a13cb8d92f9
+  branch: handler-config
   specs:
     coach (0.3.0)
       actionpack (~> 4.2)
