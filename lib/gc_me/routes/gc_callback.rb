@@ -21,11 +21,8 @@ module GCMe
       uses Middleware::JSONSchema, schema: SCHEMA
 
       def call
-        store = config.fetch(:store)
-        oauth_client = config.fetch(:oauth_client)
-
-        code  = params.fetch('code')
-        state = params.fetch('state')
+        store, oauth_client = config.fetch_values(:store, :oauth_client)
+        code, state = params.fetch_values('code', 'state')
 
         access_token = oauth_client.create_access_token!(code)
         store.create_slack_user!(gc_access_token: access_token, slack_user_id: state)
