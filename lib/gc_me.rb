@@ -13,50 +13,55 @@ require_relative 'gc_me/gc_client'
 # This is where the magic happens
 module GCMe
   def self.build(db)
-    store = DB::Store.new(db)
-    uri   = URI.parse(Prius.get(:host))
-
-    oauth_client = build_oauth_client(uri)
-
-    router = build_router(uri, store, oauth_client)
-
-    router
+    Application.new(db).rack_app
   end
 
-  def self.build_router(uri, store, oauth_client)
-    opts = { host: uri.host, scheme: uri.scheme, force_ssl: uri.scheme == 'https' }
+  # Provides the GCMe rack application
+  class Application
+    INDEX_PATH          = '/'
+    SLACK_MESSAGES_PATH = '/api/slack/messages'
+    GC_CALLBACK_PATH    = '/api/gc/callback'
 
-    index_handler          = build_index_handler
-    slack_messages_handler = build_slack_messages_handler(store, oauth_client)
-    gc_callback_handler    = build_gc_callback_handler(store, oauth_client)
-
-    Lotus::Router.new(opts) do
-      get '/', to: index_handler
-      post '/api/slack/messages', to: slack_messages_handler
-      get '/api/gc/callback', to: gc_callback_handler
+    def initialize(db)
+      @store        = DB::Store.new(db)
+      @host         = URI.parse(Prius.get(:host))
+      @environment  = Prius.get(:gc_environment).to_sym
+      @oauth_client = build_oauth_client
     end
-  end
 
-  def self.build_oauth_client(uri)
-    redirect_uri = "#{uri}/api/gc/callback"
+    def rack_app
+      opts = {
+        host: @host.host,
+        scheme: @host.scheme,
+        force_ssl: @host.scheme == 'https'
+      }
 
-    OAuthClient.new(Prius, redirect_uri)
-  end
+      Lotus::Router.new(opts).tap do |router|
+        router.get(INDEX_PATH, to: Coach::Handler.new(Routes::Index))
+        router.get(GC_CALLBACK_PATH, to: build_gc_callback_handler)
+        router.post(SLACK_MESSAGES_PATH, to: build_slack_messages_handler)
+      end
+    end
 
-  def self.build_index_handler
-    Coach::Handler.new(Routes::Index)
-  end
+    private
 
-  def self.build_slack_messages_handler(store, oauth_client)
-    Coach::Handler.new(Routes::SlackMessages,
-                       store: store,
-                       gc_environment: Prius.get(:gc_environment).to_sym,
-                       oauth_client: oauth_client)
-  end
+    def build_oauth_client
+      redirect_uri = "#{@host}#{GC_CALLBACK_PATH}"
 
-  def self.build_gc_callback_handler(store, oauth_client)
-    Coach::Handler.new(Routes::GCCallback,
-                       store: store,
-                       oauth_client: oauth_client)
+      OAuthClient.new(Prius, redirect_uri)
+    end
+
+    def build_slack_messages_handler
+      Coach::Handler.new(Routes::SlackMessages,
+                         store: @store,
+                         gc_environment: @environment,
+                         oauth_client: @oauth_client)
+    end
+
+    def build_gc_callback_handler
+      Coach::Handler.new(Routes::GCCallback,
+                         store: @store,
+                         oauth_client: @oauth_client)
+    end
   end
 end

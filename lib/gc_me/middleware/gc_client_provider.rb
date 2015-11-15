@@ -7,10 +7,7 @@ module GCMe
   module Middleware
     # Exposes `gc_client` to middlewares downsteam, allowing for injection if required
     class GCClientProvider < Coach::Middleware
-      uses Middleware::GetGCAccessToken, -> (config) { config.slice(:store) }
-
       requires :gc_access_token
-
       provides :gc_client
 
       def call

@@ -31,6 +31,8 @@ module GCMe
     # Assumes that the message text is a 'payment' one and processes it accordingly by
     # creating a payment
     class HandlePayment < Coach::Middleware
+      uses Middleware::GetGCAccessToken, -> (config) { config.slice(:store) }
+
       uses Middleware::GCClientProvider, (lambda do |config|
         config.slice(:store, :gc_environment)
       end)
