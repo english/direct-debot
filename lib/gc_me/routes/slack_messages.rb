@@ -2,7 +2,6 @@ require 'coach'
 require_relative '../middleware/gc_client_provider'
 require_relative '../middleware/get_gc_mandate'
 require_relative '../middleware/json_schema'
-require_relative '../middleware/oauth_client_provider'
 require_relative '../middleware/parse_payment_message'
 
 module GCMe
@@ -10,11 +9,8 @@ module GCMe
   module Routes
     # If the message is 'authorise'
     class HandleAuthorize < Coach::Middleware
-      uses Middleware::OAuthClientProvider
-
-      requires :oauth_client
-
       def call
+        oauth_client = config.fetch(:oauth_client)
         message = params.fetch('text')
 
         return next_middleware.call unless message == 'authorise'
@@ -35,9 +31,9 @@ module GCMe
     # Assumes that the message text is a 'payment' one and processes it accordingly by
     # creating a payment
     class HandlePayment < Coach::Middleware
-      uses Middleware::GCClientProvider, -> (config) do
+      uses Middleware::GCClientProvider, (lambda do |config|
         config.slice(:store, :gc_environment)
-      end
+      end)
 
       uses Middleware::ParsePaymentMessage
       uses Middleware::GetGCMandate
@@ -80,7 +76,7 @@ module GCMe
       }
 
       uses Middleware::JSONSchema, schema: SCHEMA
-      uses HandleAuthorize
+      uses HandleAuthorize, -> (config) { config.slice(:oauth_client) }
       uses HandlePayment, -> (config) { config.slice(:store, :gc_environment) }
     end
   end

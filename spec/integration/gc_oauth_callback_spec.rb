@@ -8,7 +8,7 @@ RSpec.describe 'GC oauth callback' do
   subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(db)) }
 
   let(:db) { RSpec.configuration.db }
-  let(:base_url) { "https://#{Prius.get(:host)}" }
+  let(:base_url) { Prius.get(:host) }
 
   it 'handles /api/gc/callback' do
     request_body = {

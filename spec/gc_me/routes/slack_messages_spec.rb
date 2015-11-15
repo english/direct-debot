@@ -58,17 +58,16 @@ end
 
 RSpec.describe GCMe::Routes::HandleAuthorize do
   subject(:handle_authorise) do
-    GCMe::Routes::HandleAuthorize.new(context, next_middleware)
+    GCMe::Routes::HandleAuthorize.new(context, next_middleware,
+                                      oauth_client: oauth_client)
   end
-  let(:oauth_client) { instance_double(GCMe::OAuthClient) }
-  let(:next_middleware) { -> () {} }
 
   let(:context) do
-    {
-      request: instance_double(ActionDispatch::Request, params: params),
-      oauth_client: oauth_client
-    }
+    { request: instance_double(ActionDispatch::Request, params: params) }
   end
+
+  let(:oauth_client) { instance_double(GCMe::OAuthClient) }
+  let(:next_middleware) { -> () {} }
 
   context 'when given an authorise message' do
     let(:params) { { 'user_id' => 'slack-user-id', 'text' => 'authorise' } }

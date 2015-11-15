@@ -7,7 +7,7 @@ RSpec.describe 'authorisation' do
   subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(db)) }
 
   let(:db) { RSpec.configuration.db }
-  let(:base_url) { "https://#{Prius.get(:host)}" }
+  let(:base_url) { Prius.get(:host) }
 
   it 'handles /api/slack/messages with authorise' do
     response = gc_me.post("#{base_url}/api/slack/messages", params: {

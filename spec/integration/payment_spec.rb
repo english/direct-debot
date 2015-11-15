@@ -9,7 +9,7 @@ RSpec.describe 'creating a payment' do
   subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(db)) }
 
   let(:db) { RSpec.configuration.db }
-  let(:base_url) { "https://#{Prius.get(:host)}" }
+  let(:base_url) { Prius.get(:host) }
   let(:store) { GCMe::DB::Store.new(db) }
 
   it 'handles /api/slack/messages with a payment message' do
