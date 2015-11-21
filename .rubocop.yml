@@ -6,3 +6,6 @@ Style/DotPosition:
 
 Style/MultilineOperationIndentation:
   EnforcedStyle: indented
+
+Style/AsciiComments:
+  Enabled: false
