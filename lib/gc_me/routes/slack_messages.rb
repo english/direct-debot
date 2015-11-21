@@ -33,9 +33,8 @@ module GCMe
     class HandlePayment < Coach::Middleware
       uses Middleware::GetGCAccessToken, -> (config) { config.slice(:store) }
 
-      uses Middleware::GCClientProvider, (lambda do |config|
-        config.slice(:store, :gc_environment)
-      end)
+      uses Middleware::GCClientProvider,
+           -> (config) { config.slice(:store, :gc_environment) }
 
       uses Middleware::ParsePaymentMessage
       uses Middleware::GetGCMandate

@@ -23,6 +23,6 @@ RSpec.describe 'authorisation' do
     expect(response.status).to eq(200)
 
     expect(response.body).
-      to match(/connect\.gocardless\.test\/oauth\/authorize.+Click me/)
+      to match(%r{connect\.gocardless\.test/oauth/authorize.+Click me})
   end
 end
