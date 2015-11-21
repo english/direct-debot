@@ -1,5 +1,7 @@
 require 'coach'
 require_relative '../middleware/gc_client_provider'
+require_relative '../middleware/get_gc_access_token'
+require_relative '../middleware/get_gc_customer'
 require_relative '../middleware/get_gc_mandate'
 require_relative '../middleware/json_schema'
 require_relative '../middleware/parse_payment_message'
@@ -37,6 +39,7 @@ module GCMe
            -> (config) { config.slice(:store, :gc_environment) }
 
       uses Middleware::ParsePaymentMessage
+      uses Middleware::GetGCCustomer
       uses Middleware::GetGCMandate
 
       requires :gc_client

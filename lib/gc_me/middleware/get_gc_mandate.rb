@@ -1,14 +1,11 @@
 require 'coach'
 require_relative 'gc_client_provider'
-require_relative 'get_gc_customer'
 
 module GCMe
   module Middleware
     # Fetches the active GC mandate by customer.
     # If an active mandate doesn't exist, and error message is returned
     class GetGCMandate < Coach::Middleware
-      uses Middleware::GetGCCustomer
-
       requires :gc_customer
       requires :gc_client
 
