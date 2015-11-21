@@ -1,4 +1,5 @@
 require 'coach'
+require_relative '../payment_message'
 
 module GCMe
   module Middleware
@@ -12,22 +13,6 @@ module GCMe
         provide(payment_message: PaymentMessage.parse(text))
 
         next_middleware.call
-      end
-
-      PaymentMessage = Struct.new(:currency, :pence, :email) do
-        CURRENCIES = {
-          '£' => 'GBP',
-          '€' => 'EUR'
-        }
-
-        def self.parse(string)
-          amount, email = string.split(' from ')
-          currency, *pounds = amount.chars
-          currency = CURRENCIES.fetch(currency)
-          pence = (BigDecimal.new(pounds.join) * 100).to_i
-
-          new(currency, pence, email)
-        end
       end
     end
   end
