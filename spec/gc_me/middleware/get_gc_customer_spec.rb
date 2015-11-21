@@ -1,25 +1,26 @@
 require_relative '../../../lib/gc_me/middleware/get_gc_customer'
 require_relative '../../../lib/gc_me/gc_client'
-require_relative '../../../lib/gc_me/middleware/parse_payment_message'
+require_relative '../../../lib/gc_me/payment_message'
 
 RSpec.describe GCMe::Middleware::GetGCCustomer do
+  let(:next_middleware) { double }
+  let(:gc_client) { instance_double(GCMe::GCClient) }
+  let(:payment_message) { GCMe::PaymentMessage.new('GBP', 1, 'someone@example.com') }
+  let(:context) { { gc_client: gc_client, payment_message: payment_message } }
+
+  subject { GCMe::Middleware::GetGCCustomer.new(context, next_middleware) }
+
   context 'when the customer exists' do
-    it 'provides the customer from the GC api' do
-      next_middleware = double
-      gc_client       = instance_double(GCMe::GCClient)
-      payment_message =
-        GCMe::Middleware::ParsePaymentMessage::PaymentMessage.new('GBP', 1,
-                                                                  'someone@example.com')
-      context         = { gc_client: gc_client, payment_message: payment_message }
-      customer        = double
+    let(:customer) { double }
 
-      subject = GCMe::Middleware::GetGCCustomer.new(context, next_middleware)
-
+    before do
       expect(gc_client).
         to receive(:get_customer).
         with('someone@example.com').
         and_return(customer)
+    end
 
+    it 'provides the customer from the GC api' do
       expect(next_middleware).to receive(:call)
 
       expect(subject).
@@ -31,23 +32,15 @@ RSpec.describe GCMe::Middleware::GetGCCustomer do
   end
 
   context 'when the customer does not exist' do
-    it 'responds with an error message' do
-      next_middleware = double
-      gc_client       = instance_double(GCMe::GCClient)
-      payment_message =
-        GCMe::Middleware::ParsePaymentMessage::PaymentMessage.new('GBP', 1,
-                                                                  'someone@example.com')
-      context         = { gc_client: gc_client, payment_message: payment_message }
-
-      subject = GCMe::Middleware::GetGCCustomer.new(context, next_middleware)
-
+    before do
       expect(gc_client).
         to receive(:get_customer).
         with('someone@example.com').
         and_return(nil)
+    end
 
+    it 'responds with an error message' do
       expect(next_middleware).to_not receive(:call)
-
       expect(subject).to_not receive(:provide)
 
       _status, _headers, body = subject.call
