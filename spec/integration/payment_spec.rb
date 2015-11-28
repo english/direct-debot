@@ -43,7 +43,7 @@ RSpec.describe 'creating a payment' do
                 })
 
     response = gc_me.post("#{base_url}/api/slack/messages", params: {
-                            token: 'L8v9uEsAb7tLOct7FLovRBEU',
+                            token: Prius.get(:slack_token),
                             team_id: 'T0001',
                             team_domain: 'example',
                             channel_id: 'C2147483705',

@@ -25,6 +25,7 @@ module GCMe
       @store        = DB::Store.new(db)
       @host         = URI.parse(Prius.get(:host))
       @environment  = Prius.get(:gc_environment).to_sym
+      @slack_token  = Prius.get(:slack_token)
       @oauth_client = build_oauth_client
     end
 
@@ -54,7 +55,8 @@ module GCMe
       Coach::Handler.new(Routes::SlackMessages,
                          store: @store,
                          gc_environment: @environment,
-                         oauth_client: @oauth_client)
+                         oauth_client: @oauth_client,
+                         slack_token: @slack_token)
     end
 
     def build_gc_callback_handler

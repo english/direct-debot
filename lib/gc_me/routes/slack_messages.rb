@@ -5,6 +5,7 @@ require_relative '../middleware/get_gc_customer'
 require_relative '../middleware/get_gc_mandate'
 require_relative '../middleware/json_schema'
 require_relative '../middleware/parse_payment_message'
+require_relative '../middleware/verify_slack_token'
 
 module GCMe
   # Middlewares and route handler that process 'authorise' and 'payment' messages
@@ -80,6 +81,7 @@ module GCMe
       }
 
       uses Middleware::JSONSchema, schema: SCHEMA
+      uses Middleware::VerifySlackToken, -> (config) { config.slice(:slack_token) }
       uses HandleAuthorize, -> (config) { config.slice(:oauth_client) }
       uses HandlePayment, -> (config) { config.slice(:store, :gc_environment) }
     end
