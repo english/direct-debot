@@ -2,27 +2,27 @@ source 'https://rubygems.org'
 
 ruby '2.3.0'
 
-gem 'puma', '~> 2.14.0'
-gem 'lotus-router', '~> 0.4.3'
+gem 'puma', '~> 2.14'
+gem 'lotus-router', '~> 0.4'
 gem 'coach', github: 'gocardless/coach', tag: 'v0.3.0'
-gem 'prius', '~> 1.0.0'
-gem 'oauth2', '~> 1.0.0'
-gem 'gocardless_pro', '~> 1.0.2'
+gem 'prius', '~> 1.0'
+gem 'oauth2', '~> 1.0'
+gem 'gocardless_pro', '~> 1.0'
 gem 'rack'
-gem 'json_schema', '~> 0.7.0'
-gem 'sequel', '~> 4.27.0'
+gem 'json_schema', '~> 0.7'
+gem 'sequel', '~> 4.27'
 
 group :production do
-  gem 'pg', '~> 0.18.3'
+  gem 'pg', '~> 0.18'
 end
 
 group :development, :test do
-  gem 'rspec', '~> 3.3.0'
+  gem 'rspec', '~> 3.3'
   gem 'pry'
   gem 'pry-byebug'
   gem 'pry-doc'
-  gem 'dotenv', '~> 2.0.2'
-  gem 'sqlite3', '~> 1.3.11'
+  gem 'dotenv', '~> 2.0'
+  gem 'sqlite3', '~> 1.3'
 end
 
 group :development do
@@ -31,5 +31,5 @@ group :development do
 end
 
 group :test do
-  gem 'webmock', '~> 1.22.2'
+  gem 'webmock', '~> 1.22'
 end
