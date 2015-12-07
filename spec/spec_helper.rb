@@ -62,4 +62,7 @@ RSpec.configure do |config|
   config.around(:each) do |example|
     db.transaction(&example)
   end
+
+  # aggregate failures in all specs
+  config.define_derived_metadata { |meta| meta[:aggregate_failures] = true }
 end

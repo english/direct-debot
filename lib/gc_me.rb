@@ -8,6 +8,7 @@ require_relative 'gc_me/routes/gc_callback'
 require_relative 'gc_me/db/store'
 require_relative 'gc_me/oauth_client'
 require_relative 'gc_me/gc_client'
+require_relative 'gc_me/mail_client'
 
 # This is where the magic happens
 module GCMe
@@ -27,6 +28,7 @@ module GCMe
       @environment  = Prius.get(:gc_environment).to_sym
       @slack_token  = Prius.get(:slack_token)
       @oauth_client = build_oauth_client
+      @mail_client  = build_mail_client
     end
 
     def rack_app
@@ -51,11 +53,18 @@ module GCMe
       OAuthClient.new(Prius, redirect_uri)
     end
 
+    def build_mail_client
+      GCMe::MailClient.build(Prius.get(:mail_delivery_method),
+                             Prius.get(:sendgrid_username),
+                             Prius.get(:sendgrid_password))
+    end
+
     def build_slack_messages_handler
       Coach::Handler.new(Routes::SlackMessages,
                          store: @store,
                          gc_environment: @environment,
                          oauth_client: @oauth_client,
+                         mail_client: @mail_client,
                          slack_token: @slack_token)
     end
 
