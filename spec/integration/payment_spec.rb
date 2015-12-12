@@ -1,64 +1,56 @@
-require 'rack/request'
 require 'webmock/rspec'
-require 'prius'
 require_relative '../../lib/gc_me'
 require_relative '../../lib/gc_me/db/store'
+require_relative '../support/test_request'
 
 RSpec.describe 'creating a payment' do
-  subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(@db)) }
+  subject(:gc_me) { TestRequest.new(GCMe.build(@db)) }
 
-  let(:base_url) { Prius.get(:host) }
-  let(:store) { GCMe::DB::Store.new(@db) }
+  before do
+    store = GCMe::DB::Store.new(@db)
+    store.create_slack_user!(slack_user_id: 'U123', gc_access_token: 'AT123')
+  end
 
-  it 'handles /api/slack/messages with a payment message' do
-    store.create_slack_user!(slack_user_id: 'U2147483697',
-                             gc_access_token: 'gc-access-token')
-
+  let!(:customers_request) do
     customers_response = {
       customers: [{ id: 'CU123', email: 'jamie@gocardless.com' }]
     }.to_json
 
-    customers_request = stub_request(:get, 'https://api-sandbox.gocardless.com/customers').
+    stub_request(:get, 'https://api-sandbox.gocardless.com/customers').
       to_return(status: 200, body: customers_response, headers: {
                   'Content-Type' => 'application/json'
                 })
+  end
 
+  let!(:mandates_request) do
     mandates_response = { mandates: [{ id: 'MA123', status: 'active' }] }.to_json
 
-    mandates_request =
-      stub_request(:get, 'https://api-sandbox.gocardless.com/mandates?customer=CU123').
-        to_return(status: 200, body: mandates_response, headers: {
-                    'Content-Type' => 'application/json'
-                  })
+    stub_request(:get, 'https://api-sandbox.gocardless.com/mandates?customer=CU123').
+      to_return(status: 200, body: mandates_response, headers: {
+                  'Content-Type' => 'application/json'
+                })
+  end
 
+  let!(:payment_request) do
     payments_response = { payments: { id: 'PA123' } }.to_json
 
     payments_body = {
       payments: { amount: 500, currency: 'GBP', links: { mandate: 'MA123' } }
     }.to_json
-    payment_request = stub_request(:post, 'https://api-sandbox.gocardless.com/payments').
+
+    stub_request(:post, 'https://api-sandbox.gocardless.com/payments').
       with(body: payments_body).
       to_return(status: 201, body: payments_response, headers: {
                   'Content-Type' => 'application/json'
                 })
+  end
 
-    response = gc_me.post("#{base_url}/api/slack/messages", params: {
-                            token: Prius.get(:slack_token),
-                            team_id: 'T0001',
-                            team_domain: 'example',
-                            channel_id: 'C2147483705',
-                            channel_name: 'test',
-                            user_id: 'U2147483697',
-                            user_name: 'Steve',
-                            command: '/gc-me',
-                            text: '£5 from jamie@gocardless.com'
-                          })
+  it 'handles /api/slack/messages with a payment message' do
+    response = gc_me.post('/api/slack/messages', text: '£5 from jamie@gocardless.com')
 
     expect(response.status).to eq(200)
 
-    expected_body = 'success!'
-
-    expect(response.body).to include(expected_body)
+    expect(response.body).to include('success!')
 
     expect(customers_request).to have_been_made
     expect(mandates_request).to have_been_made

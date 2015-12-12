@@ -1,12 +1,12 @@
-require 'rack/request'
 require 'webmock/rspec'
 require 'prius'
 require 'mail'
+require_relative '../support/test_request'
 require_relative '../../lib/gc_me'
 require_relative '../../lib/gc_me/db/store'
 
 RSpec.describe 'adding a GoCardless customer' do
-  subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(@db)) }
+  subject!(:gc_me) { TestRequest.new(GCMe.build(@db)) }
 
   before do
     store = GCMe::DB::Store.new(@db)
@@ -16,10 +16,9 @@ RSpec.describe 'adding a GoCardless customer' do
   end
 
   it 'sends a slack message to the recipient' do
-    request = TestRequest.new(gc_me)
     response = nil
 
-    expect { response = request.post('/api/slack/messages', text: 'add foo@bar.com') }.
+    expect { response = gc_me.post('/api/slack/messages', text: 'add foo@bar.com') }.
       to change { GCMe::MailClient::Test.deliveries.length }.
       by(1)
 
@@ -32,27 +31,5 @@ RSpec.describe 'adding a GoCardless customer' do
     expect(mail[:body].to_s).
       to eq('jamie wants to setup a direct debit with you. ' \
             'Authorise at https://gc-me.test/authorise/U123.')
-  end
-
-  class TestRequest
-    DEFAULT_PARAMS = {
-      token: Prius.get(:slack_token),
-      team_id: 'T0001',
-      team_domain: 'example',
-      channel_id: 'C2147483705',
-      channel_name: 'test',
-      user_id: 'U123',
-      user_name: 'jamie',
-      command: '/gc-me'
-    }
-
-    def initialize(app)
-      @app = app
-      @host = Prius.get(:host)
-    end
-
-    def post(path, params)
-      @app.post(@host + path, params: DEFAULT_PARAMS.merge(params))
-    end
   end
 end

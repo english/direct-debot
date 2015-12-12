@@ -1,14 +1,11 @@
-require 'rack/request'
 require 'webmock/rspec'
-require 'prius'
+require_relative '../support/test_request'
 require_relative '../../lib/gc_me'
 
 RSpec.describe 'GC oauth callback' do
-  subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(@db)) }
+  subject(:gc_me) { TestRequest.new(GCMe.build(@db)) }
 
-  let(:base_url) { Prius.get(:host) }
-
-  it 'handles /api/gc/callback' do
+  let!(:gc_auth_token_request) do
     request_body = {
       client_id: 'gc_client_id',
       client_secret: 'gc_client_secret',
@@ -24,20 +21,23 @@ RSpec.describe 'GC oauth callback' do
       organisation_id: 'OR123'
     }
 
-    request = stub_request(:post, 'https://connect.gocardless.test/oauth/access_token').
+    stub_request(:post, 'https://connect.gocardless.test/oauth/access_token').
       with(body: request_body).
       to_return(status: 200, body: response_body.to_json, headers: {
                   'Content-Type' => 'application/json'
                 })
+  end
+
+  it 'handles /api/gc/callback' do
+    store = GCMe::DB::Store.new(@db)
 
     expect do
-      url = "#{base_url}/api/gc/callback?" \
-            'code=6NJiqXzT7HcgEGsAZXUmaBfB&&state=q8wEr9yMohTP'
-      response = gc_me.get(url)
+      response = gc_me.
+        get('/api/gc/callback?code=6NJiqXzT7HcgEGsAZXUmaBfB&&state=q8wEr9yMohTP')
 
       expect(response.body).to include('Gotcha!')
-    end.to change { GCMe::DB::Store.new(@db).count_slack_users! }.by(1)
+    end.to change { store.count_slack_users! }.by(1)
 
-    expect(request).to have_been_requested
+    expect(gc_auth_token_request).to have_been_requested
   end
 end

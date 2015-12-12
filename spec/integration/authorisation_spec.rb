@@ -1,27 +1,13 @@
-require 'rack/request'
-require 'prius'
+require_relative '../support/test_request'
 require_relative '../../lib/gc_me'
 
 RSpec.describe 'authorisation' do
-  subject!(:gc_me) { Rack::MockRequest.new(GCMe.build(@db)) }
-
-  let(:base_url) { Prius.get(:host) }
+  subject(:gc_me) { TestRequest.new(GCMe.build(@db)) }
 
   it 'handles /api/slack/messages with authorise' do
-    response = gc_me.post("#{base_url}/api/slack/messages", params: {
-                            token: Prius.get(:slack_token),
-                            team_id: 'T0001',
-                            team_domain: 'example',
-                            channel_id: 'C2147483705',
-                            channel_name: 'test',
-                            user_id: 'U2147483697',
-                            user_name: 'Steve',
-                            command: '/gc-me',
-                            text: 'authorise'
-                          })
+    response = gc_me.post('/api/slack/messages', text: 'authorise')
 
     expect(response.status).to eq(200)
-
     expect(response.body).
       to match(%r{connect\.gocardless\.test/oauth/authorize.+Click me})
   end
