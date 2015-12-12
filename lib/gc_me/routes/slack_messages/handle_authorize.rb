@@ -12,7 +12,7 @@ module GCMe
 
           return next_middleware.call unless message == 'authorise'
 
-          url  = oauth_client.authorise_url(user_id)
+          url  = oauth_client.authorize_url(user_id)
           body = SlackLink.new(url, 'Click me!').to_s
 
           [200, {}, [body]]

@@ -17,7 +17,7 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAuthorize do
 
     it 'returns a gc oauth link' do
       expect(oauth_client).
-        to receive(:authorise_url).
+        to receive(:authorize_url).
         with('slack-user-id').
         and_return('https://authorise-url')
 

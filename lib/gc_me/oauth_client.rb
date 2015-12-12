@@ -12,7 +12,7 @@ module GCMe
       @client.auth_code.get_token(code, redirect_uri: @redirect_uri).token
     end
 
-    def authorise_url(state)
+    def authorize_url(state)
       @client.auth_code.authorize_url(redirect_uri: @redirect_uri,
                                       state: state,
                                       scope: 'full_access',
