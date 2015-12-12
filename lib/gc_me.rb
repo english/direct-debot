@@ -60,7 +60,7 @@ module GCMe
     end
 
     def build_slack_messages_handler
-      Coach::Handler.new(Routes::SlackMessages,
+      Coach::Handler.new(Routes::SlackMessages::Handler,
                          store: @store,
                          gc_environment: @environment,
                          oauth_client: @oauth_client,
