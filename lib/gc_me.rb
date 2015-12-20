@@ -5,6 +5,7 @@ require_relative 'gc_me/middleware/injector'
 require_relative 'gc_me/routes/index'
 require_relative 'gc_me/routes/slack_messages'
 require_relative 'gc_me/routes/gc_callback'
+require_relative 'gc_me/routes/add_customer'
 require_relative 'gc_me/db/store'
 require_relative 'gc_me/oauth_client'
 require_relative 'gc_me/gc_client'
@@ -18,9 +19,11 @@ module GCMe
 
   # Provides the GCMe rack application
   class Application
-    INDEX_PATH          = '/'
-    SLACK_MESSAGES_PATH = '/api/slack/messages'
-    GC_CALLBACK_PATH    = '/api/gc/callback'
+    INDEX_PATH                = '/'
+    SLACK_MESSAGES_PATH       = '/api/slack/messages'
+    GC_CALLBACK_PATH          = '/api/gc/callback'
+    ADD_CUSTOMER_PATH         = '/add-customer'
+    ADD_CUSTOMER_SUCCESS_PATH = '/api/gc/add-customer-success'
 
     def initialize(db)
       @store        = DB::Store.new(db)
@@ -32,16 +35,15 @@ module GCMe
     end
 
     def rack_app
-      opts = {
-        host: @host.host,
-        scheme: @host.scheme,
-        force_ssl: @host.scheme == 'https'
-      }
+      opts = { host: @host.host,
+               scheme: @host.scheme,
+               force_ssl: @host.scheme == 'https' }
 
       Lotus::Router.new(opts).tap do |router|
         router.get(INDEX_PATH, to: Coach::Handler.new(Routes::Index))
         router.get(GC_CALLBACK_PATH, to: build_gc_callback_handler)
         router.post(SLACK_MESSAGES_PATH, to: build_slack_messages_handler)
+        router.get(ADD_CUSTOMER_PATH, to: build_add_customer_handler)
       end
     end
 
@@ -66,6 +68,15 @@ module GCMe
                          oauth_client: @oauth_client,
                          mail_client: @mail_client,
                          slack_token: @slack_token)
+    end
+
+    def build_add_customer_handler
+      success_url = "#{@host}#{ADD_CUSTOMER_SUCCESS_PATH}"
+
+      Coach::Handler.new(Routes::AddCustomer,
+                         store: @store,
+                         gc_environment: @environment,
+                         success_url: success_url)
     end
 
     def build_gc_callback_handler
