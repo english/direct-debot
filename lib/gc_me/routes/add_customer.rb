@@ -1,7 +1,7 @@
 require 'coach'
 require_relative '../middleware/json_schema'
 require_relative '../middleware/get_gc_access_token'
-require_relative '../middleware/gc_client_provider'
+require_relative '../middleware/build_gc_client'
 
 module GCMe
   module Routes
@@ -19,7 +19,7 @@ module GCMe
       uses Middleware::JSONSchema, schema: SCHEMA
       # TODO: Configure response for when user not found
       uses Middleware::GetGCAccessToken, -> (config) { config.slice(:store) }
-      uses Middleware::GCClientProvider, -> (config) { config.slice(:gc_environment) }
+      uses Middleware::BuildGCClient, -> (config) { config.slice(:gc_environment) }
 
       requires :gc_client
 

@@ -1,6 +1,6 @@
 require 'coach'
 require_relative '../../middleware/get_gc_access_token'
-require_relative '../../middleware/gc_client_provider'
+require_relative '../../middleware/build_gc_client'
 require_relative '../../middleware/parse_payment_message'
 require_relative '../../middleware/get_gc_customer'
 require_relative '../../middleware/get_gc_mandate'
@@ -13,7 +13,7 @@ module GCMe
       class HandlePayment < Coach::Middleware
         uses Middleware::GetGCAccessToken, -> (config) { config.slice(:store) }
 
-        uses Middleware::GCClientProvider,
+        uses Middleware::BuildGCClient,
              -> (config) { config.slice(:store, :gc_environment) }
 
         uses Middleware::ParsePaymentMessage

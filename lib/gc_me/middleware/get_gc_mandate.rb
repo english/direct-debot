@@ -1,5 +1,4 @@
 require 'coach'
-require_relative 'gc_client_provider'
 
 module GCMe
   module Middleware

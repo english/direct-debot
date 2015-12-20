@@ -6,7 +6,7 @@ require_relative '../gc_client'
 module GCMe
   module Middleware
     # Exposes `gc_client` to middlewares downsteam, allowing for injection if required
-    class GCClientProvider < Coach::Middleware
+    class BuildGCClient < Coach::Middleware
       requires :gc_access_token
       provides :gc_client
 

@@ -1,5 +1,5 @@
 require 'coach'
-require_relative '../middleware/gc_client_provider'
+require_relative '../middleware/build_gc_client'
 require_relative '../middleware/get_gc_access_token'
 require_relative '../middleware/get_gc_customer'
 require_relative '../middleware/get_gc_mandate'
@@ -18,6 +18,8 @@ module GCMe
       #   /gc-me <amount> from <user>
       # or
       #   /gc-me authorise
+      # or
+      #   /gc-me add someone@example.com
       class Handler < Coach::Middleware
         TEXT_PATTERN = '^' \
                          '(authorise)' \
