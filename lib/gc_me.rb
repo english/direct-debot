@@ -84,7 +84,7 @@ module GCMe
     end
 
     def build_add_customer_success_handler
-      Coach::Handler.new(Routes::AddCustomerSuccess,
+      Coach::Handler.new(Routes::AddCustomerSuccess::Handler,
                          store: @store,
                          gc_environment: @environment)
     end

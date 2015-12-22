@@ -26,11 +26,13 @@ RSpec.describe GCMe::DB::Store do
     end
   end
 
-  it "finds a gc access token by a gc redirect flow id" do
+  it 'finds a gc access token by a gc redirect flow id' do
     store.create_user!(gc_access_token: 'abc', slack_user_id: 'USER')
     store.create_redirect_flow!('USER', 'RF123')
 
-    access_token = store.find_access_token_for_redirect_flow('RF123')
+    redirect_flow = store.find_redirect_flow('RF123')
+
+    access_token = store.find_access_token_for_redirect_flow(redirect_flow.fetch(:id))
 
     expect(access_token).to eq('abc')
   end

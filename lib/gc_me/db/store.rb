@@ -46,12 +46,19 @@ module GCMe
           insert(id: build_id, user_id: user_id, gc_redirect_flow_id: gc_redirect_flow_id)
       end
 
-      def find_access_token_for_redirect_flow(gc_redirect_flow_id)
+      def find_redirect_flow(gc_redirect_flow_id)
+        @db.
+          from(:redirect_flows).
+          where(gc_redirect_flow_id: gc_redirect_flow_id).
+          first
+      end
+
+      def find_access_token_for_redirect_flow(redirect_flow_id)
         @db.
           select(:gc_access_token).
           from(:users).
           join(:redirect_flows, user_id: :id).
-          where(redirect_flows__gc_redirect_flow_id: gc_redirect_flow_id).
+          where(redirect_flows__id: redirect_flow_id).
           first.
           fetch(:gc_access_token)
       end
