@@ -6,6 +6,7 @@ require_relative 'gc_me/routes/index'
 require_relative 'gc_me/routes/slack_messages'
 require_relative 'gc_me/routes/gc_callback'
 require_relative 'gc_me/routes/add_customer'
+require_relative 'gc_me/routes/add_customer_success'
 require_relative 'gc_me/db/store'
 require_relative 'gc_me/oauth_client'
 require_relative 'gc_me/gc_client'
@@ -34,6 +35,7 @@ module GCMe
       @mail_client  = build_mail_client
     end
 
+    # rubocop:disable Metrics/AbcSize
     def rack_app
       opts = { host: @host.host,
                scheme: @host.scheme,
@@ -44,8 +46,10 @@ module GCMe
         router.get(GC_CALLBACK_PATH, to: build_gc_callback_handler)
         router.post(SLACK_MESSAGES_PATH, to: build_slack_messages_handler)
         router.get(ADD_CUSTOMER_PATH, to: build_add_customer_handler)
+        router.get(ADD_CUSTOMER_SUCCESS_PATH, to: build_add_customer_success_handler)
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     private
 
@@ -77,6 +81,12 @@ module GCMe
                          store: @store,
                          gc_environment: @environment,
                          success_url: success_url)
+    end
+
+    def build_add_customer_success_handler
+      Coach::Handler.new(Routes::AddCustomerSuccess,
+                         store: @store,
+                         gc_environment: @environment)
     end
 
     def build_gc_callback_handler

@@ -7,10 +7,10 @@ require_relative '../../lib/gc_me/db/store'
 
 RSpec.describe 'adding a GoCardless customer' do
   subject!(:gc_me) { TestRequest.new(GCMe.build(@db)) }
+  let(:store) { GCMe::DB::Store.new(@db) }
 
   before do
-    store = GCMe::DB::Store.new(@db)
-    store.create_slack_user!(slack_user_id: 'U123', gc_access_token: 'AT123')
+    store.create_user!(slack_user_id: 'U123', gc_access_token: 'AT123')
 
     GCMe::MailClient::Test.clear!
   end
@@ -70,6 +70,45 @@ RSpec.describe 'adding a GoCardless customer' do
       expect(response.status).to eq(302)
       expect(response.location).to eq('https://pay.gocardless.com/flow/RE123')
       expect(redirect_flows_request).to have_been_requested
+    end
+  end
+
+  context 'when the customer completes the redirect flow' do
+    let!(:confirm_redirec_flows_request) do
+      request_body = { data: { session_token: '1' } }
+
+      response_body = {
+        redirect_flows: {
+          id: 'RE123',
+          description: nil,
+          session_token: '1',
+          scheme: nil,
+          success_redirect_url: 'https://gc-me.test/api/gc/add-customer-success',
+          redirect_url: 'https://pay.gocardless.com/flow/RE123',
+          created_at: '2014-10-22T13:10:06.000Z',
+          links: {
+            creditor: 'CR123',
+            mandate: 'MA123',
+            customer: 'CU123',
+            customer_bank_account: 'BA123'
+          }
+        }
+      }
+
+      stub_request(:post,
+                   'https://api-sandbox.gocardless.com/redirect_flows/RF123/actions/complete').
+        with(body: request_body).
+        to_return(status: 200, body: response_body.to_json,
+                  headers: { 'Content-Type' => 'application/json' })
+    end
+
+    it 'confirms the redirect flow' do
+      store.create_redirect_flow!('U123', 'RF123')
+
+      response = gc_me.get('/api/gc/add-customer-success?redirect_flow_id=RF123')
+
+      expect(response.status).to eq(200)
+      expect(response.body).to include('boom')
     end
   end
 end

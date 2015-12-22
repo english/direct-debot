@@ -13,7 +13,7 @@ RSpec.describe GCMe::Middleware::GetGCAccessToken do
                                                        store: store)
 
       expect(store).
-        to receive(:find_slack_user).
+        to receive(:find_user).
         with('slack-user-id').
         and_return(gc_access_token: 'gc-access-token')
 
@@ -38,7 +38,7 @@ RSpec.describe GCMe::Middleware::GetGCAccessToken do
                                                        store: store)
 
       expect(store).
-        to receive(:find_slack_user).
+        to receive(:find_user).
         with('slack-user-id').
         and_return(nil)
 

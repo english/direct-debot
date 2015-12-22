@@ -36,7 +36,7 @@ RSpec.describe 'GC oauth callback' do
         get('/api/gc/callback?code=6NJiqXzT7HcgEGsAZXUmaBfB&&state=q8wEr9yMohTP')
 
       expect(response.body).to include('Gotcha!')
-    end.to change { store.count_slack_users! }.by(1)
+    end.to change { store.count_users! }.by(1)
 
     expect(gc_auth_token_request).to have_been_requested
   end

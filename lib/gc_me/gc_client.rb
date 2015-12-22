@@ -1,6 +1,8 @@
 module GCMe
   # wrapper around the GoCardlessPro client
   class GCClient
+    REDIRECT_FLOW_SESSION_TOKEN = '1'
+
     def initialize(client)
       @client = client
     end
@@ -28,11 +30,19 @@ module GCMe
     end
 
     def create_redirect_flow(success_redirect_url)
-      attributes = { success_redirect_url: success_redirect_url, session_token: '1' }
+      attributes = { success_redirect_url: success_redirect_url,
+                     session_token: REDIRECT_FLOW_SESSION_TOKEN }
 
       @client.
         redirect_flows.
         create(params: attributes)
+    end
+
+    def complete_redirect_flow(gc_redirect_flow_id)
+      @client.
+        redirect_flows.
+        complete(gc_redirect_flow_id,
+                 params: { session_token: REDIRECT_FLOW_SESSION_TOKEN })
     end
   end
 end

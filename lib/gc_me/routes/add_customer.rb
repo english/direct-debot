@@ -24,9 +24,11 @@ module GCMe
       requires :gc_client
 
       def call
-        success_url = config.fetch(:success_url)
+        slack_user_id = params.fetch(:user_id)
+        success_url, store = config.fetch_values(:success_url, :store)
 
         redirect_flow = gc_client.create_redirect_flow(success_url)
+        store.create_redirect_flow!(slack_user_id, redirect_flow.id)
 
         [302, { 'Location' => redirect_flow.redirect_url }, ['']]
       end

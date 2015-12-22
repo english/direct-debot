@@ -52,7 +52,8 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     Sequel::Migrator.run(db, 'lib/gc_me/db/migrations')
-    db[:slack_users].truncate
+    db[:redirect_flows].truncate
+    db[:users].truncate
   end
 
   config.before(:each) do
@@ -60,7 +61,10 @@ RSpec.configure do |config|
   end
 
   config.around(:each) do |example|
-    db.transaction(&example)
+    db.transaction do
+      example.call
+      fail Sequel::Rollback
+    end
   end
 
   # aggregate failures in all specs
