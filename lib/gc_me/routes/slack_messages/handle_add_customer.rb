@@ -37,7 +37,7 @@ module GCMe
           BODY    = '%s wants to setup a direct debit with you. Authorise at %s.'
 
           def self.build(to, user_name, user_id, host)
-            authorisation_url = "#{host}/add-customer?user=#{user_id}"
+            authorisation_url = "#{host}/add-customer?user_id=#{user_id}"
 
             {
               from:    FROM,

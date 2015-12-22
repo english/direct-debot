@@ -28,7 +28,7 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAddCustomer do
         expect(from).to eq('noreply@gc-me.test')
         expect(to).to eq('jane@example.com')
         expect(subject).to eq('Setup a direct debit with Joaquin')
-        expect(body).to match(%r{Joaquin.+/add-customer\?user=US123})
+        expect(body).to match(%r{Joaquin.+/add-customer\?user_id=US123})
       end)
 
       status, _headers, body = handle_add_customer.call

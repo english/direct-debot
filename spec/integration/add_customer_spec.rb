@@ -32,7 +32,7 @@ RSpec.describe 'adding a GoCardless customer' do
       expect(mail[:to]).to eq('foo@bar.com')
       expect(mail[:body].to_s).
         to eq('jamie wants to setup a direct debit with you. ' \
-              'Authorise at https://gc-me.test/add-customer?user=U123.')
+              'Authorise at https://gc-me.test/add-customer?user_id=U123.')
     end
   end
 
