@@ -14,11 +14,13 @@ module GCMe
         find { |customer| customer.email == email }
     end
 
+    ACTIVE_MANDATE_STATUSES = Set.new(%w(pending_submission submitted active))
+
     def get_active_mandate(customer)
       @client.
         mandates.
         all(params: { customer: customer.id }).
-        find { |mandate| mandate.status == 'active' }
+        find { |mandate| ACTIVE_MANDATE_STATUSES.include?(mandate.status) }
     end
 
     def create_payment(mandate, currency, pence)
