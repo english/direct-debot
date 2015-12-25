@@ -52,7 +52,7 @@ module GCMe
         uses Middleware::JSONSchema, schema: SCHEMA
         uses Middleware::VerifySlackToken, -> (config) { config.slice(:slack_token) }
         uses HandleAuthorize, -> (config) { config.slice(:oauth_client) }
-        uses HandleAddCustomer, -> (config) { config.slice(:mail_client, :store) }
+        uses HandleAddCustomer, -> (config) { config.slice(:mail_client, :store, :host) }
         uses HandlePayment, -> (config) { config.slice(:store, :gc_environment) }
       end
     end

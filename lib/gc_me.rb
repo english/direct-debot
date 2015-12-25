@@ -73,7 +73,8 @@ module GCMe
                          gc_environment: @environment,
                          oauth_client: @oauth_client,
                          mail_client: @mail_client,
-                         slack_token: @slack_token)
+                         slack_token: @slack_token,
+                         host: @host)
     end
 
     def build_add_customer_handler
