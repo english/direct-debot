@@ -27,7 +27,7 @@ group :development, :test do
 end
 
 group :development do
-  gem 'rubocop'
+  gem 'rubocop', github: 'bbatsov/rubocop'
   gem 'rake'
 end
 
