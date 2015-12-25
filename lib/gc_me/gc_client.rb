@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GCMe
   # wrapper around the GoCardlessPro client
   class GCClient

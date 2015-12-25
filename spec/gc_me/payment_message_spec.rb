@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../lib/gc_me/payment_message'
 
 RSpec.describe GCMe::PaymentMessage do

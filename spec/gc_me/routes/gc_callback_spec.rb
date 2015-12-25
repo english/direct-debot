@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../lib/gc_me/oauth_client'
 require_relative '../../../lib/gc_me/routes/gc_callback'
 require_relative '../../../lib/gc_me/db/store'

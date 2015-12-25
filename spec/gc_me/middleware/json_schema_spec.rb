@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../lib/gc_me/middleware/json_schema'
 
 RSpec.describe GCMe::Middleware::JSONSchema do

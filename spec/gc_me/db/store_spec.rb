@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../lib/gc_me/db/store'
 
 RSpec.describe GCMe::DB::Store do

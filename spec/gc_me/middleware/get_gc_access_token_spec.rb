@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../lib/gc_me/middleware/get_gc_access_token'
 require_relative '../../../lib/gc_me/db/store'
 

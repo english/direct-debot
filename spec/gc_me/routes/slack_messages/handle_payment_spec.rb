@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../../lib/gc_me/routes/slack_messages/handle_payment'
 require_relative '../../../../lib/gc_me/gc_client'
 

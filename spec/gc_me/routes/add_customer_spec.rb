@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'gocardless_pro'
 require_relative '../../../lib/gc_me/routes/add_customer'
 require_relative '../../../lib/gc_me/gc_client'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GCMe
   module Middleware
     # Inject arbitrary values into the request env

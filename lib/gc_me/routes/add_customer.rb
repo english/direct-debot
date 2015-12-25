@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'coach'
 require_relative '../middleware/json_schema'
 require_relative '../middleware/get_gc_access_token'

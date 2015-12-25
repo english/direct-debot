@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'prius'
 
 Prius.load(:rack_env, type: :string)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json_schema'
 require_relative '../../../../lib/gc_me/routes/slack_messages'
 

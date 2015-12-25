@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'coach'
 require 'json'
 require_relative '../middleware/json_schema'

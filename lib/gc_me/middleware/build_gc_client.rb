@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'coach'
 require 'gocardless_pro'
 require_relative 'get_gc_access_token'

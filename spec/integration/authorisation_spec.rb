@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../support/test_request'
 require_relative '../../lib/gc_me'
 

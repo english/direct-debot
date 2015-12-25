@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../../lib/gc_me/middleware/get_gc_customer'
 require_relative '../../../lib/gc_me/gc_client'
 require_relative '../../../lib/gc_me/payment_message'

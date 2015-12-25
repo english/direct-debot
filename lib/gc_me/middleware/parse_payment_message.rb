@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'coach'
 require_relative '../payment_message'
 

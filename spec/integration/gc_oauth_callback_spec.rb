@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'webmock/rspec'
 require_relative '../support/test_request'
 require_relative '../../lib/gc_me'
