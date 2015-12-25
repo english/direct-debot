@@ -4,7 +4,7 @@ ruby '2.3.0'
 
 gem 'puma', '~> 2.14'
 gem 'lotus-router', '~> 0.4'
-gem 'coach', github: 'gocardless/coach', tag: 'v0.3.0'
+gem 'coach', '~> 0.4.0'
 gem 'prius', '~> 1.0'
 gem 'oauth2', '~> 1.0'
 gem 'gocardless_pro', '~> 1.0'
