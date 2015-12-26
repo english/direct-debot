@@ -10,7 +10,7 @@ module GCMe
       @client = client
     end
 
-    def get_customers
+    def customers
       @client.
         customers.
         all

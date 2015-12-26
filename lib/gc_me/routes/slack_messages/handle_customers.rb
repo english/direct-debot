@@ -20,7 +20,7 @@ module GCMe
         requires :gc_client
 
         def call
-          customers = gc_client.get_customers
+          customers = gc_client.customers
           emails = customers.map(&:email)
 
           [200, {}, [emails.join("\n")]]
