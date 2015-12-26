@@ -6,11 +6,6 @@ require 'hamster'
 module GCMe
   # Wraps up the Mail library with a minimal interface.
   module MailClient
-    CLIENTS = Hamster::Hash.new(
-      'test' => Test,
-      'smtp' => SMTP
-    )
-
     def self.build(delivery_method, user_name, password)
       CLIENTS.fetch(delivery_method).new(user_name, password)
     end
@@ -60,5 +55,10 @@ module GCMe
         message.deliver!
       end
     end
+
+    CLIENTS = Hamster::Hash.new(
+      'test' => Test,
+      'smtp' => SMTP
+    )
   end
 end
