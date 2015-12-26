@@ -15,7 +15,6 @@ require_relative 'slack_messages/handle_authorize'
 require_relative 'slack_messages/handle_payment'
 
 module GCMe
-  # Middlewares and route handler that process 'authorise' and 'payment' messages
   module Routes
     module SlackMessages
       # Handles Slack messages in the format of
@@ -25,6 +24,14 @@ module GCMe
       # or
       #   /gc-me add someone@example.com
       class Handler < Coach::Middleware
+        # We should never really see this error since the JSON schema will reject
+        # unexpected 'text' requests.
+        class RouteNotFoundError < StandardError
+          def initialize(text)
+            super("could not match route with text: #{text}")
+          end
+        end
+
         using Refinements::HashSlice
 
         AUTHORISE_REGEXP    = /^authorise$/
@@ -64,14 +71,11 @@ module GCMe
 
         def call
           route_klass, config_keys = match_route(params.fetch('text'))
+          fail RouteNotFoundError, params.fetch('text') unless route_klass
 
-          if route_klass
-            Coach::Handler.
-              new(route_klass, config.slice!(*config_keys)).
-              call(request.env)
-          else
-            [404, {}, ['not found']]
-          end
+          Coach::Handler.
+            new(route_klass, config.slice!(*config_keys)).
+            call(request.env)
         end
 
         private
