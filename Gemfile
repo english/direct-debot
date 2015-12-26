@@ -13,6 +13,7 @@ gem 'json_schema', '~> 0.7'
 gem 'sequel', '~> 4.27'
 gem 'mail', '~> 2.6.3'
 gem 'hamster', github: 'hamstergem/hamster'
+gem 'rake', '~> 10.4.2'
 
 group :production do
   gem 'pg', '~> 0.18'
@@ -29,7 +30,6 @@ end
 
 group :development do
   gem 'rubocop', github: 'bbatsov/rubocop'
-  gem 'rake'
 end
 
 group :test do

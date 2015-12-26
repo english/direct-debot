@@ -166,7 +166,7 @@ DEPENDENCIES
   pry-doc
   puma (~> 2.14)
   rack (~> 1.6.4)
-  rake
+  rake (~> 10.4.2)
   rspec (~> 3.3)
   rubocop!
   sequel (~> 4.27)
