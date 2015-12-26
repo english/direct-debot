@@ -21,9 +21,28 @@ module GCMe
 
         def call
           customers = gc_client.customers
-          emails = customers.map(&:email)
 
-          [200, {}, [emails.join("\n")]]
+          body = format_customers(customers)
+
+          [200, {}, [body]]
+        end
+
+        private
+
+        def format_customers(customers)
+          {
+            attachments: customers.map { |customer| format_customer(customer) }.to_a
+          }.to_json
+        end
+
+        def format_customer(customer)
+          {
+            text: "#{customer.given_name} #{customer.family_name}",
+            fields: [
+              { title: 'ID', value: customer.id, short: true },
+              { title: 'Email', value: customer.email, short: true }
+            ]
+          }
         end
       end
     end
