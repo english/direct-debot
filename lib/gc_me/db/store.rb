@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'securerandom'
+require 'hamster'
 
 module GCMe
   module DB
@@ -12,14 +13,16 @@ module GCMe
       end
 
       def all_users
-        @db.from(:users).all
+        Hamster.from(@db.from(:users).all)
       end
 
       def find_user(slack_user_id)
-        @db.
+        user = @db.
           from(:users).
           where(slack_user_id: slack_user_id).
           first
+
+        Hamster.from(user)
       end
 
       def create_user!(gc_access_token:, slack_user_id:)
@@ -49,10 +52,12 @@ module GCMe
       end
 
       def find_redirect_flow(gc_redirect_flow_id)
-        @db.
+        redirect_flow = @db.
           from(:redirect_flows).
           where(gc_redirect_flow_id: gc_redirect_flow_id).
           first
+
+        Hamster.from(redirect_flow)
       end
 
       def find_access_token_for_redirect_flow(redirect_flow_id)

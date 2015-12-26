@@ -3,7 +3,6 @@
 require 'lotus/router'
 require 'coach'
 require 'prius'
-require_relative 'gc_me/middleware/injector'
 require_relative 'gc_me/routes/index'
 require_relative 'gc_me/routes/slack_messages'
 require_relative 'gc_me/routes/gc_callback'

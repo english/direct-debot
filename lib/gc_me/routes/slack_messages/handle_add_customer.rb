@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'coach'
+require 'hamster'
 require_relative '../../middleware/get_gc_access_token'
 
 module GCMe
@@ -34,12 +35,12 @@ module GCMe
           def self.build(to, user_name, user_id, host)
             url = "#{host}/add-customer?user_id=#{user_id}"
 
-            {
+            Hamster::Hash.new(
               from:    FROM,
               to:      to,
               subject: format(SUBJECT, user_name),
               body:    format(BODY, user_name, url)
-            }
+            )
           end
         end
       end

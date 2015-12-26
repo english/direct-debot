@@ -13,13 +13,14 @@ module GCMe
       provides :gc_customer
 
       def call
-        gc_customer = gc_client.get_customer(payment_message.email)
+        email = payment_message.fetch(:email)
+        gc_customer = gc_client.get_customer(email)
 
         if gc_customer
           provide(gc_customer: gc_customer)
           next_middleware.call
         else
-          [200, {}, ["#{payment_message.email} is not a customer of yours!"]]
+          [200, {}, ["#{email} is not a customer of yours!"]]
         end
       end
     end

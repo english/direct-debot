@@ -9,6 +9,13 @@ GIT
       rainbow (>= 1.99.1, < 3.0)
       ruby-progressbar (~> 1.7)
 
+GIT
+  remote: git://github.com/hamstergem/hamster.git
+  revision: 00b86cfa42594dcbe549fec99b2ff09f45e3a675
+  specs:
+    hamster (2.0.0)
+      concurrent-ruby (~> 1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -41,6 +48,7 @@ GEM
       actionpack (~> 4.2)
       activesupport (~> 4.2)
     coderay (1.1.0)
+    concurrent-ruby (1.0.0)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)
@@ -146,6 +154,7 @@ DEPENDENCIES
   coach (~> 0.4.0)
   dotenv (~> 2.0)
   gocardless_pro (~> 1.0)
+  hamster!
   json_schema (~> 0.7)
   lotus-router (~> 0.4)
   mail (~> 2.6.3)
@@ -165,4 +174,4 @@ DEPENDENCIES
   webmock (~> 1.22)
 
 BUNDLED WITH
-   1.10.6
+   1.11.2

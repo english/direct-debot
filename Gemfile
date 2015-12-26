@@ -12,6 +12,7 @@ gem 'rack', '~> 1.6.4'
 gem 'json_schema', '~> 0.7'
 gem 'sequel', '~> 4.27'
 gem 'mail', '~> 2.6.3'
+gem 'hamster', github: 'hamstergem/hamster'
 
 group :production do
   gem 'pg', '~> 0.18'

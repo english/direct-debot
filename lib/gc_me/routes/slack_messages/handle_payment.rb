@@ -27,8 +27,9 @@ module GCMe
         requires :gc_mandate
 
         def call
-          gc_client.create_payment(gc_mandate, payment_message.currency,
-                                   payment_message.pence)
+          currency, pence = payment_message.fetch_values(:currency, :pence)
+
+          gc_client.create_payment(gc_mandate, currency, pence)
 
           [200, {}, ['success!']]
         end

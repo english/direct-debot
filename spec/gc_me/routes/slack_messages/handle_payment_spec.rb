@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
+require 'hamster'
 require_relative '../../../../lib/gc_me/routes/slack_messages/handle_payment'
 require_relative '../../../../lib/gc_me/gc_client'
 
 RSpec.describe GCMe::Routes::SlackMessages::HandlePayment do
   it 'creates a payment' do
     gc_client       = instance_double(GCMe::GCClient)
-    payment_message = double(currency: 'GBP', pence: 1)
+    payment_message = Hamster::Hash.new(currency: 'GBP', pence: 1)
     gc_mandate      = double
 
     slack_messages = described_class.new(gc_client: gc_client,

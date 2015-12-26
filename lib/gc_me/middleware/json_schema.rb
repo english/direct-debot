@@ -23,12 +23,9 @@ module GCMe
       private
 
       def serialise_errors(errors)
-        errors.map do |error|
-          "error: #{error.type}\n" \
-          "message: #{error.message}"
-        end
-
-        errors.join("\n\n")
+        errors.
+          map { |error| "error: #{error.type}\nmessage: #{error.message}" }.
+          join("\n\n")
       end
     end
   end

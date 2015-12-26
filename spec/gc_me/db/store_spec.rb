@@ -12,7 +12,7 @@ RSpec.describe GCMe::DB::Store do
       to change { store.count_users! }.
       by(1)
 
-    expect(store.all_users.last).to be > user
+    expect(store.all_users.last.to_h).to be > user
   end
 
   context 'when a slack user already exists' do

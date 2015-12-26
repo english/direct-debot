@@ -8,8 +8,10 @@ RSpec.describe GCMe::PaymentMessage do
 
     subject = described_class.parse(message)
 
-    expect(subject.currency).to eq('GBP')
-    expect(subject.pence).to eq(1000)
-    expect(subject.email).to eq('someone@example.com')
+    expect(subject.to_h).to eq(
+      currency: 'GBP',
+      pence: 1000,
+      email: 'someone@example.com'
+    )
   end
 end

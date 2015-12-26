@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'hamster'
 require_relative '../../../lib/gc_me/middleware/get_gc_customer'
 require_relative '../../../lib/gc_me/gc_client'
 require_relative '../../../lib/gc_me/payment_message'
@@ -7,7 +8,9 @@ require_relative '../../../lib/gc_me/payment_message'
 RSpec.describe GCMe::Middleware::GetGCCustomer do
   let(:next_middleware) { double }
   let(:gc_client) { instance_double(GCMe::GCClient) }
-  let(:payment_message) { GCMe::PaymentMessage.new('GBP', 1, 'someone@example.com') }
+  let(:payment_message) do
+    Hamster::Hash.new(currency: 'GBP', amount: 1, email: 'someone@example.com')
+  end
   let(:context) { { gc_client: gc_client, payment_message: payment_message } }
 
   subject { described_class.new(context, next_middleware) }
