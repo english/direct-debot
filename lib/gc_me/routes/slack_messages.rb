@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'coach'
+require 'hamster'
 require_relative '../middleware/build_gc_client'
 require_relative '../middleware/get_gc_access_token'
 require_relative '../middleware/get_gc_customer'
@@ -26,13 +27,13 @@ module GCMe
       class Handler < Coach::Middleware
         using Refinements::HashSlice
 
-        TEXT_PATTERN = '^' \
-                         '(authorise)' \
-                       '|' \
-                         '(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)' \
-                       '|' \
-                       'add .+@.+\..+' \
-                       '$'
+        AUTHORISE_REGEXP    = /^authorise$/
+        PAYMENT_REGEXP      = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
+        ADD_CUSTOMER_REGEXP = /^add .+@.+\..+$/
+
+        TEXT_PATTERN = [AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP].
+          map { |re| "(#{re})" }.
+          join('|')
 
         SCHEMA = {
           'type'     => 'object',
@@ -54,9 +55,33 @@ module GCMe
 
         uses Middleware::JSONSchema, schema: SCHEMA
         uses Middleware::VerifySlackToken, -> (config) { config.slice!(:slack_token) }
-        uses HandleAuthorize, -> (config) { config.slice!(:oauth_client) }
-        uses HandleAddCustomer, -> (config) { config.slice!(:mail_client, :store, :host) }
-        uses HandlePayment, -> (config) { config.slice!(:store, :gc_environment) }
+
+        ROUTE_TABLE = Hamster::Hash.new(
+          ADD_CUSTOMER_REGEXP => [HandleAddCustomer, [:mail_client, :store, :host]],
+          AUTHORISE_REGEXP    => [HandleAuthorize, [:oauth_client]],
+          PAYMENT_REGEXP      => [HandlePayment, [:store, :gc_environment]]
+        )
+
+        def call
+          route_klass, config_keys = match_route(params.fetch('text'))
+
+          if route_klass
+            Coach::Handler.
+              new(route_klass, config.slice!(*config_keys)).
+              call(request.env)
+          else
+            [404, {}, ['not found']]
+          end
+        end
+
+        private
+
+        def match_route(text)
+          ROUTE_TABLE.
+            select { |key, _| key.match(text) }.
+            values.
+            first
+        end
       end
     end
   end
