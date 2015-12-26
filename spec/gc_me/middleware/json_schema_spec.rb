@@ -6,7 +6,7 @@ RSpec.describe GCMe::Middleware::JSONSchema do
   subject(:middleware) do
     context = { request: double(params: params) }
 
-    GCMe::Middleware::JSONSchema.new(context, next_middleware, schema: schema)
+    described_class.new(context, next_middleware, schema: schema)
   end
 
   let(:next_middleware) { -> {} }

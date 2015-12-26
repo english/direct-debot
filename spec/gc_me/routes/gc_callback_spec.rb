@@ -8,7 +8,7 @@ RSpec.describe GCMe::Routes::GCCallback do
   subject(:gc_callback) do
     context = { request: double(params: params) }
 
-    GCMe::Routes::GCCallback.new(context, nil, store: store, oauth_client: oauth_client)
+    described_class.new(context, nil, store: store, oauth_client: oauth_client)
   end
 
   let(:params) { { 'code' => 'the-code', 'state' => 'slack-user-id' } }

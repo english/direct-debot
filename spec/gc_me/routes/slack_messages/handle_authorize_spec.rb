@@ -7,8 +7,7 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAuthorize do
   subject(:handle_authorize) do
     context = { request: double(params: params) }
 
-    GCMe::Routes::SlackMessages::HandleAuthorize.new(context, next_middleware,
-                                                     oauth_client: oauth_client)
+    described_class.new(context, next_middleware, oauth_client: oauth_client)
   end
 
   let(:oauth_client) { instance_double(GCMe::OAuthClient) }

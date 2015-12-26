@@ -14,7 +14,7 @@ RSpec.describe GCMe::Middleware::GetGCMandate do
       context         = { gc_client: gc_client, gc_customer: customer }
       mandate         = double
 
-      subject = GCMe::Middleware::GetGCMandate.new(context, next_middleware)
+      subject = described_class.new(context, next_middleware)
 
       expect(gc_client).
         to receive(:get_active_mandate).
@@ -39,7 +39,7 @@ RSpec.describe GCMe::Middleware::GetGCMandate do
                                         email: 'someone@example.com')
       context         = { gc_client: gc_client, gc_customer: customer }
 
-      subject = GCMe::Middleware::GetGCMandate.new(context, next_middleware)
+      subject = described_class.new(context, next_middleware)
 
       expect(gc_client).
         to receive(:get_active_mandate).

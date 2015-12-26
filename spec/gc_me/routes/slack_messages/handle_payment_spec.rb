@@ -9,10 +9,9 @@ RSpec.describe GCMe::Routes::SlackMessages::HandlePayment do
     payment_message = double(currency: 'GBP', pence: 1)
     gc_mandate      = double
 
-    slack_messages = GCMe::Routes::SlackMessages::HandlePayment.new(
-      gc_client: gc_client,
-      payment_message: payment_message,
-      gc_mandate: gc_mandate)
+    slack_messages = described_class.new(gc_client: gc_client,
+                                         payment_message: payment_message,
+                                         gc_mandate: gc_mandate)
 
     expect(gc_client).
       to receive(:create_payment).

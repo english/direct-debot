@@ -6,7 +6,7 @@ RSpec.describe GCMe::PaymentMessage do
   it 'parses a string message' do
     message = '£10 from someone@example.com'
 
-    subject = GCMe::PaymentMessage.parse(message)
+    subject = described_class.parse(message)
 
     expect(subject.currency).to eq('GBP')
     expect(subject.pence).to eq(1000)

@@ -11,8 +11,7 @@ RSpec.describe GCMe::Middleware::GetGCAccessToken do
 
       context = { request: double(params: { 'user_id' => 'slack-user-id' }) }
 
-      subject = GCMe::Middleware::GetGCAccessToken.new(context, next_middleware,
-                                                       store: store)
+      subject = described_class.new(context, next_middleware, store: store)
 
       expect(store).
         to receive(:find_user).
@@ -36,8 +35,7 @@ RSpec.describe GCMe::Middleware::GetGCAccessToken do
 
       context = { request: double(params: { 'user_id' => 'slack-user-id' }) }
 
-      subject = GCMe::Middleware::GetGCAccessToken.new(context, next_middleware,
-                                                       store: store)
+      subject = described_class.new(context, next_middleware, store: store)
 
       expect(store).
         to receive(:find_user).

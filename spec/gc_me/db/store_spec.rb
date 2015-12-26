@@ -3,7 +3,7 @@
 require_relative '../../../lib/gc_me/db/store'
 
 RSpec.describe GCMe::DB::Store do
-  subject(:store) { GCMe::DB::Store.new(@db) }
+  subject(:store) { described_class.new(@db) }
 
   it 'persists user records' do
     user = { gc_access_token: 'x', slack_user_id: 'y' }

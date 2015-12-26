@@ -7,9 +7,8 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAddCustomer do
   subject(:handle_add_customer) do
     context = { request: double(params: params) }
 
-    GCMe::Routes::SlackMessages::HandleAddCustomer.new(context, next_middleware,
-                                                       mail_client: mail_client,
-                                                       host: 'http://gc-me.test')
+    described_class.new(context, next_middleware, mail_client: mail_client,
+                                                  host: 'http://gc-me.test')
   end
 
   let(:mail_client) { instance_double(GCMe::MailClient::SMTP) }

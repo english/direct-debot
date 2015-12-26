@@ -12,7 +12,7 @@ RSpec.describe GCMe::Routes::AddCustomer do
     context = { gc_client: gc_client, request: double(params: { user_id: 'US123' }) }
     config  = { store: store, success_url: 'https://foo.bar/baz' }
 
-    GCMe::Routes::AddCustomer.new(context, nil, config)
+    described_class.new(context, nil, config)
   end
 
   let(:gc_client) { instance_double(GCMe::GCClient, create_redirect_flow: redirect_flow) }

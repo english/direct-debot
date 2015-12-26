@@ -10,7 +10,7 @@ RSpec.describe GCMe::Middleware::GetGCCustomer do
   let(:payment_message) { GCMe::PaymentMessage.new('GBP', 1, 'someone@example.com') }
   let(:context) { { gc_client: gc_client, payment_message: payment_message } }
 
-  subject { GCMe::Middleware::GetGCCustomer.new(context, next_middleware) }
+  subject { described_class.new(context, next_middleware) }
 
   context 'when the customer exists' do
     let(:customer) { double }

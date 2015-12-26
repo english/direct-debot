@@ -22,7 +22,7 @@ RSpec.describe GCMe::Routes::SlackMessages::Handler::SCHEMA do
     }
   end
 
-  let(:schema) { JsonSchema.parse!(GCMe::Routes::SlackMessages::Handler::SCHEMA) }
+  let(:schema) { JsonSchema.parse!(described_class) }
 
   it 'knows what valid params are' do
     expect(schema).to validate(valid_params)
