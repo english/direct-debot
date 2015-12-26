@@ -23,9 +23,10 @@ module GCMe
         def call
           customers = gc_client.customers
 
-          body = format_customers(customers)
+          json = JSON.pretty_generate(customers.map(&:to_h).to_a)
+          body = "```\n#{json}\n```"
 
-          [200, { 'content-type' => 'application/json' }, [body]]
+          [200, {}, [body]]
         end
 
         private
