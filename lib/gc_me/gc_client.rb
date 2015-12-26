@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'hamster'
+
 module GCMe
   # wrapper around the GoCardlessPro client
   class GCClient
@@ -11,9 +13,12 @@ module GCMe
     end
 
     def customers
-      @client.
+      customers = @client.
         customers.
-        all
+        all.
+        to_a
+
+      Hamster::Hash.from(customers)
     end
 
     def get_customer(email)
