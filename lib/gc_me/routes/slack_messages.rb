@@ -13,6 +13,7 @@ require_relative '../refinements/hash_slice'
 require_relative 'slack_messages/handle_add_customer'
 require_relative 'slack_messages/handle_authorize'
 require_relative 'slack_messages/handle_payment'
+require_relative 'slack_messages/handle_customers'
 
 module GCMe
   module Routes
@@ -37,6 +38,7 @@ module GCMe
         AUTHORISE_REGEXP    = /^authorise$/
         PAYMENT_REGEXP      = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
         ADD_CUSTOMER_REGEXP = /^add .+@.+\..+$/
+        CUSTOMERS_REGEXP    = /^customers$/
 
         TEXT_PATTERN = [AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP].
           map { |re| "(#{re})" }.
@@ -66,7 +68,8 @@ module GCMe
         ROUTE_TABLE = Hamster::Hash.new(
           ADD_CUSTOMER_REGEXP => [HandleAddCustomer, [:mail_client, :store, :host]],
           AUTHORISE_REGEXP    => [HandleAuthorize, [:oauth_client]],
-          PAYMENT_REGEXP      => [HandlePayment, [:store, :gc_environment]]
+          PAYMENT_REGEXP      => [HandlePayment, [:store, :gc_environment]],
+          CUSTOMERS_REGEXP    => [HandleCustomers, [:store, :gc_environment]]
         )
 
         def call

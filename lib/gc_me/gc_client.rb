@@ -4,9 +4,16 @@ module GCMe
   # wrapper around the GoCardlessPro client
   class GCClient
     REDIRECT_FLOW_SESSION_TOKEN = '1'
+    ACTIVE_MANDATE_STATUSES = Set.new(%w(pending_submission submitted active))
 
     def initialize(client)
       @client = client
+    end
+
+    def get_customers
+      @client.
+        customers.
+        all
     end
 
     def get_customer(email)
@@ -15,8 +22,6 @@ module GCMe
         all.
         find { |customer| customer.email == email }
     end
-
-    ACTIVE_MANDATE_STATUSES = Set.new(%w(pending_submission submitted active))
 
     def get_active_mandate(customer)
       @client.
