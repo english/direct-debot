@@ -18,7 +18,7 @@ module GCMe
         all.
         to_a
 
-      Hamster::Hash.from(customers)
+      Hamster::List.from_enum(customers)
     end
 
     def get_customer(email)
