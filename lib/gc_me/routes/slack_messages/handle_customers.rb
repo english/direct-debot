@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'coach'
+require 'json'
 require_relative '../../middleware/get_gc_access_token'
 require_relative '../../middleware/build_gc_client'
 require_relative '../../refinements/hash_slice'
@@ -37,13 +38,10 @@ module GCMe
         end
 
         def format_customer(customer)
-          {
-            fields: [
-              { title: 'Name', value: "#{customer.given_name} #{customer.family_name}" },
-              { title: 'ID', value: customer.id, short: true },
-              { title: 'Email', value: customer.email, short: true }
-            ]
-          }
+          fields = customer.to_h.
+            map { |key, val| { title: key, value: val.to_s, short: true } }
+
+          { fields: fields }
         end
       end
     end
