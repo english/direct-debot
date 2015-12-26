@@ -40,7 +40,8 @@ module GCMe
         ADD_CUSTOMER_REGEXP = /^add .+@.+\..+$/
         CUSTOMERS_REGEXP    = /^customers$/
 
-        TEXT_PATTERN = [AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP].
+        TEXT_PATTERN = [
+          AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP, CUSTOMERS_REGEXP].
           map { |re| "(#{re})" }.
           join('|')
 
