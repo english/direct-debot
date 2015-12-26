@@ -24,7 +24,7 @@ module GCMe
 
           body = format_customers(customers)
 
-          [200, {}, [body]]
+          [200, { 'Content-Type' => 'application/json' }, [body]]
         end
 
         private
