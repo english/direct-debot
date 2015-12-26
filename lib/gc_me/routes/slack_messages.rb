@@ -8,6 +8,7 @@ require_relative '../middleware/get_gc_mandate'
 require_relative '../middleware/json_schema'
 require_relative '../middleware/parse_payment_message'
 require_relative '../middleware/verify_slack_token'
+require_relative '../refinements/hash_slice'
 require_relative 'slack_messages/handle_add_customer'
 require_relative 'slack_messages/handle_authorize'
 require_relative 'slack_messages/handle_payment'
@@ -23,6 +24,8 @@ module GCMe
       # or
       #   /gc-me add someone@example.com
       class Handler < Coach::Middleware
+        using Refinements::HashSlice
+
         TEXT_PATTERN = '^' \
                          '(authorise)' \
                        '|' \
@@ -50,10 +53,10 @@ module GCMe
         }
 
         uses Middleware::JSONSchema, schema: SCHEMA
-        uses Middleware::VerifySlackToken, -> (config) { config.slice(:slack_token) }
-        uses HandleAuthorize, -> (config) { config.slice(:oauth_client) }
-        uses HandleAddCustomer, -> (config) { config.slice(:mail_client, :store, :host) }
-        uses HandlePayment, -> (config) { config.slice(:store, :gc_environment) }
+        uses Middleware::VerifySlackToken, -> (config) { config.slice!(:slack_token) }
+        uses HandleAuthorize, -> (config) { config.slice!(:oauth_client) }
+        uses HandleAddCustomer, -> (config) { config.slice!(:mail_client, :store, :host) }
+        uses HandlePayment, -> (config) { config.slice!(:store, :gc_environment) }
       end
     end
   end

@@ -3,14 +3,17 @@
 require 'coach'
 require 'hamster'
 require_relative '../../middleware/get_gc_access_token'
+require_relative '../../refinements/hash_slice'
 
 module GCMe
   module Routes
     module SlackMessages
       # If the message is 'add jane@example.com'
       class HandleAddCustomer < Coach::Middleware
+        using Refinements::HashSlice
+
         # verify slack user has authorised
-        uses Middleware::GetGCAccessToken, -> (config) { config.slice(:store, :host) }
+        uses Middleware::GetGCAccessToken, -> (config) { config.slice!(:store, :host) }
 
         def call
           mail_client, host = config.fetch_values(:mail_client, :host)

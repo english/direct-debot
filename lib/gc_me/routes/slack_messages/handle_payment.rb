@@ -6,6 +6,7 @@ require_relative '../../middleware/build_gc_client'
 require_relative '../../middleware/parse_payment_message'
 require_relative '../../middleware/get_gc_customer'
 require_relative '../../middleware/get_gc_mandate'
+require_relative '../../refinements/hash_slice'
 
 module GCMe
   module Routes
@@ -13,10 +14,12 @@ module GCMe
       # Assumes that the message text is a 'payment' one and processes it accordingly by
       # creating a payment
       class HandlePayment < Coach::Middleware
-        uses Middleware::GetGCAccessToken, -> (config) { config.slice(:store) }
+        using Refinements::HashSlice
+
+        uses Middleware::GetGCAccessToken, -> (config) { config.slice!(:store) }
 
         uses Middleware::BuildGCClient,
-             -> (config) { config.slice(:store, :gc_environment) }
+             -> (config) { config.slice!(:store, :gc_environment) }
 
         uses Middleware::ParsePaymentMessage
         uses Middleware::GetGCCustomer

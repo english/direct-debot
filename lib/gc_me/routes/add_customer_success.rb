@@ -3,11 +3,14 @@
 require 'coach'
 require_relative '../middleware/json_schema'
 require_relative '../middleware/build_gc_client'
+require_relative '../refinements/hash_slice'
 
 module GCMe
   module Routes
     # Handle redirect flow completion
     module AddCustomerSuccess
+      using Refinements::HashSlice
+
       # Fetches the redirect flow given in params from the store.
       # Responds with a 422 if the redirect flow is not found.
       class GetRedirectFlow < Coach::Middleware
@@ -58,9 +61,9 @@ module GCMe
         }
 
         uses Middleware::JSONSchema, schema: SCHEMA
-        uses GetRedirectFlow, -> (config) { config.slice(:store) }
-        uses GetGCAccessTokenFromRedirectFlow, -> (config) { config.slice(:store) }
-        uses Middleware::BuildGCClient, -> (config) { config.slice(:gc_environment) }
+        uses GetRedirectFlow, -> (config) { config.slice!(:store) }
+        uses GetGCAccessTokenFromRedirectFlow, -> (config) { config.slice!(:store) }
+        uses Middleware::BuildGCClient, -> (config) { config.slice!(:gc_environment) }
 
         requires :gc_client, :redirect_flow
 

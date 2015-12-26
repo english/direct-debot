@@ -4,11 +4,14 @@ require 'coach'
 require_relative '../middleware/json_schema'
 require_relative '../middleware/get_gc_access_token'
 require_relative '../middleware/build_gc_client'
+require_relative '../refinements/hash_slice'
 
 module GCMe
   module Routes
     # Redirects a potential customer to a new GC redirect flow
     class AddCustomer < Coach::Middleware
+      using Refinements::HashSlice
+
       SCHEMA = {
         'type' => 'object',
         'required' => %w(user_id),
@@ -20,8 +23,8 @@ module GCMe
 
       uses Middleware::JSONSchema, schema: SCHEMA
       # TODO: Configure response for when user not found
-      uses Middleware::GetGCAccessToken, -> (config) { config.slice(:store) }
-      uses Middleware::BuildGCClient, -> (config) { config.slice(:gc_environment) }
+      uses Middleware::GetGCAccessToken, -> (config) { config.slice!(:store) }
+      uses Middleware::BuildGCClient, -> (config) { config.slice!(:gc_environment) }
 
       requires :gc_client
 
