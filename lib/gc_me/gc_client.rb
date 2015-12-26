@@ -21,6 +21,15 @@ module GCMe
       Hamster::List.from_enum(customers)
     end
 
+    def mandates
+      mandates = @client.
+        mandates.
+        all.
+        to_a
+
+      Hamster::List.from_enum(mandates)
+    end
+
     def get_customer(email)
       @client.
         customers.
