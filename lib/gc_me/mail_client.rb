@@ -1,17 +1,18 @@
 # frozen_string_literal: true
 
 require 'mail'
+require 'hamster'
 
 module GCMe
   # Wraps up the Mail library with a minimal interface.
   module MailClient
-    def self.build(delivery_method, user_name, password)
-      clients = {
-        'test' => Test,
-        'smtp' => SMTP
-      }
+    CLIENTS = Hamster::Hash.new(
+      'test' => Test,
+      'smtp' => SMTP
+    )
 
-      clients.fetch(delivery_method).new(user_name, password)
+    def self.build(delivery_method, user_name, password)
+      CLIENTS.fetch(delivery_method).new(user_name, password)
     end
 
     # Fake mail client
@@ -53,7 +54,7 @@ module GCMe
       end
 
       def deliver!(message_hash)
-        message = Mail::Message.new(message_hash)
+        message = Mail::Message.new(message_hash.to_h)
         message.delivery_method(:smtp, @options)
 
         message.deliver!
