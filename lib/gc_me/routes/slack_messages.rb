@@ -35,13 +35,13 @@ module GCMe
 
         using Refinements::HashSlice
 
-        AUTHORISE_REGEXP      = /^authorise$/
-        PAYMENT_REGEXP        = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
-        ADD_CUSTOMER_REGEXP   = /^add .+@.+\..+$/
+        AUTHORISE_REGEXP       = /^authorise$/
+        PAYMENT_REGEXP         = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
+        ADD_CUSTOMER_REGEXP    = /^add .+@.+\..+$/
         ALLOWED_LIST_RESOURCES = Hamster::List['customer_bank_accounts', 'customers',
                                                'events', 'mandates', 'payments',
                                                'payouts', 'refunds', 'subscriptions']
-        LIST_RESOURCES_REGEXP = /^list #{ALLOWED_LIST_RESOURCES.join('|')}$/
+        LIST_RESOURCES_REGEXP  = /^list (#{ALLOWED_LIST_RESOURCES.join('|')})$/
 
         TEXT_PATTERN = [
           AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP, LIST_RESOURCES_REGEXP
@@ -76,8 +76,10 @@ module GCMe
         )
 
         def call
-          route_klass, config_keys = match_route(params.fetch('text'))
-          fail RouteNotFoundError, params.fetch('text') unless route_klass
+          text = params.fetch(:text)
+          route_klass, config_keys = match_route(text)
+
+          fail RouteNotFoundError, text unless route_klass
 
           Coach::Handler.
             new(route_klass, config.slice!(*config_keys)).
