@@ -14,6 +14,7 @@ require_relative 'slack_messages/handle_add_customer'
 require_relative 'slack_messages/handle_authorize'
 require_relative 'slack_messages/handle_payment'
 require_relative 'slack_messages/handle_list_resources'
+require_relative 'slack_messages/handle_show_resources'
 
 module GCMe
   module Routes
@@ -38,13 +39,15 @@ module GCMe
         AUTHORISE_REGEXP       = /^authorise$/
         PAYMENT_REGEXP         = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
         ADD_CUSTOMER_REGEXP    = /^add .+@.+\..+$/
-        ALLOWED_LIST_RESOURCES = Hamster::List['customer_bank_accounts', 'customers',
-                                               'events', 'mandates', 'payments',
-                                               'payouts', 'refunds', 'subscriptions']
-        LIST_RESOURCES_REGEXP  = /^list (#{ALLOWED_LIST_RESOURCES.join('|')})$/
+        EXPOSED_RESOURCES = Hamster::List['customer_bank_accounts', 'customers',
+                                          'events', 'mandates', 'payments', 'payouts',
+                                          'refunds', 'subscriptions']
+        LIST_RESOURCES_REGEXP  = /^list (#{EXPOSED_RESOURCES.join('|')})$/
+        SHOW_RESOURCES_REGEXP  = /^show (#{EXPOSED_RESOURCES.join('|')}) [A-Z0-9]+$/
 
         TEXT_PATTERN = [
-          AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP, LIST_RESOURCES_REGEXP
+          AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP, LIST_RESOURCES_REGEXP,
+          SHOW_RESOURCES_REGEXP
         ].map { |re| "(#{re})" }.join('|')
 
         SCHEMA = {
@@ -72,7 +75,8 @@ module GCMe
           ADD_CUSTOMER_REGEXP   => [HandleAddCustomer, [:mail_client, :store, :host]],
           AUTHORISE_REGEXP      => [HandleAuthorize, [:oauth_client]],
           PAYMENT_REGEXP        => [HandlePayment, [:store, :gc_environment]],
-          LIST_RESOURCES_REGEXP => [HandleListResources, [:store, :gc_environment]]
+          LIST_RESOURCES_REGEXP => [HandleListResources, [:store, :gc_environment]],
+          SHOW_RESOURCES_REGEXP => [HandleShowResources, [:store, :gc_environment]]
         )
 
         def call

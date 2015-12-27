@@ -55,5 +55,11 @@ module GCMe
 
       Hamster::List.from_enum(resource_service.list.records)
     end
+
+    def show(resource_type, id)
+      @client.
+        public_send(resource_type).
+        get(id)
+    end
   end
 end
