@@ -12,33 +12,6 @@ module GCMe
       @client = client
     end
 
-    def customers
-      customers = @client.
-        customers.
-        all.
-        to_a
-
-      Hamster::List.from_enum(customers)
-    end
-
-    def mandates
-      mandates = @client.
-        mandates.
-        all.
-        to_a
-
-      Hamster::List.from_enum(mandates)
-    end
-
-    def payments
-      payments = @client.
-        payments.
-        all.
-        to_a
-
-      Hamster::List.from_enum(payments)
-    end
-
     def get_customer(email)
       @client.
         customers.
@@ -75,6 +48,12 @@ module GCMe
         redirect_flows.
         complete(gc_redirect_flow_id,
                  params: { session_token: REDIRECT_FLOW_SESSION_TOKEN })
+    end
+
+    def list(resource_type)
+      resource_service = @client.public_send(resource_type)
+
+      Hamster::List.from_enum(resource_service.list.records)
     end
   end
 end

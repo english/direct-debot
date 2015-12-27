@@ -38,7 +38,10 @@ module GCMe
         AUTHORISE_REGEXP      = /^authorise$/
         PAYMENT_REGEXP        = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
         ADD_CUSTOMER_REGEXP   = /^add .+@.+\..+$/
-        LIST_RESOURCES_REGEXP = /^list (customers|mandates|payments)$/
+        ALLOWED_LIST_RESOURCES = Hamster::List['customer_bank_accounts', 'customers',
+                                               'events', 'mandates', 'payments',
+                                               'payouts', 'refunds', 'subscriptions']
+        LIST_RESOURCES_REGEXP = /^list #{ALLOWED_LIST_RESOURCES.join('|')}$/
 
         TEXT_PATTERN = [
           AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP, LIST_RESOURCES_REGEXP
