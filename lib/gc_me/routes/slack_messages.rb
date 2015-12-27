@@ -13,9 +13,7 @@ require_relative '../refinements/hash_slice'
 require_relative 'slack_messages/handle_add_customer'
 require_relative 'slack_messages/handle_authorize'
 require_relative 'slack_messages/handle_payment'
-require_relative 'slack_messages/handle_customers'
-require_relative 'slack_messages/handle_mandates'
-require_relative 'slack_messages/handle_payments'
+require_relative 'slack_messages/handle_list_resources'
 
 module GCMe
   module Routes
@@ -37,16 +35,13 @@ module GCMe
 
         using Refinements::HashSlice
 
-        AUTHORISE_REGEXP    = /^authorise$/
-        PAYMENT_REGEXP      = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
-        ADD_CUSTOMER_REGEXP = /^add .+@.+\..+$/
-        CUSTOMERS_REGEXP    = /^customers$/
-        MANDATES_REGEXP     = /^mandates$/
-        PAYMENTS_REGEXP     = /^payments$/
+        AUTHORISE_REGEXP      = /^authorise$/
+        PAYMENT_REGEXP        = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
+        ADD_CUSTOMER_REGEXP   = /^add .+@.+\..+$/
+        LIST_RESOURCES_REGEXP = /^list (customers|mandates|payments)$/
 
         TEXT_PATTERN = [
-          AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP, CUSTOMERS_REGEXP,
-          MANDATES_REGEXP, PAYMENTS_REGEXP
+          AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP, LIST_RESOURCES_REGEXP
         ].map { |re| "(#{re})" }.join('|')
 
         SCHEMA = {
@@ -71,12 +66,10 @@ module GCMe
         uses Middleware::VerifySlackToken, -> (config) { config.slice!(:slack_token) }
 
         ROUTE_TABLE = Hamster::Hash.new(
-          ADD_CUSTOMER_REGEXP => [HandleAddCustomer, [:mail_client, :store, :host]],
-          AUTHORISE_REGEXP    => [HandleAuthorize, [:oauth_client]],
-          PAYMENT_REGEXP      => [HandlePayment, [:store, :gc_environment]],
-          CUSTOMERS_REGEXP    => [HandleCustomers, [:store, :gc_environment]],
-          MANDATES_REGEXP     => [HandleMandates, [:store, :gc_environment]],
-          PAYMENTS_REGEXP     => [HandlePayments, [:store, :gc_environment]]
+          ADD_CUSTOMER_REGEXP   => [HandleAddCustomer, [:mail_client, :store, :host]],
+          AUTHORISE_REGEXP      => [HandleAuthorize, [:oauth_client]],
+          PAYMENT_REGEXP        => [HandlePayment, [:store, :gc_environment]],
+          LIST_RESOURCES_REGEXP => [HandleListResources, [:store, :gc_environment]]
         )
 
         def call
