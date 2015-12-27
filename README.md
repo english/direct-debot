@@ -14,6 +14,10 @@ To take a payment from one of your existing customers:
 
 > /gc-me £10 from my-existing-customer@example.com
 
-## Todo
+List resources:
 
-- add/manage customers via slack username
+> /gc-me list customers
+
+Show a resource:
+
+> /gc-me show customers CR123
