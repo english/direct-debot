@@ -30,6 +30,15 @@ module GCMe
       Hamster::List.from_enum(mandates)
     end
 
+    def payments
+      payments = @client.
+        payments.
+        all.
+        to_a
+
+      Hamster::List.from_enum(payments)
+    end
+
     def get_customer(email)
       @client.
         customers.

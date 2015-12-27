@@ -9,8 +9,8 @@ require_relative '../../refinements/hash_slice'
 module GCMe
   module Routes
     module SlackMessages
-      # List all GC mandates
-      class HandleMandates < Coach::Middleware
+      # List all GC payments
+      class HandlePayments < Coach::Middleware
         using Refinements::HashSlice
 
         uses Middleware::GetGCAccessToken, -> (config) { config.slice!(:store) }
@@ -21,17 +21,17 @@ module GCMe
         requires :gc_client
 
         def call
-          mandates = gc_client.mandates
+          payments = gc_client.payments
 
-          body = serialise_mandates(mandates)
+          body = serialise_payments(payments)
 
           [200, {}, [body]]
         end
 
         private
 
-        def serialise_mandates(mandates)
-          json = JSON.pretty_generate(mandates.map(&:to_h).to_a)
+        def serialise_payments(payments)
+          json = JSON.pretty_generate(payments.map(&:to_h).to_a)
 
           "```\n#{json}\n```"
         end

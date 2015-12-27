@@ -23,26 +23,17 @@ module GCMe
         def call
           customers = gc_client.customers
 
-          json = JSON.pretty_generate(customers.map(&:to_h).to_a)
-          body = "```\n#{json}\n```"
+          body = serialise_customers(customers)
 
           [200, {}, [body]]
         end
 
         private
 
-        def format_customers(customers)
-          {
-            text: 'Your customers',
-            attachments: customers.map { |customer| format_customer(customer) }.to_a
-          }.to_json
-        end
+        def serialise_customers(customers)
+          json = JSON.pretty_generate(customers.map(&:to_h).to_a)
 
-        def format_customer(customer)
-          fields = customer.to_h.
-            map { |key, val| { title: key, value: val.to_s, short: true } }
-
-          { fields: fields }
+          "```\n#{json}\n```"
         end
       end
     end

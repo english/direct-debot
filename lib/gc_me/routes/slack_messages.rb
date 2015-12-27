@@ -15,6 +15,7 @@ require_relative 'slack_messages/handle_authorize'
 require_relative 'slack_messages/handle_payment'
 require_relative 'slack_messages/handle_customers'
 require_relative 'slack_messages/handle_mandates'
+require_relative 'slack_messages/handle_payments'
 
 module GCMe
   module Routes
@@ -41,10 +42,11 @@ module GCMe
         ADD_CUSTOMER_REGEXP = /^add .+@.+\..+$/
         CUSTOMERS_REGEXP    = /^customers$/
         MANDATES_REGEXP     = /^mandates$/
+        PAYMENTS_REGEXP     = /^payments$/
 
         TEXT_PATTERN = [
           AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP, CUSTOMERS_REGEXP,
-          MANDATES_REGEXP
+          MANDATES_REGEXP, PAYMENTS_REGEXP
         ].map { |re| "(#{re})" }.join('|')
 
         SCHEMA = {
@@ -73,7 +75,8 @@ module GCMe
           AUTHORISE_REGEXP    => [HandleAuthorize, [:oauth_client]],
           PAYMENT_REGEXP      => [HandlePayment, [:store, :gc_environment]],
           CUSTOMERS_REGEXP    => [HandleCustomers, [:store, :gc_environment]],
-          MANDATES_REGEXP     => [HandleMandates, [:store, :gc_environment]]
+          MANDATES_REGEXP     => [HandleMandates, [:store, :gc_environment]],
+          PAYMENTS_REGEXP     => [HandlePayments, [:store, :gc_environment]]
         )
 
         def call
