@@ -43,12 +43,8 @@ RSpec.describe 'adding a GoCardless customer' do
       expect(response.status).to eq(200)
       expect(response.body).to eq(<<-RESPONSE.chomp)
 ```
-[
-  {
-    "id": "CU123",
-    "email": "jamie@gocardless.com"
-  }
-]
+- id: CU123
+  email: jamie@gocardless.com
 ```
       RESPONSE
     end
@@ -72,10 +68,8 @@ RSpec.describe 'adding a GoCardless customer' do
       expect(response.status).to eq(200)
       expect(response.body).to eq(<<-RESPONSE.chomp)
 ```
-{
-  "id": "CU123",
-  "email": "jamie@gocardless.com"
-}
+id: CU123
+email: jamie@gocardless.com
 ```
       RESPONSE
     end

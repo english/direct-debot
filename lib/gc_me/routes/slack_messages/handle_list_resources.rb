@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'coach'
-require 'json'
+require 'yaml'
 require_relative '../../middleware/get_gc_access_token'
 require_relative '../../middleware/build_gc_client'
 require_relative '../../refinements/hash_slice'
@@ -32,9 +32,9 @@ module GCMe
         private
 
         def serialise_resources(resources)
-          json = JSON.pretty_generate(resources.map(&:to_h).to_a)
+          yaml = resources.map(&:to_h).to_a.to_yaml.split("\n")[1..-1].join("\n")
 
-          "```\n#{json}\n```"
+          "```\n#{yaml}\n```"
         end
       end
     end
