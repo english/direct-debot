@@ -1,35 +1,39 @@
 # frozen_string_literal: true
 
 require 'webmock/rspec'
-require 'prius'
-require 'mail'
 require_relative '../support/test_request'
+require_relative '../support/transaction'
 require_relative '../../lib/gc_me'
+require_relative '../../lib/gc_me/system'
 require_relative '../../lib/gc_me/db/store'
 
 RSpec.describe 'adding a GoCardless customer' do
-  subject!(:gc_me) { TestRequest.new(GCMe.build(@db)) }
-  let(:store) { GCMe::DB::Store.new(@db) }
+  let(:system) { GCMe::System.build }
+  let(:store) { GCMe::DB::Store.new(system.fetch(:db_component).connection) }
+
+  around do |example|
+    system.start
+    Transaction.with_rollback(system) { example.call }
+  end
+
+  after { system.stop }
+
+  subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
 
   before do
     store.create_user!(slack_user_id: 'U123', gc_access_token: 'AT123')
-
-    GCMe::MailClient::Test.clear!
   end
 
   context 'for the merchant adding a customer' do
     it 'sends an email to the recipient' do
-      response = nil
-
-      expect { response = gc_me.post('/api/slack/messages', text: 'add foo@bar.com') }.
-        to change { GCMe::MailClient::Test.deliveries.length }.
-        by(1)
+      response = app.post('/api/slack/messages', text: 'add foo@bar.com')
 
       expect(response.status).to eq(200)
       expect(response.body).
         to include('Authorisation from foo@bar.com has been requested.')
 
-      mail = GCMe::MailClient::Test.deliveries.last
+      mail = system.fetch(:mail_component).output_queue.pop
+
       expect(mail[:from]).to eq('noreply@gc-me.test')
       expect(mail[:to]).to eq('foo@bar.com')
       expect(mail[:body].to_s).
@@ -67,7 +71,7 @@ RSpec.describe 'adding a GoCardless customer' do
     end
 
     it 'sets up, and redirects to, a redirect flow' do
-      response = gc_me.get('/add-customer?user_id=U123')
+      response = app.get('/add-customer?user_id=U123')
 
       expect(response.status).to eq(302)
       expect(response.location).to eq('https://pay.gocardless.com/flow/RE123')
@@ -107,7 +111,7 @@ RSpec.describe 'adding a GoCardless customer' do
     it 'confirms the redirect flow' do
       store.create_redirect_flow!('U123', 'RF123')
 
-      response = gc_me.get('/api/gc/add-customer-success?redirect_flow_id=RF123')
+      response = app.get('/api/gc/add-customer-success?redirect_flow_id=RF123')
 
       expect(response.status).to eq(200)
       expect(response.body).to include('boom')

@@ -6,14 +6,16 @@ if ENV['RACK_ENV'] == 'development'
   Dotenv.load
 end
 
-require 'prius'
-require 'sequel'
-require './config/prius'
 require './lib/gc_me'
+require './lib/gc_me/system'
 
-db = Sequel.connect(Prius.get(:database_url))
+system = GCMe::System.build
+system.start
 
-Sequel.extension(:migration)
-Sequel::Migrator.run(db, 'lib/gc_me/db/migrations')
+app = GCMe::Application.new(system)
 
-run GCMe.build(db)
+begin
+  run app.rack_app
+ensure
+  system.stop
+end

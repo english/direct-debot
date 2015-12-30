@@ -16,14 +16,14 @@ module GCMe
         uses Middleware::GetGCAccessToken, -> (config) { config.slice!(:store, :host) }
 
         def call
-          mail_client, host = config.fetch_values(:mail_client, :host)
+          mail_queue, host = config.fetch_values(:mail_queue, :host)
+
           text, user_name, user_id = params.fetch_values('text', 'user_name', 'user_id')
           prefix, email = text.split(' ')
 
           return next_middleware.call unless prefix == 'add'
 
-          mail = AddCustomerMail.build(email, user_name, user_id, host)
-          mail_client.deliver!(mail)
+          mail_queue << AddCustomerMail.build(email, user_name, user_id, host)
 
           [200, {}, ["Authorisation from #{email} has been requested."]]
         end

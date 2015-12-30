@@ -2,14 +2,25 @@
 
 require 'webmock/rspec'
 require_relative '../../lib/gc_me'
+require_relative '../../lib/gc_me/system'
 require_relative '../../lib/gc_me/db/store'
 require_relative '../support/test_request'
+require_relative '../support/transaction'
 
 RSpec.describe 'creating a payment' do
-  subject(:gc_me) { TestRequest.new(GCMe.build(@db)) }
+  let(:system) { GCMe::System.build }
+
+  around do |example|
+    system.start
+    Transaction.with_rollback(system) { example.call }
+  end
+
+  after { system.stop }
+
+  subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
 
   before do
-    store = GCMe::DB::Store.new(@db)
+    store = GCMe::DB::Store.new(system.fetch(:db_component).connection)
     store.create_user!(slack_user_id: 'U123', gc_access_token: 'AT123')
   end
 
@@ -48,7 +59,7 @@ RSpec.describe 'creating a payment' do
   end
 
   it 'handles /api/slack/messages with a payment message' do
-    response = gc_me.post('/api/slack/messages', text: '£5 from jamie@gocardless.com')
+    response = app.post('/api/slack/messages', text: '£5 from jamie@gocardless.com')
 
     expect(response.status).to eq(200)
 

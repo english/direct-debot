@@ -3,22 +3,18 @@
 require 'lotus/router'
 require 'coach'
 require 'prius'
+require 'hamster'
 require_relative 'gc_me/routes/index'
 require_relative 'gc_me/routes/slack_messages'
 require_relative 'gc_me/routes/gc_callback'
 require_relative 'gc_me/routes/add_customer'
 require_relative 'gc_me/routes/add_customer_success'
+require_relative 'gc_me/db/component'
 require_relative 'gc_me/db/store'
 require_relative 'gc_me/oauth_client'
-require_relative 'gc_me/gc_client'
-require_relative 'gc_me/mail_client'
 
 # This is where the magic happens
 module GCMe
-  def self.build(db)
-    Application.new(db).rack_app
-  end
-
   # Provides the GCMe rack application
   class Application
     INDEX_PATH                = '/'
@@ -27,20 +23,18 @@ module GCMe
     ADD_CUSTOMER_PATH         = '/add-customer'
     ADD_CUSTOMER_SUCCESS_PATH = '/api/gc/add-customer-success'
 
-    def initialize(db)
-      @store        = DB::Store.new(db)
-      @host         = URI.parse(Prius.get(:host))
-      @environment  = Prius.get(:gc_environment).to_sym
-      @slack_token  = Prius.get(:slack_token)
-      @oauth_client = build_oauth_client
-      @mail_client  = build_mail_client
+    def initialize(system)
+      @system           = system
+      @server_component = system.fetch(:server_component)
+      @store            = DB::Store.new(system.fetch(:db_component).connection)
+      @oauth_client     = build_oauth_client(system)
     end
 
     # rubocop:disable Metrics/AbcSize
     def rack_app
-      opts = { host: @host.host,
-               scheme: @host.scheme,
-               force_ssl: @host.scheme == 'https' }
+      opts = { host: @server_component.host.host,
+               scheme: @server_component.host.scheme,
+               force_ssl: @server_component.host.scheme == 'https' }
 
       Lotus::Router.new(opts).tap do |router|
         router.get(INDEX_PATH, to: Coach::Handler.new(Routes::Index))
@@ -54,41 +48,35 @@ module GCMe
 
     private
 
-    def build_oauth_client
-      redirect_uri = "#{@host}#{GC_CALLBACK_PATH}"
+    def build_oauth_client(system)
+      redirect_uri = "#{@server_component.host}#{GC_CALLBACK_PATH}"
 
-      OAuthClient.new(Prius, redirect_uri)
-    end
-
-    def build_mail_client
-      GCMe::MailClient.build(Prius.get(:mail_delivery_method),
-                             Prius.get(:sendgrid_username),
-                             Prius.get(:sendgrid_password))
+      OAuthClient.new(system.fetch(:oauth_component).client, redirect_uri)
     end
 
     def build_slack_messages_handler
       Coach::Handler.new(Routes::SlackMessages::Handler,
                          store: @store,
-                         gc_environment: @environment,
+                         gc_environment: @server_component.environment,
                          oauth_client: @oauth_client,
-                         mail_client: @mail_client,
-                         slack_token: @slack_token,
-                         host: @host)
+                         mail_queue: @system.fetch(:mail_component).input_queue,
+                         slack_token: @server_component.slack_token,
+                         host: @server_component.host)
     end
 
     def build_add_customer_handler
-      success_url = "#{@host}#{ADD_CUSTOMER_SUCCESS_PATH}"
+      success_url = "#{@server_component.host}#{ADD_CUSTOMER_SUCCESS_PATH}"
 
       Coach::Handler.new(Routes::AddCustomer,
                          store: @store,
-                         gc_environment: @environment,
+                         gc_environment: @server_component.environment,
                          success_url: success_url)
     end
 
     def build_add_customer_success_handler
       Coach::Handler.new(Routes::AddCustomerSuccess::Handler,
                          store: @store,
-                         gc_environment: @environment)
+                         gc_environment: @server_component.environment)
     end
 
     def build_gc_callback_handler

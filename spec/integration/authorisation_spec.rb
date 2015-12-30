@@ -1,13 +1,24 @@
 # frozen_string_literal: true
 
 require_relative '../support/test_request'
+require_relative '../support/transaction'
 require_relative '../../lib/gc_me'
+require_relative '../../lib/gc_me/system'
 
 RSpec.describe 'authorisation' do
-  subject(:gc_me) { TestRequest.new(GCMe.build(@db)) }
+  let(:system) { GCMe::System.build }
+
+  around do |example|
+    system.start
+    Transaction.with_rollback(system) { example.call }
+  end
+
+  after { system.stop }
+
+  subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
 
   it 'handles /api/slack/messages with authorise' do
-    response = gc_me.post('/api/slack/messages', text: 'authorise')
+    response = app.post('/api/slack/messages', text: 'authorise')
 
     expect(response.status).to eq(200)
     expect(response.body).

@@ -1,9 +1,18 @@
 # frozen_string_literal: true
 
+require_relative '../../../lib/gc_me/system'
 require_relative '../../../lib/gc_me/db/store'
+require_relative '../../support/transaction'
 
 RSpec.describe GCMe::DB::Store do
-  subject(:store) { described_class.new(@db) }
+  let(:system) { GCMe::System.build }
+
+  around do |example|
+    system.start
+    Transaction.with_rollback(system) { example.call }
+  end
+
+  subject(:store) { described_class.new(system.fetch(:db_component).connection) }
 
   it 'persists user records' do
     user = { gc_access_token: 'x', slack_user_id: 'y' }

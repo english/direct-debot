@@ -2,10 +2,22 @@
 
 require 'webmock/rspec'
 require_relative '../support/test_request'
+require_relative '../support/transaction'
 require_relative '../../lib/gc_me'
+require_relative '../../lib/gc_me/system'
 
 RSpec.describe 'GC oauth callback' do
-  subject(:gc_me) { TestRequest.new(GCMe.build(@db)) }
+  let(:system) { GCMe::System.build }
+
+  around do |example|
+    system.start
+    Transaction.with_rollback(system) { example.call }
+  end
+
+  after { system.stop }
+
+  subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
+  let(:store) { GCMe::DB::Store.new(system.fetch(:db_component).connection) }
 
   let!(:gc_auth_token_request) do
     request_body = {
@@ -31,10 +43,8 @@ RSpec.describe 'GC oauth callback' do
   end
 
   it 'handles /api/gc/callback' do
-    store = GCMe::DB::Store.new(@db)
-
     expect do
-      response = gc_me.
+      response = app.
         get('/api/gc/callback?code=6NJiqXzT7HcgEGsAZXUmaBfB&&state=q8wEr9yMohTP')
 
       expect(response.body).to include('Gotcha!')

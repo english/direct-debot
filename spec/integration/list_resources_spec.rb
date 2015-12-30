@@ -2,17 +2,26 @@
 
 require 'webmock/rspec'
 require_relative '../support/test_request'
+require_relative '../support/transaction'
 require_relative '../../lib/gc_me'
+require_relative '../../lib/gc_me/system'
 require_relative '../../lib/gc_me/db/store'
 
 RSpec.describe 'adding a GoCardless customer' do
-  subject!(:gc_me) { TestRequest.new(GCMe.build(@db)) }
-  let(:store) { GCMe::DB::Store.new(@db) }
+  let(:system) { GCMe::System.build }
+
+  around do |example|
+    system.start
+    Transaction.with_rollback(system) { example.call }
+  end
+
+  after { system.stop }
+
+  subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
+  let(:store) { GCMe::DB::Store.new(system.fetch(:db_component).connection) }
 
   before do
     store.create_user!(slack_user_id: 'U123', gc_access_token: 'AT123')
-
-    GCMe::MailClient::Test.clear!
   end
 
   context 'listing resources' do
@@ -29,7 +38,7 @@ RSpec.describe 'adding a GoCardless customer' do
     end
 
     it "lists all of a user's GC resources" do
-      response = gc_me.post('/api/slack/messages', text: 'list customers')
+      response = app.post('/api/slack/messages', text: 'list customers')
 
       expect(response.status).to eq(200)
       expect(response.body).to eq(<<-RESPONSE.chomp)
@@ -58,7 +67,7 @@ RSpec.describe 'adding a GoCardless customer' do
     end
 
     it 'shows single GC resources' do
-      response = gc_me.post('/api/slack/messages', text: 'show customers CU123')
+      response = app.post('/api/slack/messages', text: 'show customers CU123')
 
       expect(response.status).to eq(200)
       expect(response.body).to eq(<<-RESPONSE.chomp)

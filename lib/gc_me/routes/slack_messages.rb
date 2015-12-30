@@ -72,7 +72,7 @@ module GCMe
         uses Middleware::VerifySlackToken, -> (config) { config.slice!(:slack_token) }
 
         ROUTE_TABLE = Hamster::Hash.new(
-          ADD_CUSTOMER_REGEXP   => [HandleAddCustomer, [:mail_client, :store, :host]],
+          ADD_CUSTOMER_REGEXP   => [HandleAddCustomer, [:mail_queue, :store, :host]],
           AUTHORISE_REGEXP      => [HandleAuthorize, [:oauth_client]],
           PAYMENT_REGEXP        => [HandlePayment, [:store, :gc_environment]],
           LIST_RESOURCES_REGEXP => [HandleListResources, [:store, :gc_environment]],
