@@ -38,7 +38,7 @@ RSpec.describe 'adding a GoCardless customer' do
     end
 
     it "lists all of a user's GC resources" do
-      response = app.post('/api/slack/messages', text: 'list customers')
+      response = app.post('/api/slack/messages', text: 'customers list')
 
       expect(response.status).to eq(200)
       expect(response.body).to eq(<<-RESPONSE.chomp)
@@ -63,7 +63,7 @@ RSpec.describe 'adding a GoCardless customer' do
     end
 
     it 'shows single GC resources' do
-      response = app.post('/api/slack/messages', text: 'show customers CU123')
+      response = app.post('/api/slack/messages', text: 'customers show CU123')
 
       expect(response.status).to eq(200)
       expect(response.body).to eq(<<-RESPONSE.chomp)

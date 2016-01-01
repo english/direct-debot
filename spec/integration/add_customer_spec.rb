@@ -26,7 +26,7 @@ RSpec.describe 'adding a GoCardless customer' do
 
   context 'for the merchant adding a customer' do
     it 'sends an email to the recipient' do
-      response = app.post('/api/slack/messages', text: 'add foo@bar.com')
+      response = app.post('/api/slack/messages', text: 'customers add foo@bar.com')
 
       expect(response.status).to eq(200)
       expect(response.body).

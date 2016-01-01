@@ -8,7 +8,7 @@ To authorise `gc-me` to create payments on your behalf, in Slack:
 
 To add a new customer (sends them an email with a redirect flow link)
 
-> /gc-me add new-customer@example.com
+> /gc-me customers add new-customer@example.com
 
 To take a payment from one of your existing customers:
 
@@ -16,8 +16,8 @@ To take a payment from one of your existing customers:
 
 List resources:
 
-> /gc-me list customers
+> /gc-me customers list
 
 Show a resource:
 
-> /gc-me show customers CR123
+> /gc-me customers show CU123

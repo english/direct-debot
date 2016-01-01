@@ -21,7 +21,7 @@ module GCMe
         requires :gc_client
 
         def call
-          _, resource_type, id = params.fetch(:text).split(' ')
+          resource_type, _show, id = params.fetch(:text).split(' ')
 
           resource = gc_client.show(resource_type, id)
           body     = serialise_resource(resource)

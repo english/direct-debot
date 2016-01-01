@@ -15,7 +15,7 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAddCustomer do
   context "when given an 'add customer' message" do
     let(:params) do
       {
-        'text'      => 'add jane@example.com',
+        'text'      => 'customers add jane@example.com',
         'user_name' => 'Joaquin',
         'user_id'   => 'US123'
       }
@@ -37,17 +37,5 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAddCustomer do
       expect(subject).to eq('Setup a direct debit with Joaquin')
       expect(body).to match(%r{Joaquin.+/add-customer\?user_id=US123})
     end
-  end
-
-  context "when not given an 'add customer' message" do
-    let(:params) do
-      {
-        'text'      => 'bla bla',
-        'user_name' => 'Joaquin',
-        'user_id'   => 'US123'
-      }
-    end
-
-    it { is_expected.to call_next_middleware }
   end
 end

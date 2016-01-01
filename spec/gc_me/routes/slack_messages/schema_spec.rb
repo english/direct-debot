@@ -55,9 +55,9 @@ RSpec.describe GCMe::Routes::SlackMessages::Handler::SCHEMA do
   end
 
   it "validates 'add customer' messages" do
-    expect(schema).to validate(valid_params.merge('text' => 'add foo@bar.com'))
+    expect(schema).to validate(valid_params.merge('text' => 'customers add foo@bar.com'))
 
-    expect(schema).to_not validate(valid_params.merge('text' => 'add foo'))
-    expect(schema).to_not validate(valid_params.merge('text' => 'add @jane'))
+    expect(schema).to_not validate(valid_params.merge('text' => 'customers add foo'))
+    expect(schema).to_not validate(valid_params.merge('text' => 'customers add @jane'))
   end
 end

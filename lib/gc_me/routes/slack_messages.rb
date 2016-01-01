@@ -36,14 +36,14 @@ module GCMe
 
         using Refinements::HashSlice
 
-        AUTHORISE_REGEXP       = /^authorise$/
-        PAYMENT_REGEXP         = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
-        ADD_CUSTOMER_REGEXP    = /^add .+@.+\..+$/
-        EXPOSED_RESOURCES = Hamster::List['customer_bank_accounts', 'customers',
-                                          'events', 'mandates', 'payments', 'payouts',
-                                          'refunds', 'subscriptions']
-        LIST_RESOURCES_REGEXP  = /^list (#{EXPOSED_RESOURCES.join('|')})$/
-        SHOW_RESOURCES_REGEXP  = /^show (#{EXPOSED_RESOURCES.join('|')}) [A-Z0-9]+$/
+        AUTHORISE_REGEXP      = /^authorise$/
+        PAYMENT_REGEXP        = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
+        ADD_CUSTOMER_REGEXP   = /^customers add .+@.+\..+$/
+        EXPOSED_RESOURCES     = Hamster::List['customer_bank_accounts', 'customers',
+                                              'events', 'mandates', 'payments',
+                                              'payouts', 'refunds', 'subscriptions']
+        LIST_RESOURCES_REGEXP = /^(#{EXPOSED_RESOURCES.join('|')}) list$/
+        SHOW_RESOURCES_REGEXP = /^(#{EXPOSED_RESOURCES.join('|')}) show [A-Z0-9]+$/
 
         TEXT_PATTERN = [
           AUTHORISE_REGEXP, PAYMENT_REGEXP, ADD_CUSTOMER_REGEXP, LIST_RESOURCES_REGEXP,
