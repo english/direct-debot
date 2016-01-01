@@ -7,6 +7,12 @@ require 'dotenv'
 Dotenv.load('.env.test')
 
 require 'pry'
+require 'rantly/rspec_extensions'
+require 'rantly/shrinks'
+require 'coach'
+require 'active_support/core_ext'
+
+Coach.require_matchers!
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

@@ -15,36 +15,44 @@ RSpec.describe GCMe::DB::Store do
   subject(:store) { described_class.new(system.fetch(:db_component).connection) }
 
   it 'persists user records' do
-    user = { gc_access_token: 'x', slack_user_id: 'y' }
+    properties = property_of do
+      dict(2) { [choose(:gc_access_token, :slack_user_id), string] }
+    end
 
-    expect { store.create_user!(user) }.
-      to change { store.count_users! }.
-      by(1)
+    properties.check do |user|
+      expect { store.create_user!(user) }.
+        to change { store.count_users! }.
+        by(1)
 
-    expect(store.all_users.last.to_h).to be > user
+      expect(store.all_users.last.to_h).to be > user
+    end
   end
 
   context 'when a slack user already exists' do
     it 'overwrites the existing row' do
-      store.create_user!(gc_access_token: 'abc', slack_user_id: 'USER')
-      store.create_user!(gc_access_token: 'xyz', slack_user_id: 'USER')
+      properties = property_of { [array(range(1, 100)) { string }, string] }
 
-      users = store.all_users.
-        select { |user| user.fetch(:slack_user_id) == 'USER' }
+      properties.check do |(access_tokens, user_id)|
+        expect do
+          access_tokens.each do |token|
+            store.create_user!(gc_access_token: token, slack_user_id: user_id)
+          end
+        end.to change { store.all_users.count }.by(1)
 
-      expect(users.count).to eq(1)
-      expect(users.last.fetch(:gc_access_token)).to eq('xyz')
+        expect(store.all_users.last.fetch(:gc_access_token)).to eq(access_tokens.last)
+      end
     end
   end
 
   it 'finds a gc access token by a gc redirect flow id' do
-    store.create_user!(gc_access_token: 'abc', slack_user_id: 'USER')
-    store.create_redirect_flow!('USER', 'RF123')
+    property_of { [string, string, string] }.check do |(token, user_id, redirect_flow_id)|
+      store.create_user!(gc_access_token: token, slack_user_id: user_id)
+      store.create_redirect_flow!(user_id, redirect_flow_id)
 
-    redirect_flow = store.find_redirect_flow('RF123')
+      redirect_flow = store.find_redirect_flow(redirect_flow_id)
+      access_token  = store.find_access_token_for_redirect_flow(redirect_flow.fetch(:id))
 
-    access_token = store.find_access_token_for_redirect_flow(redirect_flow.fetch(:id))
-
-    expect(access_token).to eq('abc')
+      expect(access_token).to eq(token)
+    end
   end
 end

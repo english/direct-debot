@@ -6,10 +6,8 @@ RSpec.describe GCMe::Middleware::JSONSchema do
   subject(:middleware) do
     context = { request: double(params: params) }
 
-    described_class.new(context, next_middleware, schema: schema)
+    described_class.new(context, null_middleware, schema: schema)
   end
-
-  let(:next_middleware) { -> {} }
 
   let(:schema) do
     {
@@ -24,32 +22,14 @@ RSpec.describe GCMe::Middleware::JSONSchema do
   context 'with valid params' do
     let(:params) { { 'foo' => 'bar' } }
 
-    it 'calls the next middleware' do
-      expect(next_middleware).to receive(:call)
-
-      middleware.call
-    end
+    it { is_expected.to call_next_middleware }
   end
 
   context 'with invalid params' do
     let(:params) { { 'foo' => 123 } }
 
-    it 'returns a 400' do
-      status, * = middleware.call
-
-      expect(status).to eq(400)
-    end
-
-    it 'returns errors' do
-      *, body = middleware.call
-
-      expect(body.first).to include('123 is not a string')
-    end
-
-    it "doesn't call the next middleware" do
-      expect(next_middleware).to_not receive(:call)
-
-      middleware.call
-    end
+    it { is_expected.to_not call_next_middleware }
+    it { is_expected.to respond_with_status(400) }
+    it { is_expected.to respond_with_body_that_matches('123 is not a string') }
   end
 end

@@ -6,14 +6,13 @@ require_relative '../../../lib/gc_me/gc_client'
 require_relative '../../../lib/gc_me/payment_message'
 
 RSpec.describe GCMe::Middleware::GetGCCustomer do
-  let(:next_middleware) { double }
+  subject { described_class.new(context, null_middleware) }
+
+  let(:context) { { gc_client: gc_client, payment_message: payment_message } }
   let(:gc_client) { instance_double(GCMe::GCClient) }
   let(:payment_message) do
     Hamster::Hash.new(currency: 'GBP', amount: 1, email: 'someone@example.com')
   end
-  let(:context) { { gc_client: gc_client, payment_message: payment_message } }
-
-  subject { described_class.new(context, next_middleware) }
 
   context 'when the customer exists' do
     let(:customer) { double }
@@ -25,15 +24,7 @@ RSpec.describe GCMe::Middleware::GetGCCustomer do
         and_return(customer)
     end
 
-    it 'provides the customer from the GC api' do
-      expect(next_middleware).to receive(:call)
-
-      expect(subject).
-        to receive(:provide).
-        with(gc_customer: customer)
-
-      subject.call
-    end
+    it { is_expected.to provide(gc_customer: customer) }
   end
 
   context 'when the customer does not exist' do
@@ -44,13 +35,6 @@ RSpec.describe GCMe::Middleware::GetGCCustomer do
         and_return(nil)
     end
 
-    it 'responds with an error message' do
-      expect(next_middleware).to_not receive(:call)
-      expect(subject).to_not receive(:provide)
-
-      _status, _headers, body = subject.call
-
-      expect(body.first).to include('not a customer')
-    end
+    it { is_expected.to respond_with_body_that_matches('not a customer') }
   end
 end

@@ -15,7 +15,7 @@ RSpec.describe GCMe::GCClient do
   let(:pro_client) { instance_double(GoCardlessPro::Client) }
   subject(:gc_client) { described_class.new(pro_client) }
 
-  it 'gets an active mandates' do
+  it 'gets an active mandate' do
     customer          = build_customer(id: 'CU123')
     active_mandate    = build_mandate(status: 'active')
     cancelled_mandate = build_mandate(status: 'cancelled')

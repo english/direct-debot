@@ -34,4 +34,5 @@ end
 
 group :test do
   gem 'webmock', '~> 1.22'
+  gem 'rantly', '~> 0.3.2'
 end

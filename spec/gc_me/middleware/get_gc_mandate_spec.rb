@@ -6,51 +6,41 @@ require_relative '../../../lib/gc_me/gc_client'
 require_relative '../../../lib/gc_me/middleware/parse_payment_message'
 
 RSpec.describe GCMe::Middleware::GetGCMandate do
+  subject(:route) { described_class.new(context, null_middleware) }
+
+  let(:context) { { gc_client: gc_client, gc_customer: customer } }
+  let(:gc_client) { instance_double(GCMe::GCClient) }
+  let(:customer) do
+    instance_double(GoCardlessPro::Resources::Customer, email: 'someone@example.com')
+  end
+
   context 'when the mandate exists' do
-    it 'provides the mandate from the GC api' do
-      next_middleware = double
-      gc_client       = instance_double(GCMe::GCClient)
-      customer        = double
-      context         = { gc_client: gc_client, gc_customer: customer }
-      mandate         = double
+    let(:mandate) { double }
 
-      subject = described_class.new(context, next_middleware)
-
+    before do
       expect(gc_client).
         to receive(:get_active_mandate).
         with(customer).
         and_return(mandate)
-
-      expect(next_middleware).to receive(:call)
-
-      expect(subject).
-        to receive(:provide).
-        with(gc_mandate: mandate)
-
-      subject.call
     end
+
+    it { is_expected.to call_next_middleware }
+    it { is_expected.to provide(gc_mandate: mandate) }
   end
 
   context 'when the mandate does not exist' do
-    it 'responds with an error message' do
-      next_middleware = double
-      gc_client       = instance_double(GCMe::GCClient)
-      customer        = instance_double(GoCardlessPro::Resources::Customer,
-                                        email: 'someone@example.com')
-      context         = { gc_client: gc_client, gc_customer: customer }
-
-      subject = described_class.new(context, next_middleware)
-
+    before do
       expect(gc_client).
         to receive(:get_active_mandate).
         with(customer).
         and_return(nil)
+    end
 
-      expect(next_middleware).to_not receive(:call)
+    it { is_expected.to_not call_next_middleware }
 
-      _status, _headers, body = subject.call
-
-      expect(body.first).to include('someone@example.com does not have an active mandate')
+    it do
+      is_expected.to respond_with_body_that_matches(
+        'someone@example.com does not have an active mandate')
     end
   end
 end

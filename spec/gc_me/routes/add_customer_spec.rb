@@ -23,14 +23,12 @@ RSpec.describe GCMe::Routes::AddCustomer do
                     redirect_url: 'https://foo.bar/baz')
   end
 
-  it 'creates a GoCardless redirect flow' do
+  before do
     expect(store).
       to receive(:create_redirect_flow!).
       with('US123', 'RF123')
-
-    status, headers, _body = subject.call
-
-    expect(status).to eq(302)
-    expect(headers['Location']).to eq('https://foo.bar/baz')
   end
+
+  it { is_expected.to respond_with_status(302) }
+  it { is_expected.to respond_with_header('Location', 'https://foo.bar/baz') }
 end

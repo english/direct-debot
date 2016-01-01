@@ -34,17 +34,20 @@ RSpec.describe GCMe::Routes::SlackMessages::Handler::SCHEMA do
   end
 
   it "validates 'payment' messages" do
-    valid_amounts      = ['10', '0.1', '1.50']
-    valid_currencies   = ['€', '£']
-    invalid_currencies = ['', 'a', '$']
-
-    valid_currencies.product(valid_amounts).each do |(currency, amount)|
+    property_of { [choose('€', '£'), float] }.check do |(currency, amount)|
       data = valid_params.merge('text' => "#{currency}#{amount} from someone")
 
       expect(schema).to validate(data)
     end
 
-    invalid_currencies.product(valid_amounts).each do |(currency, amount)|
+    properties = property_of do
+      invalid_currency = sized(1) { string }
+      guard !string.in?(Set.new(['€', '£']))
+
+      [invalid_currency, float]
+    end
+
+    properties.check do |(currency, amount)|
       data = valid_params.merge('text' => "#{currency}#{amount} from someone")
 
       expect(schema).to_not validate(data)

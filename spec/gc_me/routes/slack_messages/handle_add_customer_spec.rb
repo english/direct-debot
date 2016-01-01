@@ -6,12 +6,11 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAddCustomer do
   subject(:handle_add_customer) do
     context = { request: double(params: params) }
 
-    described_class.new(context, next_middleware, mail_queue: mail_queue,
+    described_class.new(context, null_middleware, mail_queue: mail_queue,
                                                   host: 'http://gc-me.test')
   end
 
   let(:mail_queue) { Queue.new }
-  let(:next_middleware) { -> () {} }
 
   context "when given an 'add customer' message" do
     let(:params) do
@@ -22,11 +21,11 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAddCustomer do
       }
     end
 
-    it 'returns a success message' do
-      status, _headers, body = handle_add_customer.call
+    it { is_expected.to respond_with_status(200) }
+    it { is_expected.to respond_with_body_that_matches('jane@example.com') }
 
-      expect(status).to eq(200)
-      expect(body.first).to include('jane@example.com')
+    it 'adds a message to the mail queue' do
+      handle_add_customer.call
 
       expect(mail_queue.length).to eq(1)
       message = mail_queue.pop
@@ -49,9 +48,6 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAddCustomer do
       }
     end
 
-    it 'calls the next middleware' do
-      expect(next_middleware).to receive(:call)
-      handle_add_customer.call
-    end
+    it { is_expected.to call_next_middleware }
   end
 end

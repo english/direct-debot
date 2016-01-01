@@ -25,8 +25,6 @@ RSpec.describe GCMe::Routes::GCCallback do
       to receive(:create_user!).
       with(gc_access_token: 'gc-token', slack_user_id: 'slack-user-id')
 
-    status, _headers, _body = gc_callback.call
-
-    expect(status).to eq(200)
+    expect(subject).to respond_with_status(200)
   end
 end
