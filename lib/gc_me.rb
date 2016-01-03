@@ -9,7 +9,6 @@ require_relative 'gc_me/routes/slack_messages'
 require_relative 'gc_me/routes/gc_callback'
 require_relative 'gc_me/routes/add_customer'
 require_relative 'gc_me/routes/add_customer_success'
-require_relative 'gc_me/db/component'
 require_relative 'gc_me/db/store'
 require_relative 'gc_me/oauth_client'
 
