@@ -30,7 +30,7 @@ RSpec.describe GCMe::DB::Store do
 
   context 'when a slack user already exists' do
     it 'overwrites the existing row' do
-      properties = property_of { [array(range(1, 100)) { string }, string] }
+      properties = property_of { [array(range(1, 10)) { string }, string] }
 
       properties.check do |(access_tokens, user_id)|
         expect do
@@ -39,7 +39,8 @@ RSpec.describe GCMe::DB::Store do
           end
         end.to change { store.all_users.count }.by(1)
 
-        expect(store.all_users.last.fetch(:gc_access_token)).to eq(access_tokens.last)
+        expect(store.all_users.last.to_h).
+          to be > { slack_user_id: user_id, gc_access_token: access_tokens.last }
       end
     end
   end
