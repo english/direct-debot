@@ -23,17 +23,16 @@ module GCMe
     ADD_CUSTOMER_SUCCESS_PATH = '/api/gc/add-customer-success'
 
     def initialize(system)
-      @system           = system
-      @server_component = system.fetch(:server_component)
-      @store            = DB::Store.new(system.fetch(:db_component).connection)
-      @oauth_client     = build_oauth_client(system)
+      @system       = system
+      @store        = DB::Store.new(system.fetch(:db_component).connection)
+      @oauth_client = build_oauth_client(system)
     end
 
     # rubocop:disable Metrics/AbcSize
     def rack_app
-      opts = { host: @server_component.host.host,
-               scheme: @server_component.host.scheme,
-               force_ssl: @server_component.host.scheme == 'https' }
+      opts = { host: server_component.host.host,
+               scheme: server_component.host.scheme,
+               force_ssl: server_component.host.scheme == 'https' }
 
       Lotus::Router.new(opts).tap do |router|
         router.get(INDEX_PATH, to: Coach::Handler.new(Routes::Index))
@@ -48,7 +47,7 @@ module GCMe
     private
 
     def build_oauth_client(system)
-      redirect_uri = "#{@server_component.host}#{GC_CALLBACK_PATH}"
+      redirect_uri = "#{server_component.host}#{GC_CALLBACK_PATH}"
 
       OAuthClient.new(system.fetch(:oauth_component).client, redirect_uri)
     end
@@ -56,32 +55,36 @@ module GCMe
     def build_slack_messages_handler
       Coach::Handler.new(Routes::SlackMessages::Handler,
                          store: @store,
-                         gc_environment: @server_component.environment,
+                         gc_environment: server_component.environment,
                          oauth_client: @oauth_client,
                          mail_queue: @system.fetch(:mail_component).input_queue,
-                         slack_token: @server_component.slack_token,
-                         host: @server_component.host)
+                         slack_token: server_component.slack_token,
+                         host: server_component.host)
     end
 
     def build_add_customer_handler
-      success_url = "#{@server_component.host}#{ADD_CUSTOMER_SUCCESS_PATH}"
+      success_url = "#{server_component.host}#{ADD_CUSTOMER_SUCCESS_PATH}"
 
       Coach::Handler.new(Routes::AddCustomer,
                          store: @store,
-                         gc_environment: @server_component.environment,
+                         gc_environment: server_component.environment,
                          success_url: success_url)
     end
 
     def build_add_customer_success_handler
       Coach::Handler.new(Routes::AddCustomerSuccess::Handler,
                          store: @store,
-                         gc_environment: @server_component.environment)
+                         gc_environment: server_component.environment)
     end
 
     def build_gc_callback_handler
       Coach::Handler.new(Routes::GCCallback,
                          store: @store,
                          oauth_client: @oauth_client)
+    end
+
+    def server_component
+      @system.fetch(:server_component)
     end
   end
 end
