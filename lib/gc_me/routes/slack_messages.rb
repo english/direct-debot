@@ -37,7 +37,7 @@ module GCMe
         using Refinements::HashSlice
 
         AUTHORISE_REGEXP      = /^authorise$/
-        PAYMENT_REGEXP        = /^(?:((?:£|€)[0-9]+(\.[0-9]+)?) from .+)$/
+        PAYMENT_REGEXP        = /^(?:((?:£|€)[0-9]+(\.[0-9]{2})?) from .+)$/
         ADD_CUSTOMER_REGEXP   = /^customers add .+@.+\..+$/
         EXPOSED_RESOURCES     = Hamster::List['customer_bank_accounts', 'customers',
                                               'events', 'mandates', 'payments',

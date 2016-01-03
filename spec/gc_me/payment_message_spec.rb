@@ -8,7 +8,7 @@ RSpec.describe GCMe::PaymentMessage do
 
     subject = described_class.parse(message)
 
-    expect(subject.to_h).to eq(
+    expect(subject).to eq(
       currency: 'GBP',
       pence: 1000,
       email: 'someone@example.com'
@@ -16,7 +16,7 @@ RSpec.describe GCMe::PaymentMessage do
   end
 
   specify do
-    properties = property_of { [choose('£', '€'), float, string] }
+    properties = property_of { [choose('£', '€'), float.round(2), string] }
 
     properties.check do |(currency, pounds, email)|
       string = "#{currency}#{pounds} from #{email}"
@@ -24,10 +24,10 @@ RSpec.describe GCMe::PaymentMessage do
       message = described_class.parse(string)
 
       expect(message[:currency]).to be_in(Set.new(%w(GBP EUR)))
-      expect(message[:email]).to be_a(String)
+      expect(message[:email]).to eq(email)
 
       expect(message[:pence]).to be_a(Fixnum)
-      expect(message[:pence] / 100.0).to be_within(0.01).of(pounds)
+      expect(message[:pence] / 100.0).to eq(pounds)
     end
   end
 end
