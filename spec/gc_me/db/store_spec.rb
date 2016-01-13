@@ -39,8 +39,8 @@ RSpec.describe GCMe::DB::Store do
           end
         end.to change { store.all_users.count }.by(1)
 
-        expect(store.all_users.last.to_h).
-          to be > { slack_user_id: user_id, gc_access_token: access_tokens.last }
+        user = store.find_user(user_id)
+        expect(user.fetch(:gc_access_token)).to eq(access_tokens.last)
       end
     end
   end
