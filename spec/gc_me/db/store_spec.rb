@@ -7,10 +7,7 @@ require_relative '../../support/transaction'
 RSpec.describe GCMe::DB::Store do
   let(:system) { GCMe::System.build }
 
-  around do |example|
-    system.start
-    Transaction.with_rollback(system) { example.call }
-  end
+  before { system.start }
 
   subject(:store) { described_class.new(system.fetch(:db_component).connection) }
 
@@ -20,11 +17,13 @@ RSpec.describe GCMe::DB::Store do
     end
 
     properties.check do |user|
-      expect { store.create_user!(user) }.
-        to change { store.count_users! }.
-        by(1)
+      Transaction.with_rollback(system) do
+        expect { store.create_user!(user) }.
+          to change { store.count_users! }.
+          by(1)
 
-      expect(store.all_users.last.to_h).to be > user
+        expect(store.all_users.last.to_h).to be > user
+      end
     end
   end
 
@@ -33,27 +32,31 @@ RSpec.describe GCMe::DB::Store do
       properties = property_of { [array(range(1, 10)) { string }, string] }
 
       properties.check do |(access_tokens, user_id)|
-        expect do
-          access_tokens.each do |token|
-            store.create_user!(gc_access_token: token, slack_user_id: user_id)
-          end
-        end.to change { store.all_users.count }.by(1)
+        Transaction.with_rollback(system) do
+          expect do
+            access_tokens.each do |token|
+              store.create_user!(gc_access_token: token, slack_user_id: user_id)
+            end
+          end.to change { store.all_users.count }.by(1)
 
-        user = store.find_user(user_id)
-        expect(user.fetch(:gc_access_token)).to eq(access_tokens.last)
+          user = store.find_user(user_id)
+          expect(user.fetch(:gc_access_token)).to eq(access_tokens.last)
+        end
       end
     end
   end
 
   it 'finds a gc access token by a gc redirect flow id' do
     property_of { [string, string, string] }.check do |(token, user_id, redirect_flow_id)|
-      store.create_user!(gc_access_token: token, slack_user_id: user_id)
-      store.create_redirect_flow!(user_id, redirect_flow_id)
+      Transaction.with_rollback(system) do
+        store.create_user!(gc_access_token: token, slack_user_id: user_id)
+        store.create_redirect_flow!(user_id, redirect_flow_id)
 
-      redirect_flow = store.find_redirect_flow(redirect_flow_id)
-      access_token  = store.find_access_token_for_redirect_flow(redirect_flow.fetch(:id))
+        redirect_flow = store.find_redirect_flow(redirect_flow_id)
+        access_token = store.find_access_token_for_redirect_flow(redirect_flow.fetch(:id))
 
-      expect(access_token).to eq(token)
+        expect(access_token).to eq(token)
+      end
     end
   end
 end
