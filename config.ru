@@ -6,6 +6,7 @@ if ENV['RACK_ENV'] == 'development'
   Dotenv.load
 end
 
+require 'airbrake'
 require './lib/gc_me'
 require './lib/gc_me/system'
 
@@ -15,6 +16,7 @@ system.start
 app = GCMe::Application.new(system)
 
 begin
+  use Airbrake::Rack::Middleware
   run app.rack_app
 ensure
   system.stop
