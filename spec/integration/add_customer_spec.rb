@@ -9,7 +9,7 @@ require_relative '../../lib/gc_me/db/store'
 
 RSpec.describe 'adding a GoCardless customer' do
   let(:system) { GCMe::System.build }
-  let(:store) { GCMe::DB::Store.new(system.fetch(:db_component).connection) }
+  let(:store) { GCMe::DB::Store.new(system.fetch(:db_component).database) }
 
   around do |example|
     system.start

@@ -13,10 +13,14 @@ module GCMe
   class System
     def self.build
       new(Hamster::Hash.new(
-            db_component: GCMe::Components::DB.new(Prius.get(:database_url)),
+            db_component: build_db_component,
             oauth_component: build_oauth_component,
             mail_component: build_mail_component,
             server_component: build_server_component))
+    end
+
+    private_class_method def self.build_db_component
+      GCMe::Components::DB.new(Prius.get(:database_url), Prius.get(:thread_count))
     end
 
     private_class_method def self.build_oauth_component

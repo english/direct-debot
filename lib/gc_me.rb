@@ -24,7 +24,7 @@ module GCMe
 
     def initialize(system)
       @system       = system
-      @store        = DB::Store.new(system.fetch(:db_component).connection)
+      @store        = DB::Store.new(system.fetch(:db_component).database)
       @oauth_client = build_oauth_client(system)
     end
 

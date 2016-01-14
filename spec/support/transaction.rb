@@ -4,7 +4,7 @@ require 'sequel'
 
 module Transaction
   def self.with_rollback(system)
-    system.fetch(:db_component).connection.transaction do
+    system.fetch(:db_component).database.transaction do
       begin
         yield
       ensure
