@@ -8,6 +8,7 @@ require_relative 'components/mail'
 require_relative 'components/oauth'
 require_relative 'components/server'
 require_relative 'components/airbrake'
+require_relative 'components/logger'
 
 module GCMe
   # Configures and manages the lifecycle of potentially stateful components.
@@ -18,7 +19,8 @@ module GCMe
             oauth_component: build_oauth_component,
             mail_component: build_mail_component,
             server_component: build_server_component,
-            airbrake_component: build_airbrake_component))
+            airbrake_component: build_airbrake_component,
+            logger_component: build_logger_component))
     end
 
     private_class_method def self.build_db_component
@@ -52,6 +54,10 @@ module GCMe
     private_class_method def self.build_airbrake_component
       GCMe::Components::Airbrake.new(Prius.get(:airbrake_project_id),
                                      Prius.get(:airbrake_api_key))
+    end
+
+    private_class_method def self.build_logger_component
+      GCMe::Components::Logger.new(Prius.get(:log_path))
     end
 
     def initialize(components)
