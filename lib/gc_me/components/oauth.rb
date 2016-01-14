@@ -19,10 +19,13 @@ module GCMe
       end
 
       def start
+        connection_opts = { request: { timeout: 1 } }
+
         @client = OAuth2::Client.new(@client_id, @client_secret,
                                      site: @connect_url,
                                      authorize_url: @authorize_path,
-                                     token_url: @access_token_path)
+                                     token_url: @access_token_path,
+                                     connection_opts: connection_opts)
 
         self
       end
