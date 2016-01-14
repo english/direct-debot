@@ -115,7 +115,7 @@ module GoCardlessPro
     def default_options
       {
         default_headers: { 
-          'GoCardless-Version' => '2015-04-29',
+          'GoCardless-Version' => '2015-07-06',
           'User-Agent' => "#{user_agent}",
           'Content-Type' => 'application/json'
         }
