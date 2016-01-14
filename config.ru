@@ -7,6 +7,7 @@ if ENV['RACK_ENV'] == 'development'
 end
 
 require 'airbrake'
+require 'newrelic_rpm'
 require './lib/gc_me'
 require './lib/gc_me/system'
 
