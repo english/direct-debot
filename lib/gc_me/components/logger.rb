@@ -19,7 +19,9 @@ module GCMe
       end
 
       def stop
-        @logger&.close
+        # if we try to close the logger with $stdout it blows up...
+        @logger&.close if @path
+
         @logger = nil
       end
     end
