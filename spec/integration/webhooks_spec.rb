@@ -2,6 +2,7 @@
 
 require 'webmock/rspec'
 require_relative '../support/transaction'
+require_relative '../support/eventually'
 require_relative '../../lib/gc_me'
 require_relative '../../lib/gc_me/db/store'
 require_relative '../../lib/gc_me/system'
@@ -124,6 +125,11 @@ RSpec.describe 'processing webhooks' do
                         headers: webhook_headers)
 
     expect(response.status).to eq(204)
+
+    Eventually.try(timeout: 0.5, sleep_time: 0.1) do
+      system.fetch(:webhook_component).input_queue.empty? &&
+        system.fetch(:slack_component).input_queue.empty?
+    end
 
     expect(ev123_request).to have_been_made
     expect(ev456_request).to have_been_made
