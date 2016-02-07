@@ -48,7 +48,8 @@ module GCMe
     private_class_method def self.build_server_component
       GCMe::Components::Server.new(Prius.get(:host),
                                    Prius.get(:gc_environment),
-                                   Prius.get(:slack_token))
+                                   Prius.get(:slack_token),
+                                   Prius.get(:slack_bot_api_token))
     end
 
     private_class_method def self.build_airbrake_component
