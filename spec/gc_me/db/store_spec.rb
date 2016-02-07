@@ -13,7 +13,7 @@ RSpec.describe GCMe::DB::Store do
 
   it 'persists user records' do
     properties = property_of do
-      dict(2) { [choose(:gc_access_token, :slack_user_id), string] }
+      dict(2) { [choose(:gc_access_token, :slack_user_id, :organisation_id), string] }
     end
 
     properties.check do |user|
@@ -29,13 +29,14 @@ RSpec.describe GCMe::DB::Store do
 
   context 'when a slack user already exists' do
     it 'overwrites the existing row' do
-      properties = property_of { [array(range(1, 10)) { string }, string] }
+      properties = property_of { [array(range(1, 10)) { string }, string, string] }
 
-      properties.check do |(access_tokens, user_id)|
+      properties.check do |(access_tokens, organisation_id, user_id)|
         Transaction.with_rollback(system) do
           expect do
             access_tokens.each do |token|
-              store.create_user!(gc_access_token: token, slack_user_id: user_id)
+              store.create_user!(gc_access_token: token, organisation_id: organisation_id,
+                                 slack_user_id: user_id)
             end
           end.to change { store.all_users.count }.by(1)
 
@@ -47,9 +48,12 @@ RSpec.describe GCMe::DB::Store do
   end
 
   it 'finds a gc access token by a gc redirect flow id' do
-    property_of { [string, string, string] }.check do |(token, user_id, redirect_flow_id)|
+    properties = property_of { [string, string, string] }
+
+    properties.check do |(token, user_id, organisation_id, redirect_flow_id)|
       Transaction.with_rollback(system) do
-        store.create_user!(gc_access_token: token, slack_user_id: user_id)
+        store.create_user!(gc_access_token: token, organisation_id: organisation_id,
+                           slack_user_id: user_id)
         store.create_redirect_flow!(user_id, redirect_flow_id)
 
         redirect_flow = store.find_redirect_flow(redirect_flow_id)

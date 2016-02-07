@@ -13,7 +13,7 @@ module GCMe
       SCHEMA = {
         'type' => 'object',
         'required' => %w(code state),
-        'additionalProperties': false,
+        'additionalProperties' => false,
         'properties' => {
           'code' => { 'type' => 'string' },
           'state' => { 'type' => 'string' }
@@ -27,7 +27,9 @@ module GCMe
         code, state = params.fetch_values('code', 'state')
 
         access_token = oauth_client.create_access_token!(code)
-        store.create_user!(gc_access_token: access_token, slack_user_id: state)
+        store.create_user!(gc_access_token: access_token.fetch(:token),
+                           organisation_id: access_token.fetch(:organisation_id),
+                           slack_user_id: state)
 
         [200, {}, ['Gotcha!']]
       end

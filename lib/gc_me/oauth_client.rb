@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'hamster'
+
 module GCMe
   # Wraps OAuth2::Client with a nicer interface
   class OAuthClient
@@ -9,7 +11,10 @@ module GCMe
     end
 
     def create_access_token!(code)
-      @client.auth_code.get_token(code, redirect_uri: @redirect_uri).token
+      access_token = @client.auth_code.get_token(code, redirect_uri: @redirect_uri)
+
+      Hamster::Hash.new(token: access_token.token,
+                        organisation_id: access_token.params.fetch('organisation_id'))
     end
 
     def authorize_url(state)

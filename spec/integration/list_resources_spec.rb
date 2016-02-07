@@ -21,7 +21,9 @@ RSpec.describe 'adding a GoCardless customer' do
   let(:store) { GCMe::DB::Store.new(system.fetch(:db_component).database) }
 
   before do
-    store.create_user!(slack_user_id: 'U123', gc_access_token: 'AT123')
+    store.create_user!(slack_user_id: 'U123',
+                       organisation_id: 'OR123',
+                       gc_access_token: 'AT123')
   end
 
   context 'listing resources' do

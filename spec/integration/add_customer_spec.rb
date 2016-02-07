@@ -21,7 +21,9 @@ RSpec.describe 'adding a GoCardless customer' do
   subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
 
   before do
-    store.create_user!(slack_user_id: 'U123', gc_access_token: 'AT123')
+    store.create_user!(slack_user_id: 'U123',
+                       organisation_id: 'OR123',
+                       gc_access_token: 'AT123')
   end
 
   context 'for the merchant adding a customer' do

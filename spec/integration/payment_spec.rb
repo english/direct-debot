@@ -21,7 +21,9 @@ RSpec.describe 'creating a payment' do
 
   before do
     store = GCMe::DB::Store.new(system.fetch(:db_component).database)
-    store.create_user!(slack_user_id: 'U123', gc_access_token: 'AT123')
+    store.create_user!(slack_user_id: 'U123',
+                       organisation_id: 'OR123',
+                       gc_access_token: 'AT123')
   end
 
   let!(:customers_request) do

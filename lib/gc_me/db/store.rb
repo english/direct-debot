@@ -25,18 +25,27 @@ module GCMe
         Hamster.from(user)
       end
 
-      def create_user!(gc_access_token:, slack_user_id:)
+      def find_user_by_organisation_id(organisation_id)
+        user = @db.
+          from(:users).
+          where(organisation_id: organisation_id).
+          first
+
+        Hamster.from(user)
+      end
+
+      def create_user!(gc_access_token:, organisation_id:, slack_user_id:)
         update_count = @db.
           from(:users).
           where(slack_user_id: slack_user_id).
-          update(gc_access_token: gc_access_token)
+          update(gc_access_token: gc_access_token, organisation_id: organisation_id)
 
         return unless update_count.zero?
 
         @db.
           from(:users).
-          insert(gc_access_token: gc_access_token, slack_user_id: slack_user_id,
-                 id: build_id)
+          insert(gc_access_token: gc_access_token, organisation_id: organisation_id,
+                 slack_user_id: slack_user_id, id: build_id)
       end
 
       def count_users!
