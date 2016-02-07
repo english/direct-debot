@@ -79,7 +79,7 @@ RSpec.describe 'processing webhooks' do
   let!(:ev123_message) do
     params = {
       channel: 'US123',
-      token: system.fetch(:server_component).slack_bot_api_token,
+      token: system.fetch(:slack_component).slack_bot_api_token,
       as_user: 'true',
       text: 'Payment PM123 confirmed'
     }
@@ -93,7 +93,7 @@ RSpec.describe 'processing webhooks' do
   let!(:ev456_message) do
     params = {
       channel: 'US456',
-      token: system.fetch(:server_component).slack_bot_api_token,
+      token: system.fetch(:slack_component).slack_bot_api_token,
       as_user: 'true',
       text: 'Payment PM456 failed'
     }

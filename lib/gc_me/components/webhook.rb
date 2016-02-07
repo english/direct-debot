@@ -9,15 +9,14 @@ module GCMe
     # Wraps up the Webhook library with a minimal interface.
     class Webhook
       def self.depends_on
-        { DB => :db_component, Server => :server_component }
+        { DB => :db_component, Server => :server_component, Slack => :slack_component }
       end
 
       attr_reader :input_queue
-      attr_writer :db_component, :server_component
+      attr_writer :db_component, :server_component, :slack_component
 
-      def initialize(input_queue, slack_bot_api_token)
+      def initialize(input_queue)
         @input_queue = input_queue
-        @slack_bot_api_token = slack_bot_api_token
         @running = false
       end
 
@@ -33,7 +32,7 @@ module GCMe
             job = GCMe::Jobs::WebhookEvent.new(
               @db_component.database,
               @server_component.environment,
-              @server_component.slack_bot_api_token,
+              @slack_component.input_queue,
               message.fetch(:organisation_id),
               message.fetch(:event_id)
             )

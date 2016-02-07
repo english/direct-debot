@@ -9,10 +9,10 @@ require_relative '../db/store'
 module GCMe
   module Jobs
     class WebhookEvent
-      def initialize(database, environment, slack_bot_api_token, organisation_id, event_id)
+      def initialize(database, environment, slack_queue, organisation_id, event_id)
         @database = database
         @environment = environment
-        @slack_bot_api_token = slack_bot_api_token
+        @slack_queue = slack_queue
         @organisation_id = organisation_id
         @event_id = event_id
       end
@@ -21,9 +21,9 @@ module GCMe
         store   = GCMe::DB::Store.new(@database)
         user    = store.find_user_by_organisation_id(@organisation_id)
         event   = get_latest_event!(@event_id, user, @environment)
-        message = make_slack_message(event, user, @slack_bot_api_token)
+        message = make_slack_message(event, user)
 
-        send_slack_message!(message)
+        @slack_queue << message
       end
 
       private
@@ -37,17 +37,12 @@ module GCMe
         gc_client.show('events', event_id)
       end
 
-      def make_slack_message(event, user, slack_bot_api_token)
+      def make_slack_message(event, user)
         Hamster::Hash.new(
           channel: user.fetch(:slack_user_id),
-          token: slack_bot_api_token,
           as_user: 'true',
           text: "#{format_resource(event.resource_type)} #{event.links.payment} #{event.action}"
         )
-      end
-
-      def send_slack_message!(message)
-        Net::HTTP.post_form(URI('https://slack.com/api/chat.postMessage'), message.to_h)
       end
 
       def format_resource(string)
