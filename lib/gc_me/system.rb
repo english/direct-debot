@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'prius'
+require 'tsort'
 require_relative '../../config/prius'
 require 'hamster'
 require_relative 'components/db'
@@ -9,6 +10,7 @@ require_relative 'components/oauth'
 require_relative 'components/server'
 require_relative 'components/airbrake'
 require_relative 'components/logger'
+require_relative 'components/webhook'
 
 module GCMe
   # Configures and manages the lifecycle of potentially stateful components.
@@ -20,7 +22,8 @@ module GCMe
             mail_component: build_mail_component,
             server_component: build_server_component,
             airbrake_component: build_airbrake_component,
-            logger_component: build_logger_component))
+            logger_component: build_logger_component,
+            webhook_component: build_webhook_component))
     end
 
     private_class_method def self.build_db_component
@@ -61,6 +64,10 @@ module GCMe
       GCMe::Components::Logger.new(Prius.get(:log_path))
     end
 
+    private_class_method def self.build_webhook_component
+      GCMe::Components::Webhook.new(Queue.new, Prius.get(:slack_bot_api_token))
+    end
+
     def initialize(components)
       @components = components
     end
@@ -70,15 +77,63 @@ module GCMe
     end
 
     def start
-      @components = @components.reduce(Hamster::Hash.new) do |memo, (name, component)|
+      components = sort_by_dependencies(@components)
+
+      @components = components.reduce(Hamster::Hash.new) do |memo, (name, component)|
+        if component.class.respond_to?(:depends_on)
+          dependencies = component.class.depends_on
+
+          dependencies.each do |(klass, attr)|
+            inst = memo.values.find { |inst| inst.is_a?(klass) }
+
+            component.public_send("#{attr}=", inst)
+          end
+        end
+
         memo.put(name, component.start)
       end
     end
 
     def stop
-      @components = @components.reduce(Hamster::Hash.new) do |memo, (name, component)|
+      components = sort_by_dependencies(@components).to_a.reverse
+
+      @components = components.reduce(Hamster::Hash.new) do |memo, (name, component)|
         memo.put(name, component.stop)
       end
+    end
+
+    private
+
+    def sort_by_dependencies(components)
+      components_and_dependencies = components.values.map do |instance|
+        if instance.class.respond_to?(:depends_on)
+          [instance.class, instance.class.depends_on.keys]
+        else
+          [instance.class, []]
+        end
+      end
+
+      hash = Hash[components_and_dependencies]
+
+      class << hash
+        include TSort
+
+        alias tsort_each_node each_key
+
+        def tsort_each_child(node, &block)
+          fetch(node).each(&block)
+        end
+      end
+
+      in_starting_order = hash.tsort
+
+      ordered_pairs = in_starting_order.map do |klass|
+        name, inst = components.find { |(k, v)| v.is_a?(klass) }
+
+        [name, inst]
+      end
+
+      ordered_pairs
     end
   end
 end
