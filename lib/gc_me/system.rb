@@ -66,7 +66,7 @@ module GCMe
     end
 
     private_class_method def self.build_webhook_component
-      GCMe::Components::Webhook.new(Queue.new)
+      GCMe::Components::Webhook.new(Queue.new, Prius.get(:gc_webhook_secret))
     end
 
     private_class_method def self.build_slack_component

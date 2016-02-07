@@ -87,8 +87,11 @@ module GCMe
     end
 
     def build_gc_webhooks_handler
+      webhook_component = @system.fetch(:webhook_component)
+
       Coach::Handler.new(Routes::GCWebhooks,
-                         queue: @system.fetch(:webhook_component).input_queue)
+                         gc_webhook_secret: webhook_component.gc_webhook_secret,
+                         queue: webhook_component.input_queue)
     end
 
     def server_component

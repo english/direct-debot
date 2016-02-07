@@ -12,12 +12,13 @@ module GCMe
         { DB => :db_component, Server => :server_component, Slack => :slack_component }
       end
 
-      attr_reader :input_queue
+      attr_reader :input_queue, :gc_webhook_secret
       attr_writer :db_component, :server_component, :slack_component
 
-      def initialize(input_queue, worker_count: 2)
+      def initialize(input_queue, gc_webhook_secret, worker_count: 2)
         @input_queue = input_queue
         @worker_count = worker_count
+        @gc_webhook_secret = gc_webhook_secret
         @running = false
       end
 
