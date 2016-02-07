@@ -9,6 +9,7 @@ require_relative 'gc_me/routes/slack_messages'
 require_relative 'gc_me/routes/gc_callback'
 require_relative 'gc_me/routes/add_customer'
 require_relative 'gc_me/routes/add_customer_success'
+require_relative 'gc_me/routes/gc_webhooks'
 require_relative 'gc_me/db/store'
 require_relative 'gc_me/oauth_client'
 
@@ -21,6 +22,7 @@ module GCMe
     GC_CALLBACK_PATH          = '/api/gc/callback'
     ADD_CUSTOMER_PATH         = '/add-customer'
     ADD_CUSTOMER_SUCCESS_PATH = '/api/gc/add-customer-success'
+    GC_WEBHOOKS_PATH          = '/api/gc/webhooks'
 
     def initialize(system)
       @system       = system
@@ -40,6 +42,7 @@ module GCMe
         router.post(SLACK_MESSAGES_PATH, to: build_slack_messages_handler)
         router.get(ADD_CUSTOMER_PATH, to: build_add_customer_handler)
         router.get(ADD_CUSTOMER_SUCCESS_PATH, to: build_add_customer_success_handler)
+        router.post(GC_WEBHOOKS_PATH, to: build_gc_webhooks_handler)
       end
     end
     # rubocop:enable Metrics/AbcSize
@@ -81,6 +84,14 @@ module GCMe
       Coach::Handler.new(Routes::GCCallback,
                          store: @store,
                          oauth_client: @oauth_client)
+    end
+
+    def build_gc_webhooks_handler
+      Coach::Handler.new(Routes::GCWebhooks,
+                         gc_environment: server_component.environment,
+                         slack_bot_api_token: server_component.slack_bot_api_token,
+                         store: @store,
+                         queue: @system.fetch(:webhook_component).input_queue)
     end
 
     def server_component
