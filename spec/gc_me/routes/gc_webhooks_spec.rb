@@ -36,8 +36,8 @@ RSpec.describe GCMe::Routes::GCWebhooks do
     expect(subject).to respond_with_status(204)
 
     expected_messages = [
-      { organisation_id: "OR123", event_id: "EV123" },
-      { organisation_id: "OR456", event_id: "EV456" }
+      { organisation_id: 'OR123', event_id: 'EV123' },
+      { organisation_id: 'OR456', event_id: 'EV456' }
     ]
     expect(messages).to match_array(expected_messages)
   end

@@ -118,7 +118,7 @@ module GCMe
       class << hash
         include TSort
 
-        alias tsort_each_node each_key
+        alias_method :tsort_each_node, :each_key
 
         def tsort_each_child(node, &block)
           fetch(node).each(&block)
@@ -128,7 +128,7 @@ module GCMe
       in_starting_order = hash.tsort
 
       ordered_pairs = in_starting_order.map do |klass|
-        name, inst = components.find { |(k, v)| v.is_a?(klass) }
+        name, inst = components.find { |(_k, v)| v.is_a?(klass) }
 
         [name, inst]
       end

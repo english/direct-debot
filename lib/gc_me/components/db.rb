@@ -33,7 +33,7 @@ module GCMe
       def stop
         return self unless @database
 
-        @database&.disconnect
+        @database&.disconnect unless @database.is_a?(Sequel::SQLite::Database)
 
         self.class.new(@url, @max_connections)
       end

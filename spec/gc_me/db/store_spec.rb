@@ -13,7 +13,7 @@ RSpec.describe GCMe::DB::Store do
 
   it 'persists user records' do
     properties = property_of do
-      dict(2) { [choose(:gc_access_token, :slack_user_id, :organisation_id), string] }
+      dict(3) { [choose(:gc_access_token, :slack_user_id, :organisation_id), string] }
     end
 
     properties.check do |user|
@@ -48,7 +48,7 @@ RSpec.describe GCMe::DB::Store do
   end
 
   it 'finds a gc access token by a gc redirect flow id' do
-    properties = property_of { [string, string, string] }
+    properties = property_of { [string, string, string, string] }
 
     properties.check do |(token, user_id, organisation_id, redirect_flow_id)|
       Transaction.with_rollback(system) do

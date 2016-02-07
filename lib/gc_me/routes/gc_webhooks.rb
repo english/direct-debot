@@ -15,7 +15,7 @@ module GCMe
         params.fetch('events').each do |event|
           queue << {
             organisation_id: event.dig!('links', 'organisation'),
-            event_id: event.fetch("id")
+            event_id: event.fetch('id')
           }
         end
 

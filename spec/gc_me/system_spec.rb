@@ -40,7 +40,7 @@ RSpec.describe GCMe::System do
     end
   end
 
-  it "starts components in order" do
+  it 'starts components in order' do
     db = DB.new
     job_queue = JobQueue.new
     mailer = Mailer.new
@@ -56,7 +56,7 @@ RSpec.describe GCMe::System do
     system.start
   end
 
-  it "provides dependencies" do
+  it 'provides dependencies' do
     db = DB.new
     job_queue = JobQueue.new
     mailer = Mailer.new
@@ -67,7 +67,7 @@ RSpec.describe GCMe::System do
     expect(job_queue.my_db).to be(db)
   end
 
-  it "stops components in reverse order" do
+  it 'stops components in reverse order' do
     db = DB.new
     job_queue = JobQueue.new
     mailer = Mailer.new
