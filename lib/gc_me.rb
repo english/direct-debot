@@ -91,7 +91,9 @@ module GCMe
                          gc_environment: server_component.environment,
                          slack_bot_api_token: server_component.slack_bot_api_token,
                          store: @store,
-                         queue: @system.fetch(:webhook_component).input_queue)
+                         queue: Queue.new
+                         # queue: @system.fetch(:webhook_component).input_queue,
+                        )
     end
 
     def server_component

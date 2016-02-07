@@ -10,7 +10,7 @@ require_relative 'components/oauth'
 require_relative 'components/server'
 require_relative 'components/airbrake'
 require_relative 'components/logger'
-require_relative 'components/webhook'
+# require_relative 'components/webhook'
 
 module GCMe
   # Configures and manages the lifecycle of potentially stateful components.
@@ -23,7 +23,8 @@ module GCMe
             server_component: build_server_component,
             airbrake_component: build_airbrake_component,
             logger_component: build_logger_component,
-            webhook_component: build_webhook_component))
+            # webhook_component: build_webhook_component
+            ))
     end
 
     private_class_method def self.build_db_component
@@ -64,9 +65,9 @@ module GCMe
       GCMe::Components::Logger.new(Prius.get(:log_path))
     end
 
-    private_class_method def self.build_webhook_component
-      GCMe::Components::Webhook.new(Queue.new, Prius.get(:slack_bot_api_token))
-    end
+    # private_class_method def self.build_webhook_component
+    #   GCMe::Components::Webhook.new(Queue.new, Prius.get(:slack_bot_api_token))
+    # end
 
     def initialize(components)
       @components = components
