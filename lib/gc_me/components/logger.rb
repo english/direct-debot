@@ -23,6 +23,8 @@ module GCMe
         @logger&.close if @path
 
         @logger = nil
+
+        self
       end
     end
   end

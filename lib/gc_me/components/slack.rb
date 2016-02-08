@@ -8,7 +8,12 @@ module GCMe
     class Slack
       POST_MESSAGE_URL = URI('https://slack.com/api/chat.postMessage')
 
+      def self.depends_on
+        { Logger => :logger }
+      end
+
       attr_reader :input_queue, :slack_bot_api_token
+      attr_writer :logger
 
       def initialize(input_queue, slack_bot_api_token)
         @input_queue = input_queue
@@ -42,9 +47,18 @@ module GCMe
       private
 
       def post_form(uri, data)
+        @logger.logger.info("sending slack message: #{data}")
+
         request = Net::HTTP::Post.new(uri)
         request.set_form_data(data)
 
+        response = send_request(request, uri)
+
+        @logger.logger.info(
+          "response from sending slack message: #{response.code} #{response.message}")
+      end
+
+      def send_request(request, uri)
         Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
           http.open_timeout = 1
           http.read_timeout = 1
