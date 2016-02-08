@@ -13,7 +13,8 @@ RSpec.describe GCMe::Routes::GCWebhooks do
       )
     }
 
-    described_class.new(context, nil, store: store, queue: queue, gc_webhook_secret: 'foo')
+    described_class.new(context, nil,
+                        store: store, queue: queue, gc_webhook_secret: 'foo')
   end
 
   let(:params) do
@@ -35,7 +36,7 @@ RSpec.describe GCMe::Routes::GCWebhooks do
       messages = []
 
       worker = Thread.new do
-        while message = queue.pop
+        while (message = queue.pop)
           messages << message
         end
       end

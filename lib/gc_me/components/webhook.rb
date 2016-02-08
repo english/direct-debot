@@ -28,23 +28,7 @@ module GCMe
         @running = true
 
         threads = @worker_count.times.map do
-          Thread.new do
-            while @running
-              message = @input_queue.pop
-
-              job = GCMe::Jobs::WebhookEvent.new(
-                @db_component.database,
-                @server_component.environment,
-                @slack_component.input_queue,
-                message.fetch(:organisation_id),
-                message.fetch(:event_id)
-              )
-
-              job.perform!
-
-              sleep(0.1)
-            end
-          end
+          Thread.new { perform_job(@input_queue.pop) while @running }
         end
 
         threads.each { |t| t.abort_on_exception = true }
@@ -56,6 +40,20 @@ module GCMe
         @running = false
 
         self
+      end
+
+      private
+
+      def perform_job(message)
+        job = GCMe::Jobs::WebhookEvent.new(
+          @db_component.database,
+          @server_component.environment,
+          @slack_component.input_queue,
+          message.fetch(:organisation_id),
+          message.fetch(:event_id)
+        )
+
+        job.perform!
       end
     end
   end

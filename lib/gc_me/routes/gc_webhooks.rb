@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 require 'coach'
-require "openssl"
+require 'openssl'
 # require_relative '../middleware/json_schema'
 require_relative '../refinements/hash_dig_strict'
 
 module GCMe
   module Routes
+    # Handle GC webhooks by:
+    #  1. checking the signature of the webhook
+    #  2. if the signature is good, enqueues a job to process it
     class GCWebhooks < Coach::Middleware
       using Refinements::HashDigStrict
 
@@ -37,6 +40,7 @@ module GCMe
 
         digest = OpenSSL::Digest.new('sha256')
         calculated_signature = OpenSSL::HMAC.hexdigest(digest, webhook_secret, body)
+        request.body.rewind
 
         calculated_signature == request_signature
       end

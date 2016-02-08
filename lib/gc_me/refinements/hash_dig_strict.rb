@@ -4,7 +4,7 @@ module GCMe
     module HashDigStrict
       refine Hash do
         def dig!(*keys)
-          keys.reduce(self) { |memo, key| memo.fetch(key) }
+          keys.reduce(self, &:fetch)
         end
       end
     end

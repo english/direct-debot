@@ -20,10 +20,10 @@ RSpec.describe 'processing webhooks' do
 
   let(:webhook_headers) do
     {
-      'User-Agent' => 'gocardless-webhook-service/1.1',
-      'Content-Type' => 'application/json',
-      'Webhook-Signature' =>
-        '86f8bb84a4de63cff4af48f22b64b20970b415b066e3d21459ea515052860514'
+      'HTTP_USER_AGENT' => 'gocardless-webhook-service/1.1',
+      'HTTP_CONTENT_TYPE' => 'application/json',
+      'HTTP_WEBHOOK_SIGNATURE' =>
+        'b02b11f82140eded07369dc8cfafb587bfd951ce7394a906df8eaa50d4c39afb'
     }
   end
 
@@ -105,6 +105,8 @@ RSpec.describe 'processing webhooks' do
                 headers: { 'Content-Type' => 'application/json' })
   end
 
+  let(:params) { { 'events' => [ev123, ev456] } }
+
   before do
     store = GCMe::DB::Store.new(system.fetch(:db_component).database)
 
@@ -120,21 +122,16 @@ RSpec.describe 'processing webhooks' do
   it 'records receipt of the webhook and notifies the slack user' do
     host = system.fetch(:server_component).host.to_s
 
-    response = app.post("#{host}/api/gc/webhooks",
-                        params: { 'events' => [ev123, ev456] },
-                        headers: webhook_headers)
+    response = app.post("#{host}/api/gc/webhooks", webhook_headers.merge(params: params))
 
     expect(response.status).to eq(204)
 
-    Eventually.try(timeout: 0.5, sleep_time: 0.1) do
-      system.fetch(:webhook_component).input_queue.empty? &&
-        system.fetch(:slack_component).input_queue.empty?
+    Eventually.try(timeout: 1, sleep_time: 0.1) do
+      expect(ev123_request).to have_been_made
+      expect(ev456_request).to have_been_made
+
+      expect(ev123_message).to have_been_made
+      expect(ev456_message).to have_been_made
     end
-
-    expect(ev123_request).to have_been_made
-    expect(ev456_request).to have_been_made
-
-    expect(ev123_message).to have_been_made
-    expect(ev456_message).to have_been_made
   end
 end

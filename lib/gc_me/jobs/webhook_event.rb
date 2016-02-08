@@ -8,6 +8,8 @@ require_relative '../db/store'
 
 module GCMe
   module Jobs
+    # Processes a webhook event by fetching the latest event and putting an appropriate
+    # message on the slack queue
     class WebhookEvent
       def initialize(database, environment, slack_queue, organisation_id, event_id)
         @database = database
@@ -29,19 +31,27 @@ module GCMe
       private
 
       def get_latest_event!(event_id, user, gc_environment)
-        client = GoCardlessPro::Client.new(environment: gc_environment,
-                                           access_token: user.fetch(:gc_access_token),
-                                           connection_options: { request: { timeout: 1 } })
+        client = GoCardlessPro::Client.new(
+          environment: gc_environment,
+          access_token: user.fetch(:gc_access_token),
+          connection_options: { request: { timeout: 1 } })
+
         gc_client = GCClient.new(client)
 
         gc_client.show('events', event_id)
       end
 
       def make_slack_message(event, user)
+        text = [
+          format_resource(event.resource_type),
+          event.links.payment,
+          event.action
+        ].join(' ')
+
         Hamster::Hash.new(
           channel: user.fetch(:slack_user_id),
           as_user: 'true',
-          text: "#{format_resource(event.resource_type)} #{event.links.payment} #{event.action}"
+          text: text
         )
       end
 

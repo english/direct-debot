@@ -86,13 +86,7 @@ module GCMe
 
       @components = components.reduce(Hamster::Hash.new) do |memo, (name, component)|
         if component.class.respond_to?(:depends_on)
-          dependencies = component.class.depends_on
-
-          dependencies.each do |(klass, attr)|
-            inst = memo.values.find { |inst| inst.is_a?(klass) }
-
-            component.public_send("#{attr}=", inst)
-          end
+          assign_dependencies(component, memo)
         end
 
         memo.put(name, component.start)
@@ -109,36 +103,55 @@ module GCMe
 
     private
 
+    # Allows a system map to be sorted in dependency order
+    class DependencyMap
+      include TSort
+
+      def initialize(components)
+        @components = components_and_dependencies(components)
+      end
+
+      alias sort tsort
+
+      private
+
+      def tsort_each_node(&block)
+        @components.each_key(&block)
+      end
+
+      def tsort_each_child(node, &block)
+        @components.fetch(node).each(&block)
+      end
+
+      def components_and_dependencies(components)
+        components.values.reduce({}) do |memo, instance|
+          if instance.class.respond_to?(:depends_on)
+            memo.merge(instance.class => instance.class.depends_on.keys)
+          else
+            memo.merge(instance.class => [])
+          end
+        end
+      end
+    end
+
     def sort_by_dependencies(components)
-      components_and_dependencies = components.values.map do |instance|
-        if instance.class.respond_to?(:depends_on)
-          [instance.class, instance.class.depends_on.keys]
-        else
-          [instance.class, []]
-        end
-      end
+      in_starting_order = DependencyMap.new(components).sort
 
-      hash = Hash[components_and_dependencies]
-
-      class << hash
-        include TSort
-
-        alias_method :tsort_each_node, :each_key
-
-        def tsort_each_child(node, &block)
-          fetch(node).each(&block)
-        end
-      end
-
-      in_starting_order = hash.tsort
-
-      ordered_pairs = in_starting_order.map do |klass|
+      in_starting_order.reduce({}) do |memo, klass|
         name, inst = components.find { |(_k, v)| v.is_a?(klass) }
 
-        [name, inst]
+        memo.merge(name => inst)
       end
+    end
 
-      ordered_pairs
+    def assign_dependencies(component, system)
+      dependencies = component.class.depends_on
+
+      dependencies.each do |(klass, attr)|
+        target = system.values.find { |inst| inst.is_a?(klass) }
+
+        component.public_send("#{attr}=", target)
+      end
     end
   end
 end

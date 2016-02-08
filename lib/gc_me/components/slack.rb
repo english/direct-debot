@@ -4,6 +4,7 @@ require 'uri'
 
 module GCMe
   module Components
+    # Reads messages from a queue and posts them to slack
     class Slack
       POST_MESSAGE_URL = URI('https://slack.com/api/chat.postMessage')
 
@@ -17,17 +18,13 @@ module GCMe
 
       def start
         return self if @running
-
         @running = true
 
         thread = Thread.new do
           while @running
             message = @input_queue.pop
-            message = message.put(:token, slack_bot_api_token)
 
-            post_form(POST_MESSAGE_URL, message.to_h)
-
-            sleep(0.1)
+            post_form(POST_MESSAGE_URL, message.put(:token, slack_bot_api_token).to_h)
           end
         end
 

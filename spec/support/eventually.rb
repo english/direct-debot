@@ -2,15 +2,16 @@
 
 module Eventually
   def self.try(timeout:, sleep_time:)
-    raise ArgumentError, 'block required' unless block_given?
-
     start_time = Time.now
 
     loop do
-      result = yield
-      break if result
+      begin
+        break if yield
+      rescue RSpec::Expectations::ExpectationNotMetError
+        nil # keep Rubocop happy
+      end
 
-      raise Timeout::Eror if (Time.now - start_time) > timeout
+      fail Timeout::Eror if (Time.now - start_time) > (timeout * 1000)
       sleep(sleep_time)
     end
   end

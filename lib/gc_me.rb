@@ -30,7 +30,7 @@ module GCMe
       @oauth_client = build_oauth_client(system)
     end
 
-    # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def rack_app
       opts = { host: server_component.host.host,
                scheme: server_component.host.scheme,
@@ -45,7 +45,7 @@ module GCMe
         router.post(GC_WEBHOOKS_PATH, to: build_gc_webhooks_handler)
       end
     end
-    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
     private
 
