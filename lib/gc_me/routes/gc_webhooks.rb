@@ -18,6 +18,9 @@ module GCMe
 
         return [498, {}, ['']] unless signature_match?(request, webhook_secret)
 
+        puts '#' * 30
+        puts params
+        puts '#' * 30
         params.fetch('events').each do |event|
           queue << {
             organisation_id: event.dig!('links', 'organisation'),
