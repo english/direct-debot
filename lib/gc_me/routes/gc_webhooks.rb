@@ -2,6 +2,7 @@
 
 require 'coach'
 require 'openssl'
+require 'json'
 # require_relative '../middleware/json_schema'
 require_relative '../refinements/hash_dig_strict'
 
@@ -18,15 +19,8 @@ module GCMe
 
         return [498, {}, ['']] unless signature_match?(request, webhook_secret)
 
-        puts '#' * 30
-        puts params
-        puts '#' * 30
-        params.fetch('events').each do |event|
-          queue << {
-            organisation_id: event.dig!('links', 'organisation'),
-            event_id: event.fetch('id')
-          }
-        end
+        events = parse_events(request.body.read)
+        events.each { |event| queue << event }
 
         # Wait for the queue to be drained
         # Remove this once a proper peristent background queue is setup
@@ -36,6 +30,15 @@ module GCMe
       end
 
       private
+
+      def parse_events(json)
+        JSON.parse(json).fetch('events').map do |event|
+          {
+            organisation_id: event.dig!('links', 'organisation'),
+            event_id: event.fetch('id')
+          }
+        end
+      end
 
       def signature_match?(request, webhook_secret)
         request_signature = request.headers['Webhook-Signature']

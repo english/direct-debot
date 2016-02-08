@@ -23,7 +23,7 @@ RSpec.describe 'processing webhooks' do
       'HTTP_USER_AGENT' => 'gocardless-webhook-service/1.1',
       'HTTP_CONTENT_TYPE' => 'application/json',
       'HTTP_WEBHOOK_SIGNATURE' =>
-        'b02b11f82140eded07369dc8cfafb587bfd951ce7394a906df8eaa50d4c39afb'
+        '73eeb3dbbef1176557379f353f1a9c5dfb5e5dff8377d757d5f1230a177a23b3'
     }
   end
 
@@ -122,7 +122,8 @@ RSpec.describe 'processing webhooks' do
   it 'records receipt of the webhook and notifies the slack user' do
     host = system.fetch(:server_component).host.to_s
 
-    response = app.post("#{host}/api/gc/webhooks", webhook_headers.merge(params: params))
+    response = app.post("#{host}/api/gc/webhooks",
+                        webhook_headers.merge(params: params.to_json))
 
     expect(response.status).to eq(204)
 
