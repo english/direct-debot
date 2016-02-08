@@ -7,7 +7,7 @@ module GCMe
     # Manages connecting and disconnecting to the database at the given connection url
     class DB
       POOL_TIMEOUT    = 1
-      CONNECT_TIMEOUT = 1
+      CONNECT_TIMEOUT = 2
 
       attr_reader :database
 

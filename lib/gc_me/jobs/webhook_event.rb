@@ -34,7 +34,7 @@ module GCMe
         client = GoCardlessPro::Client.new(
           environment: gc_environment,
           access_token: user.fetch(:gc_access_token),
-          connection_options: { request: { timeout: 1 } })
+          connection_options: { request: { timeout: 2 } })
 
         gc_client = GCClient.new(client)
 
