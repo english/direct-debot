@@ -33,9 +33,16 @@ module GCMe
       def stop
         return self unless @database
 
-        @database&.disconnect unless @database.is_a?(Sequel::SQLite::Database)
+        # sqlite doesn't like to be disconnected for some reason...
+        @database&.disconnect unless sqlite?
 
         self.class.new(@url, @max_connections)
+      end
+
+      private
+
+      def sqlite?
+        defined?(Sequel::SQLite::Database) && @database.is_a?(Sequel::SQLite::Database)
       end
     end
   end
