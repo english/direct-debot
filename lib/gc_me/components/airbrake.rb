@@ -14,7 +14,7 @@ module GCMe
       end
 
       def start
-        return self if self.class.configured
+        return if self.class.configured
 
         ::Airbrake.configure do |config|
           config.project_id = @id
@@ -22,14 +22,10 @@ module GCMe
         end
 
         self.class.configured = true
-
-        self
       end
 
       def stop
         # noop since attempting to configure again will raise an exception
-
-        self
       end
     end
   end

@@ -14,8 +14,6 @@ module GCMe
         @logger = ::Logger.new(@path || STDOUT).tap do |logger|
           logger.progname = 'gc-me'
         end
-
-        self
       end
 
       def stop
@@ -23,8 +21,6 @@ module GCMe
         @logger&.close if @path
 
         @logger = nil
-
-        self
       end
     end
   end

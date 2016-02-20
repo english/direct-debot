@@ -95,8 +95,7 @@ module GCMe
     def stop
       sort_by_dependencies(@components).
         values.
-        reverse.
-        each(&:stop)
+        reverse_each(&:stop)
     end
 
     private

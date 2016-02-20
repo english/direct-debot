@@ -26,17 +26,13 @@ module GCMe
                                          preconnect: true)
         Sequel.extension(:migration)
         Sequel::Migrator.run(database, 'lib/gc_me/db/migrations')
-
-        self
       end
 
       def stop
-        return self unless @database
-
         # sqlite doesn't like to be disconnected for some reason...
         @database&.disconnect unless sqlite?
 
-        self.class.new(@url, @max_connections)
+        @database = nil
       end
 
       private

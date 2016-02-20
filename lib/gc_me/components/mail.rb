@@ -12,9 +12,9 @@ module GCMe
         attr_reader :input_queue, :output_queue
 
         def initialize(input_queue, output_queue, _username, _password)
-          @input_queue = input_queue
+          @input_queue  = input_queue
           @output_queue = output_queue
-          @running = false
+          @running      = false
         end
 
         def start
@@ -28,14 +28,10 @@ module GCMe
               sleep(0.1)
             end
           end
-
-          self
         end
 
         def stop
           @running = false
-
-          self
         end
       end
 
@@ -52,10 +48,10 @@ module GCMe
         attr_reader :input_queue, :output_queue
 
         def initialize(input_queue, output_queue, user_name, password)
-          @input_queue = input_queue
+          @input_queue  = input_queue
           @output_queue = output_queue # Not used. Here to match api with test component
-          @options = DELIVERY_OPTIONS.merge(user_name: user_name, password: password)
-          @running = false
+          @options      = DELIVERY_OPTIONS.merge(user_name: user_name, password: password)
+          @running      = false
         end
 
         def start
@@ -70,14 +66,10 @@ module GCMe
               sleep(0.1)
             end
           end
-
-          self
         end
 
         def stop
           @running = false
-
-          self
         end
       end
 

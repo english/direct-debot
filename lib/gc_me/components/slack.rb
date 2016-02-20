@@ -15,16 +15,17 @@ module GCMe
       attr_reader :input_queue, :slack_bot_api_token
 
       def initialize(input_queue, slack_bot_api_token)
-        @input_queue = input_queue
+        @input_queue         = input_queue
         @slack_bot_api_token = slack_bot_api_token
-        @running = false
-        @logger = nil
+        @running             = false
+        @logger              = nil
       end
 
       def start(logger)
-        return self if @running
+        return if @running
+
         @running = true
-        @logger = logger
+        @logger  = logger
 
         thread = Thread.new do
           while @running
@@ -35,14 +36,10 @@ module GCMe
         end
 
         thread.abort_on_exception = true
-
-        self
       end
 
       def stop
         @running = false
-
-        self
       end
 
       private

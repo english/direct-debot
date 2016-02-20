@@ -7,17 +7,15 @@ module GCMe
       attr_reader :host, :environment, :slack_token
 
       def initialize(host, environment, slack_token)
-        @host = URI.parse(host)
+        @host        = URI.parse(host)
         @environment = environment.to_sym
         @slack_token = slack_token
       end
 
       def start
-        self
       end
 
       def stop
-        self
       end
     end
   end

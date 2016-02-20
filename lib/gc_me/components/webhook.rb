@@ -15,19 +15,19 @@ module GCMe
       attr_reader :input_queue, :gc_webhook_secret
 
       def initialize(input_queue, gc_webhook_secret, worker_count: 2)
-        @input_queue = input_queue
-        @worker_count = worker_count
+        @input_queue       = input_queue
+        @worker_count      = worker_count
         @gc_webhook_secret = gc_webhook_secret
-        @running = false
+        @running           = false
       end
 
       def start(logger, db, server, slack)
         @logger = logger
-        @db = db
+        @db     = db
         @server = server
-        @slack = slack
+        @slack  = slack
 
-        return self if @running
+        return if @running
 
         @running = true
 
