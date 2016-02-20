@@ -17,7 +17,7 @@ RSpec.describe 'GC oauth callback' do
   after { system.stop }
 
   subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
-  let(:store) { GCMe::DB::Store.new(system.fetch(:db_component).database) }
+  let(:store) { GCMe::DB::Store.new(system.fetch(:db).database) }
 
   let!(:gc_auth_token_request) do
     request_body = {

@@ -29,10 +29,10 @@ class TestRequest
   private
 
   def host
-    @system.fetch(:server_component).host.to_s
+    @system.fetch(:server).host.to_s
   end
 
   def slack_token
-    @system.fetch(:server_component).slack_token
+    @system.fetch(:server).slack_token
   end
 end

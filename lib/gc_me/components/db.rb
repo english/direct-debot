@@ -11,7 +11,7 @@ module GCMe
 
       attr_reader :database
 
-      def initialize(url, max_connections = 1, database = nil)
+      def initialize(url, max_connections = 1)
         @url             = url
         @max_connections = max_connections
         @database        = database
@@ -20,14 +20,14 @@ module GCMe
       def start
         return self if @database
 
-        database = Sequel.connect(@url, max_connections: @max_connections,
-                                        pool_timeout: POOL_TIMEOUT,
-                                        connect_timeout: CONNECT_TIMEOUT,
-                                        preconnect: true)
+        @database = Sequel.connect(@url, max_connections: @max_connections,
+                                         pool_timeout: POOL_TIMEOUT,
+                                         connect_timeout: CONNECT_TIMEOUT,
+                                         preconnect: true)
         Sequel.extension(:migration)
         Sequel::Migrator.run(database, 'lib/gc_me/db/migrations')
 
-        self.class.new(@url, @max_connections, database)
+        self
       end
 
       def stop

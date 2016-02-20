@@ -80,7 +80,7 @@ RSpec.describe 'processing webhooks' do
   let!(:ev123_message) do
     params = {
       channel: 'US123',
-      token: system.fetch(:slack_component).slack_bot_api_token,
+      token: system.fetch(:slack).slack_bot_api_token,
       as_user: 'true',
       text: 'Payment PM123 confirmed'
     }
@@ -94,7 +94,7 @@ RSpec.describe 'processing webhooks' do
   let!(:ev456_message) do
     params = {
       channel: 'US456',
-      token: system.fetch(:slack_component).slack_bot_api_token,
+      token: system.fetch(:slack).slack_bot_api_token,
       as_user: 'true',
       text: 'Payment PM456 failed'
     }
@@ -108,7 +108,7 @@ RSpec.describe 'processing webhooks' do
   let(:params) { { 'events' => [ev123, ev456] } }
 
   before do
-    store = GCMe::DB::Store.new(system.fetch(:db_component).database)
+    store = GCMe::DB::Store.new(system.fetch(:db).database)
 
     store.create_user!(slack_user_id: 'US123',
                        organisation_id: 'OR123',
@@ -120,7 +120,7 @@ RSpec.describe 'processing webhooks' do
   end
 
   it 'records receipt of the webhook and notifies the slack user' do
-    host = system.fetch(:server_component).host.to_s
+    host = system.fetch(:server).host.to_s
 
     response = app.post("#{host}/api/gc/webhooks",
                         webhook_headers.merge(params: params.to_json))

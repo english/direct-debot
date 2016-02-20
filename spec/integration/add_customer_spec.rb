@@ -9,7 +9,7 @@ require_relative '../../lib/gc_me/db/store'
 
 RSpec.describe 'adding a GoCardless customer' do
   let(:system) { GCMe::System.build }
-  let(:store) { GCMe::DB::Store.new(system.fetch(:db_component).database) }
+  let(:store) { GCMe::DB::Store.new(system.fetch(:db).database) }
 
   around do |example|
     system.start
@@ -34,7 +34,7 @@ RSpec.describe 'adding a GoCardless customer' do
       expect(response.body).
         to include('Authorisation from foo@bar.com has been requested.')
 
-      mail = system.fetch(:mail_component).output_queue.pop
+      mail = system.fetch(:mail).output_queue.pop
 
       expect(mail[:from]).to eq('noreply@gc-me.test')
       expect(mail[:to]).to eq('foo@bar.com')

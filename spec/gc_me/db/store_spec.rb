@@ -9,7 +9,7 @@ RSpec.describe GCMe::DB::Store do
 
   before { system.start }
 
-  subject(:store) { described_class.new(system.fetch(:db_component).database) }
+  subject(:store) { described_class.new(system.fetch(:db).database) }
 
   it 'persists user records' do
     properties = property_of do

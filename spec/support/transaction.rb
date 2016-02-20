@@ -4,12 +4,12 @@ require 'sequel'
 
 module Transaction
   def self.with_rollback(system)
-    system.fetch(:db_component).database.execute('DELETE FROM redirect_flows;')
-    system.fetch(:db_component).database.execute('DELETE FROM users;')
+    system.fetch(:db).database.execute('DELETE FROM redirect_flows;')
+    system.fetch(:db).database.execute('DELETE FROM users;')
 
     yield
 
-    # system.fetch(:db_component).database.transaction do
+    # system.fetch(:db).database.transaction do
     #   begin
     #     yield
     #   ensure

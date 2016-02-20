@@ -6,37 +6,32 @@ require_relative '../../lib/gc_me/system'
 RSpec.describe GCMe::System do
   class DB
     def start
-      self
     end
 
     def stop
-      self
     end
   end
 
   class JobQueue
     def self.depends_on
-      { DB => :my_db }
+      [DB]
     end
 
-    attr_accessor :my_db
+    attr_reader :my_db
 
-    def start
-      self
+    def start(db)
+      @my_db = db
     end
 
     def stop
-      self
     end
   end
 
   class Mailer
     def start
-      self
     end
 
     def stop
-      self
     end
   end
 
