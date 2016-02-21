@@ -7,14 +7,16 @@ require_relative '../../support/transaction'
 RSpec.describe GCMe::DB::Store do
   let(:system) { GCMe::System.build }
 
-  before { system.start }
+  before do
+    system.start
+  end
 
   subject(:store) { described_class.new(system.fetch(:db).database) }
 
   it 'persists user records' do
-    properties = property_of do
+    properties = property_of {
       dict(3) { [choose(:gc_access_token, :slack_user_id, :organisation_id), string] }
-    end
+    }
 
     properties.check do |user|
       Transaction.with_rollback(system) do
@@ -33,12 +35,12 @@ RSpec.describe GCMe::DB::Store do
 
       properties.check do |(access_tokens, organisation_id, user_id)|
         Transaction.with_rollback(system) do
-          expect do
+          expect {
             access_tokens.each do |token|
               store.create_user!(gc_access_token: token, organisation_id: organisation_id,
                                  slack_user_id: user_id)
             end
-          end.to change { store.all_users.count }.by(1)
+          }.to change { store.all_users.count }.by(1)
 
           user = store.find_user(user_id)
           expect(user.fetch(:gc_access_token)).to eq(access_tokens.last)

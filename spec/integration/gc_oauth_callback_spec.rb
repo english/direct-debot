@@ -11,10 +11,13 @@ RSpec.describe 'GC oauth callback' do
 
   around do |example|
     system.start
-    Transaction.with_rollback(system) { example.call }
-  end
 
-  after { system.stop }
+    Transaction.with_rollback(system) do
+      example.call
+    end
+
+    system.stop
+  end
 
   subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
   let(:store) { GCMe::DB::Store.new(system.fetch(:db).database) }
@@ -43,12 +46,12 @@ RSpec.describe 'GC oauth callback' do
   end
 
   it 'handles /api/gc/callback' do
-    expect do
+    expect {
       response = app.
         get('/api/gc/callback?code=6NJiqXzT7HcgEGsAZXUmaBfB&&state=q8wEr9yMohTP')
 
       expect(response.body).to include('Gotcha!')
-    end.to change { store.count_users! }.by(1)
+    }.to change { store.count_users! }.by(1)
 
     expect(gc_auth_token_request).to have_been_requested
   end

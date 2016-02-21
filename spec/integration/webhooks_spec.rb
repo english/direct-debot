@@ -12,7 +12,11 @@ RSpec.describe 'processing webhooks' do
 
   around do |example|
     system.start
-    Transaction.with_rollback(system) { example.call }
+
+    Transaction.with_rollback(system) do
+      example.call
+    end
+
     system.stop
   end
 

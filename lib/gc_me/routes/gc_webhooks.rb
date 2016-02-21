@@ -20,7 +20,10 @@ module GCMe
         return [498, {}, ['']] unless signature_match?(request, webhook_secret)
 
         events = parse_events(request.body.read)
-        events.each { |event| queue << event }
+
+        events.each do |event|
+          queue << event
+        end
 
         # Wait for the queue to be drained
         # Remove this once a proper peristent background queue is setup

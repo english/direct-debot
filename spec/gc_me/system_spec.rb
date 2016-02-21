@@ -13,10 +13,6 @@ RSpec.describe GCMe::System do
   end
 
   class JobQueue
-    def self.depends_on
-      [DB]
-    end
-
     attr_reader :my_db
 
     def start(db)
@@ -36,11 +32,11 @@ RSpec.describe GCMe::System do
   end
 
   it 'starts components in order' do
-    db = DB.new
+    db        = DB.new
     job_queue = JobQueue.new
-    mailer = Mailer.new
+    mailer    = Mailer.new
 
-    system = described_class.new(job_queue: job_queue, mailer: mailer, db: db)
+    system = described_class.new(job_queue: [job_queue, :db], mailer: mailer, db: db)
 
     expect(db).to receive(:start).ordered.and_call_original
     expect(job_queue).to receive(:start).ordered.and_call_original
@@ -52,22 +48,22 @@ RSpec.describe GCMe::System do
   end
 
   it 'provides dependencies' do
-    db = DB.new
+    db        = DB.new
     job_queue = JobQueue.new
-    mailer = Mailer.new
+    mailer    = Mailer.new
 
-    system = described_class.new(job_queue: job_queue, mailer: mailer, db: db)
+    system = described_class.new(job_queue: [job_queue, :db], mailer: mailer, db: db)
     system.start
 
     expect(job_queue.my_db).to be(db)
   end
 
   it 'stops components in reverse order' do
-    db = DB.new
+    db        = DB.new
     job_queue = JobQueue.new
-    mailer = Mailer.new
+    mailer    = Mailer.new
 
-    system = described_class.new(job_queue: job_queue, mailer: mailer, db: db)
+    system = described_class.new(job_queue: [job_queue, :db], mailer: mailer, db: db)
 
     expect(mailer).to receive(:stop).ordered.and_call_original
     expect(job_queue).to receive(:stop).ordered.and_call_original

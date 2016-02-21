@@ -12,10 +12,16 @@ RSpec.describe 'creating a payment' do
 
   around do |example|
     system.start
-    Transaction.with_rollback(system) { example.call }
+
+    Transaction.with_rollback(system) do
+      example.call
+    end
+
+    system.stop
   end
 
-  after { system.stop }
+  after do
+  end
 
   subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
 

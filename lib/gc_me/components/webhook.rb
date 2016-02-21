@@ -8,10 +8,6 @@ module GCMe
   module Components
     # Wraps up the Webhook library with a minimal interface.
     class Webhook
-      def self.depends_on
-        [Logger, DB, Server, Slack]
-      end
-
       attr_reader :input_queue, :gc_webhook_secret
 
       def initialize(input_queue, gc_webhook_secret, worker_count: 2)
@@ -31,9 +27,9 @@ module GCMe
 
         @running = true
 
-        threads = @worker_count.times.map do
+        threads = @worker_count.times.map {
           Thread.new { perform_job(@input_queue.pop) while @running }
-        end
+        }
 
         threads.each { |t| t.abort_on_exception = true }
       end

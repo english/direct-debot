@@ -24,8 +24,8 @@ module GCMe
             server: build_server,
             airbrake: build_airbrake,
             logger: build_logger,
-            webhook: build_webhook,
-            slack: build_slack))
+            webhook: [build_webhook, :logger, :db, :server, :slack],
+            slack: [build_slack, :logger]))
     end
 
     private_class_method def self.build_db
@@ -74,79 +74,59 @@ module GCMe
     end
 
     def initialize(components)
-      @components = components
+      @components = components.map { |(k, v)| [k, Array(v)] }.to_h
     end
 
     def fetch(key)
-      @components.fetch(key)
+      @components.fetch(key).first
     end
 
     def start
-      sort_by_dependencies(@components).each_value do |component|
-        if component.class.respond_to?(:depends_on)
-          dependencies = component_dependencies(component, @components)
-          component.start(*dependencies)
-        else
-          component.start
-        end
-      end
+      sort_by_dependencies(@components).
+        map(&method(:fetch_component_with_dependent_components)).
+        each { |(component, dependencies)| component.start(*dependencies) }
     end
 
     def stop
       sort_by_dependencies(@components).
-        values.
-        reverse_each(&:stop)
+        reverse.
+        map(&method(:fetch)).
+        each(&:stop)
     end
 
     private
 
-    def sort_by_dependencies(components)
-      in_starting_order = DependencyMap.new(components).sort
+    def fetch_component_with_dependent_components(component_key)
+      component, *dependency_keys = *@components.fetch(component_key)
 
-      in_starting_order.reduce({}) do |memo, klass|
-        name, inst = components.find { |(_k, v)| v.is_a?(klass) }
-
-        memo.merge(name => inst)
-      end
+      [component, dependency_keys.map(&method(:fetch))]
     end
 
-    def component_dependencies(component, system)
-      dependencies = component.class.depends_on
+    def sort_by_dependencies(components)
+      dependency_map = components.map { |(name, component_and_dependencies)|
+        [name, Array(component_and_dependencies[1..-1])]
+      }.to_h
 
-      dependencies.
-        map { |(klass, _attr)| system.values.find { |inst| inst.is_a?(klass) } }.
-        compact
+      TSortableHash.new(dependency_map).tsort
     end
   end
 
-  # Allows a system map to be sorted in dependency order
-  class DependencyMap
+  # Allows a hash to be sorted in dependency order
+  class TSortableHash
     include TSort
 
-    def initialize(components)
-      @components = components_and_dependencies(components)
+    def initialize(hash)
+      @hash = hash
     end
-
-    alias sort tsort
 
     private
 
     def tsort_each_node(&block)
-      @components.each_key(&block)
+      @hash.each_key(&block)
     end
 
     def tsort_each_child(node, &block)
-      @components.fetch(node).each(&block)
-    end
-
-    def components_and_dependencies(components)
-      components.values.reduce({}) do |memo, instance|
-        if instance.class.respond_to?(:depends_on)
-          memo.merge(instance.class => instance.class.depends_on)
-        else
-          memo.merge(instance.class => [])
-        end
-      end
+      @hash.fetch(node).each(&block)
     end
   end
 end

@@ -8,10 +8,6 @@ module GCMe
     class Slack
       POST_MESSAGE_URL = URI('https://slack.com/api/chat.postMessage')
 
-      def self.depends_on
-        [Logger]
-      end
-
       attr_reader :input_queue, :slack_bot_api_token
 
       def initialize(input_queue, slack_bot_api_token)
