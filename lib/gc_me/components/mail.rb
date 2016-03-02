@@ -17,8 +17,8 @@ module GCMe
         end
 
         def start
-          @input_queue  = Queue.new
-          @output_queue = Queue.new
+          @input_queue  = SizedQueue.new(5)
+          @output_queue = SizedQueue.new(5)
 
           Thread.new do
             while message = @input_queue.deq
@@ -54,8 +54,8 @@ module GCMe
         end
 
         def start
-          @input_queue  = Queue.new
-          @output_queue = Queue.new
+          @input_queue  = SizedQueue.new(5)
+          @output_queue = SizedQueue.new(5)
 
           Thread.new do
             while message = @input_queue.deq

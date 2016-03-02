@@ -21,7 +21,7 @@ module GCMe
         @db          = db
         @server      = server
         @slack       = slack
-        @input_queue = Queue.new
+        @input_queue = SizedQueue.new(5)
 
         start_workers
       end

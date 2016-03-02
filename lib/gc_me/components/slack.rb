@@ -19,7 +19,7 @@ module GCMe
 
       def start(logger)
         @logger      = logger
-        @input_queue = Queue.new
+        @input_queue = SizedQueue.new(5)
 
         thread = Thread.new do
           while message = @input_queue.deq
