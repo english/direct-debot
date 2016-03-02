@@ -10,32 +10,32 @@ module GCMe
     class Webhook
       attr_reader :input_queue, :gc_webhook_secret
 
-      def initialize(input_queue, gc_webhook_secret, worker_count: 2)
-        @input_queue       = input_queue
+      def initialize(gc_webhook_secret, worker_count: 2)
         @worker_count      = worker_count
         @gc_webhook_secret = gc_webhook_secret
-        @running           = false
+        @input_queue       = nil
       end
 
       def start(logger, db, server, slack)
-        @logger = logger
-        @db     = db
-        @server = server
-        @slack  = slack
-
-        return if @running
-
-        @running = true
+        @logger      = logger
+        @db          = db
+        @server      = server
+        @slack       = slack
+        @input_queue = Queue.new
 
         threads = @worker_count.times.map {
-          Thread.new { perform_job(@input_queue.pop) while @running }
+          Thread.new do
+            while job = @input_queue.deq
+              perform_job(job)
+            end
+          end
         }
 
         threads.each { |t| t.abort_on_exception = true }
       end
 
       def stop
-        @running = false
+        @input_queue.close
       end
 
       private

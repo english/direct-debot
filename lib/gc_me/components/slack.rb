@@ -10,23 +10,19 @@ module GCMe
 
       attr_reader :input_queue, :slack_bot_api_token
 
-      def initialize(input_queue, slack_bot_api_token)
-        @input_queue         = input_queue
+      def initialize(slack_bot_api_token)
         @slack_bot_api_token = slack_bot_api_token
         @running             = false
         @logger              = nil
+        @input_queue         = nil
       end
 
       def start(logger)
-        return if @running
-
-        @running = true
-        @logger  = logger
+        @logger      = logger
+        @input_queue = Queue.new
 
         thread = Thread.new do
-          while @running
-            message = @input_queue.pop
-
+          while message = @input_queue.deq
             post_form(POST_MESSAGE_URL, message.put(:token, slack_bot_api_token).to_h)
           end
         end
@@ -35,7 +31,7 @@ module GCMe
       end
 
       def stop
-        @running = false
+        @input_queue.close
       end
 
       private
@@ -56,7 +52,7 @@ module GCMe
         Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
           http.open_timeout = 1
           http.read_timeout = 1
-          http.ssl_timeout = 1
+          http.ssl_timeout  = 1
 
           http.request(request)
         end

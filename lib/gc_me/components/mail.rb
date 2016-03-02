@@ -11,18 +11,17 @@ module GCMe
       class Test
         attr_reader :input_queue, :output_queue
 
-        def initialize(input_queue, output_queue, _username, _password)
-          @input_queue  = input_queue
-          @output_queue = output_queue
-          @running      = false
+        def initialize(_username, _password)
+          @input_queue  = nil
+          @output_queue = nil
         end
 
         def start
-          @running = true
+          @input_queue  = Queue.new
+          @output_queue = Queue.new
 
           Thread.new do
-            while @running
-              message = @input_queue.pop
+            while message = @input_queue.deq
               @output_queue << message
 
               sleep(0.1)
@@ -31,7 +30,8 @@ module GCMe
         end
 
         def stop
-          @running = false
+          @input_queue.close
+          @output_queue.close
         end
       end
 
@@ -47,19 +47,20 @@ module GCMe
 
         attr_reader :input_queue, :output_queue
 
-        def initialize(input_queue, output_queue, user_name, password)
-          @input_queue  = input_queue
-          @output_queue = output_queue # Not used. Here to match api with test component
+        def initialize(user_name, password)
           @options      = DELIVERY_OPTIONS.merge(user_name: user_name, password: password)
-          @running      = false
+          @input_queue  = nil
+          @output_queue = nil
         end
 
         def start
-          @running = true
+          @input_queue  = Queue.new
+          @output_queue = Queue.new
 
           Thread.new do
-            while @running
-              mail = Mail::Message.new(@input_queue.pop.to_h)
+            while message = @input_queue.deq
+              mail = Mail::Message.new(message.to_h)
+
               mail.delivery_method(:smtp, @options)
               mail.deliver!
 
@@ -69,7 +70,8 @@ module GCMe
         end
 
         def stop
-          @running = false
+          @input_queue.close
+          @output_queue.close
         end
       end
 
@@ -78,8 +80,8 @@ module GCMe
         'smtp' => SMTP
       )
 
-      def self.build(delivery_method:, input_queue:, output_queue:, user_name:, password:)
-        CLIENTS.fetch(delivery_method).new(input_queue, output_queue, user_name, password)
+      def self.build(delivery_method:, user_name:, password:)
+        CLIENTS.fetch(delivery_method).new(user_name, password)
       end
     end
   end

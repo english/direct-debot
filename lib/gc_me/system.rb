@@ -44,8 +44,6 @@ module GCMe
     private_class_method def self.build_mail
       GCMe::Components::Mail.build(
         delivery_method: Prius.get(:mail_delivery_method),
-        input_queue: Queue.new,
-        output_queue: Queue.new,
         user_name: Prius.get(:sendgrid_username),
         password: Prius.get(:sendgrid_password))
     end
@@ -66,19 +64,19 @@ module GCMe
     end
 
     private_class_method def self.build_webhook
-      GCMe::Components::Webhook.new(Queue.new, Prius.get(:gc_webhook_secret))
+      GCMe::Components::Webhook.new(Prius.get(:gc_webhook_secret))
     end
 
     private_class_method def self.build_slack
-      GCMe::Components::Slack.new(Queue.new, Prius.get(:slack_bot_api_token))
+      GCMe::Components::Slack.new(Prius.get(:slack_bot_api_token))
     end
 
     def initialize(components)
       @components = components.map { |(k, v)| [k, Array(v)] }.to_h
     end
 
-    def fetch(key)
-      @components.fetch(key).first
+    def fetch(compoenent_key)
+      @components.fetch(compoenent_key).first
     end
 
     def start
