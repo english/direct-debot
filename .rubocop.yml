@@ -12,3 +12,6 @@ Style/AsciiComments:
 
 Style/BlockDelimiters:
   EnforcedStyle: semantic
+
+Lint/AssignmentInCondition:
+  Enabled: false

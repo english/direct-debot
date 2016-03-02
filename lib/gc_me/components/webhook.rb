@@ -23,6 +23,16 @@ module GCMe
         @slack       = slack
         @input_queue = Queue.new
 
+        start_workers
+      end
+
+      def stop
+        @input_queue.close
+      end
+
+      private
+
+      def start_workers
         threads = @worker_count.times.map {
           Thread.new do
             while job = @input_queue.deq
@@ -33,12 +43,6 @@ module GCMe
 
         threads.each { |t| t.abort_on_exception = true }
       end
-
-      def stop
-        @input_queue.close
-      end
-
-      private
 
       def perform_job(message)
         @logger.logger.info("about to process webhook: #{message}")
