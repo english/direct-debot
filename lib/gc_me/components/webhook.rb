@@ -3,6 +3,7 @@
 require_relative 'db'
 require_relative 'server'
 require_relative '../jobs/webhook_event'
+require_relative '../db/store'
 
 module GCMe
   module Components
@@ -33,24 +34,22 @@ module GCMe
       private
 
       def start_workers
-        threads = @worker_count.times.map {
-          Thread.new do
+        @worker_count.times.each do
+          thread = Thread.new do
             while job = @input_queue.deq
               perform_job(job)
             end
           end
-        }
 
-        threads.each { |t| t.abort_on_exception = true }
+          thread.abort_on_exception = true
+        end
       end
 
       def perform_job(message)
         @logger.logger.info("about to process webhook: #{message}")
 
-        store = GCMe::DB::Store.new(@db.database)
-
         GCMe::Jobs::WebhookEvent.call(
-          store: store,
+          store: GCMe::DB::Store.new(@db.database),
           environment: @server.environment,
           slack_queue: @slack.input_queue,
           organisation_id: message.fetch(:organisation_id),
