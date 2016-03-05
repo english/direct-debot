@@ -13,15 +13,13 @@ RSpec.describe 'adding a GoCardless customer' do
 
   around do |example|
     system.start
-
-    Transaction.with_rollback(system) do
-      example.call
-    end
-
+    Transaction.with_rollback(system, &example)
     system.stop
   end
 
-  subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
+  subject(:app) do
+    TestRequest.new(GCMe::Application.from_system(system).rack_app, system)
+  end
 
   before do
     store.create_user!(slack_user_id: 'U123',

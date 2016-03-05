@@ -12,15 +12,11 @@ RSpec.describe 'processing webhooks' do
 
   around do |example|
     system.start
-
-    Transaction.with_rollback(system) do
-      example.call
-    end
-
+    Transaction.with_rollback(system, &example)
     system.stop
   end
 
-  subject(:app) { Rack::MockRequest.new(GCMe::Application.new(system).rack_app) }
+  subject(:app) { Rack::MockRequest.new(GCMe::Application.from_system(system).rack_app) }
 
   let(:webhook_headers) do
     {
@@ -124,7 +120,7 @@ RSpec.describe 'processing webhooks' do
   end
 
   it 'records receipt of the webhook and notifies the slack user' do
-    host = system.fetch(:server).host.to_s
+    host = system.fetch(:server_configuration).host.to_s
 
     response = app.post("#{host}/api/gc/webhooks",
                         webhook_headers.merge(params: params.to_json))

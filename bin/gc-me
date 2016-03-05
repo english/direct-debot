@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+Bundler.setup(:default, ENV['RACK_ENV'])
+
+require 'newrelic_rpm'
+require './lib/gc_me/system'
+
+system = GCMe::System.build
+
+trap(:INT) do
+  system.stop
+  exit
+end
+
+begin
+  system.start
+  sleep
+ensure
+  system.stop
+end

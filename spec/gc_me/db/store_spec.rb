@@ -7,8 +7,10 @@ require_relative '../../support/transaction'
 RSpec.describe GCMe::DB::Store do
   let(:system) { GCMe::System.build }
 
-  before do
+  around do |example|
     system.start
+    example.call
+    system.stop
   end
 
   subject(:store) { described_class.new(system.fetch(:db).database) }

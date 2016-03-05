@@ -11,15 +11,14 @@ RSpec.describe 'GC oauth callback' do
 
   around do |example|
     system.start
-
-    Transaction.with_rollback(system) do
-      example.call
-    end
-
+    Transaction.with_rollback(system, &example)
     system.stop
   end
 
-  subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
+  subject(:app) do
+    TestRequest.new(GCMe::Application.from_system(system).rack_app, system)
+  end
+
   let(:store) { GCMe::DB::Store.new(system.fetch(:db).database) }
 
   let!(:gc_auth_token_request) do

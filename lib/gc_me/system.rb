@@ -1,31 +1,48 @@
 # frozen_string_literal: true
 
+ENV['RACK_ENV'] ||= 'development'
+
 require 'prius'
 require 'tsort'
-require_relative '../../config/prius'
 require 'hamster'
 require_relative 'components/db'
 require_relative 'components/mail'
 require_relative 'components/oauth'
-require_relative 'components/server'
+require_relative 'components/server_configuration'
 require_relative 'components/airbrake'
 require_relative 'components/logger'
 require_relative 'components/webhook'
 require_relative 'components/slack'
+require_relative 'components/web_server'
 
 module GCMe
   # Configures and manages the lifecycle of potentially stateful components.
   class System
+    # rubocop:disable Metrics/MethodLength
     def self.build
+      load_config!
+
       new(Hamster::Hash.new(
             db: build_db,
             oauth: build_oauth,
             mail: build_mail,
-            server: build_server,
+            server_configuration: build_server_configuration,
             airbrake: build_airbrake,
             logger: build_logger,
-            webhook: [build_webhook, :logger, :db, :server, :slack],
-            slack: [build_slack, :logger]))
+            webhook: [build_webhook, :logger, :db, :server_configuration, :slack],
+            slack: [build_slack, :logger],
+            web_server: [build_web_server,
+                         :db, :server_configuration, :oauth, :mail, :webhook]))
+    end
+    # rubocop:enable Metrics/MethodLength
+
+    def self.load_config!
+      if ENV['RACK_ENV'] == 'development'
+        require 'dotenv'
+        Dotenv.load
+      end
+
+      require_relative '../../config/prius'
     end
 
     private_class_method def self.build_db
@@ -48,10 +65,10 @@ module GCMe
         password: Prius.get(:sendgrid_password))
     end
 
-    private_class_method def self.build_server
-      GCMe::Components::Server.new(Prius.get(:host),
-                                   Prius.get(:gc_environment),
-                                   Prius.get(:slack_token))
+    private_class_method def self.build_server_configuration
+      GCMe::Components::ServerConfiguration.new(Prius.get(:host),
+                                                Prius.get(:gc_environment),
+                                                Prius.get(:slack_token))
     end
 
     private_class_method def self.build_airbrake
@@ -69,6 +86,10 @@ module GCMe
 
     private_class_method def self.build_slack
       GCMe::Components::Slack.new(Prius.get(:slack_bot_api_token))
+    end
+
+    private_class_method def self.build_web_server
+      GCMe::Components::WebServer.new(Prius.get(:thread_count), Prius.get(:port))
     end
 
     def initialize(components)

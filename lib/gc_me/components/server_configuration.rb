@@ -3,7 +3,7 @@
 module GCMe
   module Components
     # Poorly named, but holds configuration for 'server'y stuff. And a slack token...
-    class Server
+    class ServerConfiguration
       attr_reader :host, :environment, :slack_token
 
       def initialize(host, environment, slack_token)

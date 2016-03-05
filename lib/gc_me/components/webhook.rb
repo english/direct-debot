@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'db'
-require_relative 'server'
+require_relative 'server_configuration'
 require_relative '../jobs/webhook_event'
 require_relative '../db/store'
 
@@ -17,12 +17,12 @@ module GCMe
         @input_queue       = nil
       end
 
-      def start(logger, db, server, slack)
-        @logger      = logger
-        @db          = db
-        @server      = server
-        @slack       = slack
-        @input_queue = SizedQueue.new(5)
+      def start(logger, db, server_configuration, slack)
+        @logger               = logger
+        @db                   = db
+        @server_configuration = server_configuration
+        @slack                = slack
+        @input_queue          = SizedQueue.new(5)
 
         start_workers
       end
@@ -50,7 +50,7 @@ module GCMe
 
         GCMe::Jobs::WebhookEvent.call(
           store: GCMe::DB::Store.new(@db.database),
-          environment: @server.environment,
+          environment: @server_configuration.environment,
           slack_queue: @slack.input_queue,
           organisation_id: message.fetch(:organisation_id),
           event_id: message.fetch(:event_id)

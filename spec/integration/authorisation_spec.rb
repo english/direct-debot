@@ -10,15 +10,13 @@ RSpec.describe 'authorisation' do
 
   around do |example|
     system.start
-
-    Transaction.with_rollback(system) do
-      example.call
-    end
-
+    Transaction.with_rollback(system, &example)
     system.stop
   end
 
-  subject(:app) { TestRequest.new(GCMe::Application.new(system).rack_app, system) }
+  subject(:app) do
+    TestRequest.new(GCMe::Application.from_system(system).rack_app, system)
+  end
 
   it 'handles /api/slack/messages with authorise' do
     response = app.post('/api/slack/messages', text: 'authorise')
