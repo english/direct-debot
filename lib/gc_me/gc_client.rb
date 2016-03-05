@@ -1,12 +1,22 @@
 # frozen_string_literal: true
 
 require 'hamster'
+require 'gocardless_pro'
 
 module GCMe
   # wrapper around the GoCardlessPro client
   class GCClient
     REDIRECT_FLOW_SESSION_TOKEN = '1'
     ACTIVE_MANDATE_STATUSES = Set.new(%w(pending_submission submitted active))
+    CONNECTION_OPTIONS = { request: { timeout: 2 } }
+
+    def self.make(environment:, access_token:)
+      pro_client = GoCardlessPro::Client.new(environment: environment,
+                                             access_token: access_token,
+                                             connection_options: CONNECTION_OPTIONS)
+
+      new(pro_client)
+    end
 
     def initialize(client)
       @client = client

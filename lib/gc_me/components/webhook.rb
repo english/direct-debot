@@ -47,15 +47,15 @@ module GCMe
       def perform_job(message)
         @logger.logger.info("about to process webhook: #{message}")
 
-        job = GCMe::Jobs::WebhookEvent.new(
-          @db.database,
-          @server.environment,
-          @slack.input_queue,
-          message.fetch(:organisation_id),
-          message.fetch(:event_id)
-        )
+        store = GCMe::DB::Store.new(@db.database)
 
-        job.perform!
+        GCMe::Jobs::WebhookEvent.call(
+          store: store,
+          environment: @server.environment,
+          slack_queue: @slack.input_queue,
+          organisation_id: message.fetch(:organisation_id),
+          event_id: message.fetch(:event_id)
+        )
       end
     end
   end

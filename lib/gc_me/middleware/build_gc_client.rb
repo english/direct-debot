@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'coach'
-require 'gocardless_pro'
 require_relative 'get_gc_access_token'
 require_relative '../gc_client'
 
@@ -13,12 +12,10 @@ module GCMe
       provides :gc_client
 
       def call
-        connection_options = { request: { timeout: 2 } }
-        pro_client = GoCardlessPro::Client.new(environment: config.fetch(:gc_environment),
-                                               access_token: gc_access_token,
-                                               connection_options: connection_options)
+        client = GCClient.make(environment: config.fetch(:gc_environment),
+                               access_token: gc_access_token)
 
-        provide(gc_client: GCClient.new(pro_client))
+        provide(gc_client: client)
 
         next_middleware.call
       end

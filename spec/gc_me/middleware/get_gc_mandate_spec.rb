@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'gocardless_pro'
 require_relative '../../../lib/gc_me/middleware/get_gc_mandate'
 require_relative '../../../lib/gc_me/gc_client'
 require_relative '../../../lib/gc_me/middleware/parse_payment_message'

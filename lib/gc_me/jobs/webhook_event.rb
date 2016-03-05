@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'hamster'
-require 'gocardless_pro'
 require 'net/http'
 require_relative '../gc_client'
 require_relative '../db/store'
@@ -11,39 +10,25 @@ module GCMe
     # Processes a webhook event by fetching the latest event and putting an appropriate
     # message on the slack queue
     class WebhookEvent
-      def initialize(database, environment, slack_queue, organisation_id, event_id)
-        @database = database
-        @environment = environment
-        @slack_queue = slack_queue
-        @organisation_id = organisation_id
-        @event_id = event_id
-      end
-
-      def perform!
-        store   = GCMe::DB::Store.new(@database)
-        user    = store.find_user_by_organisation_id(@organisation_id)
-        event   = get_latest_event!(@event_id, user, @environment)
+      def self.call(store:, environment:, slack_queue:, organisation_id:, event_id:)
+        user    = store.find_user_by_organisation_id(organisation_id)
+        event   = get_latest_event!(event_id, user, environment)
         message = make_slack_message(event, user)
 
-        @slack_queue << message
+        slack_queue << message
       end
 
-      private
+      def self.get_latest_event!(event_id, user, gc_environment)
+        client = GCClient.make(environment: gc_environment,
+                               access_token: user.fetch(:gc_access_token))
 
-      def get_latest_event!(event_id, user, gc_environment)
-        client = GoCardlessPro::Client.new(
-          environment: gc_environment,
-          access_token: user.fetch(:gc_access_token),
-          connection_options: { request: { timeout: 2 } })
-
-        gc_client = GCClient.new(client)
-
-        gc_client.show('events', event_id)
+        client.show('events', event_id)
       end
+      private_class_method :get_latest_event!
 
-      def make_slack_message(event, user)
+      def self.make_slack_message(event, user)
         text = [
-          format_resource(event.resource_type),
+          event.resource_type.capitalize.chomp('s'),
           event.links.payment,
           event.action
         ].join(' ')
@@ -54,10 +39,7 @@ module GCMe
           text: text
         )
       end
-
-      def format_resource(string)
-        string.capitalize.chomp('s')
-      end
+      private_class_method :make_slack_message
     end
   end
 end
