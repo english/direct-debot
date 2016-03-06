@@ -8,7 +8,6 @@ require 'hamster'
 require_relative 'components/db'
 require_relative 'components/mail'
 require_relative 'components/oauth'
-require_relative 'components/server_configuration'
 require_relative 'components/airbrake'
 require_relative 'components/logger'
 require_relative 'components/webhook'
@@ -18,7 +17,6 @@ require_relative 'components/web_server'
 module GCMe
   # Configures and manages the lifecycle of potentially stateful components.
   class System
-    # rubocop:disable Metrics/MethodLength
     def self.build
       load_config!
 
@@ -26,15 +24,12 @@ module GCMe
             db: build_db,
             oauth: build_oauth,
             mail: build_mail,
-            server_configuration: build_server_configuration,
             airbrake: build_airbrake,
             logger: build_logger,
-            webhook: [build_webhook, :logger, :db, :server_configuration, :slack],
+            webhook: [build_webhook, :logger, :db, :slack],
             slack: [build_slack, :logger],
-            web_server: [build_web_server,
-                         :db, :server_configuration, :oauth, :mail, :webhook]))
+            web_server: [build_web_server, :db, :oauth, :mail, :webhook]))
     end
-    # rubocop:enable Metrics/MethodLength
 
     def self.load_config!
       if ENV['RACK_ENV'] == 'development'
@@ -65,12 +60,6 @@ module GCMe
         password: Prius.get(:sendgrid_password))
     end
 
-    private_class_method def self.build_server_configuration
-      GCMe::Components::ServerConfiguration.new(Prius.get(:host),
-                                                Prius.get(:gc_environment),
-                                                Prius.get(:slack_token))
-    end
-
     private_class_method def self.build_airbrake
       GCMe::Components::Airbrake.new(Prius.get(:airbrake_project_id),
                                      Prius.get(:airbrake_api_key))
@@ -81,7 +70,8 @@ module GCMe
     end
 
     private_class_method def self.build_webhook
-      GCMe::Components::Webhook.new(Prius.get(:gc_webhook_secret))
+      GCMe::Components::Webhook.new(Prius.get(:gc_webhook_secret),
+                                    Prius.get(:gc_environment).to_sym)
     end
 
     private_class_method def self.build_slack
@@ -89,7 +79,11 @@ module GCMe
     end
 
     private_class_method def self.build_web_server
-      GCMe::Components::WebServer.new(Prius.get(:thread_count), Prius.get(:port))
+      GCMe::Components::WebServer.new(Prius.get(:thread_count),
+                                      Prius.get(:port),
+                                      Prius.get(:host),
+                                      Prius.get(:gc_environment),
+                                      Prius.get(:slack_token))
     end
 
     def initialize(components)

@@ -15,7 +15,7 @@ RSpec.describe 'authorisation' do
   end
 
   subject(:app) do
-    TestRequest.new(GCMe::Application.from_system(system).rack_app, system)
+    TestRequest.new(system.fetch(:web_server).rack_app, system)
   end
 
   it 'handles /api/slack/messages with authorise' do

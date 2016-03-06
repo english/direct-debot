@@ -18,7 +18,7 @@ RSpec.describe 'adding a GoCardless customer' do
   end
 
   subject(:app) do
-    TestRequest.new(GCMe::Application.from_system(system).rack_app, system)
+    TestRequest.new(system.fetch(:web_server).rack_app, system)
   end
 
   before do

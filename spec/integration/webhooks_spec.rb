@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'webmock/rspec'
+require_relative '../support/test_request'
 require_relative '../support/transaction'
 require_relative '../support/eventually'
 require_relative '../../lib/gc_me'
@@ -16,7 +17,9 @@ RSpec.describe 'processing webhooks' do
     system.stop
   end
 
-  subject(:app) { Rack::MockRequest.new(GCMe::Application.from_system(system).rack_app) }
+  subject(:app) do
+    Rack::MockRequest.new(system.fetch(:web_server).rack_app)
+  end
 
   let(:webhook_headers) do
     {
@@ -120,7 +123,7 @@ RSpec.describe 'processing webhooks' do
   end
 
   it 'records receipt of the webhook and notifies the slack user' do
-    host = system.fetch(:server_configuration).host.to_s
+    host = system.fetch(:web_server).host.to_s
 
     response = app.post("#{host}/api/gc/webhooks",
                         webhook_headers.merge(params: params.to_json))

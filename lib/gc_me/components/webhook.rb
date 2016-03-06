@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative 'db'
-require_relative 'server_configuration'
 require_relative '../jobs/webhook_event'
 require_relative '../db/store'
 
@@ -11,18 +10,18 @@ module GCMe
     class Webhook
       attr_reader :input_queue, :gc_webhook_secret
 
-      def initialize(gc_webhook_secret, worker_count: 2)
+      def initialize(gc_webhook_secret, environment, worker_count: 2)
         @worker_count      = worker_count
+        @environment       = environment
         @gc_webhook_secret = gc_webhook_secret
         @input_queue       = nil
       end
 
-      def start(logger, db, server_configuration, slack)
-        @logger               = logger
-        @db                   = db
-        @server_configuration = server_configuration
-        @slack                = slack
-        @input_queue          = SizedQueue.new(5)
+      def start(logger, db, slack)
+        @logger      = logger
+        @db          = db
+        @slack       = slack
+        @input_queue = SizedQueue.new(5)
 
         start_workers
       end
@@ -50,7 +49,7 @@ module GCMe
 
         GCMe::Jobs::WebhookEvent.call(
           store: GCMe::DB::Store.new(@db.database),
-          environment: @server_configuration.environment,
+          environment: @environment,
           slack_queue: @slack.input_queue,
           organisation_id: message.fetch(:organisation_id),
           event_id: message.fetch(:event_id)
