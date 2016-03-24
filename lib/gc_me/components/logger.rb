@@ -1,4 +1,5 @@
 require 'logger'
+require 'fileutils'
 
 module GCMe
   module Components
@@ -11,6 +12,8 @@ module GCMe
       end
 
       def start
+        FileUtils.mkdir_p(File.dirname(@path)) if @path
+
         @logger = ::Logger.new(@path || STDOUT).tap do |logger|
           logger.progname = 'gc-me'
         end
