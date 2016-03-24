@@ -13,6 +13,11 @@ trap(:INT) do
   exit
 end
 
+trap(:TERM) do
+  system.stop
+  exit
+end
+
 begin
   system.start
   sleep
