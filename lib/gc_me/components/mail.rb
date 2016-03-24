@@ -16,7 +16,7 @@ module GCMe
           @output_queue = nil
         end
 
-        def start
+        def start(_)
           @input_queue  = SizedQueue.new(5)
           @output_queue = SizedQueue.new(5)
 
@@ -53,16 +53,13 @@ module GCMe
           @output_queue = nil
         end
 
-        def start
+        def start(logger)
           @input_queue  = SizedQueue.new(5)
           @output_queue = SizedQueue.new(5)
 
           Thread.new do
             while message = @input_queue.deq
-              mail = Mail::Message.new(message.to_h)
-
-              mail.delivery_method(:smtp, @options)
-              mail.deliver!
+              send_message(message, logger)
 
               sleep(0.1)
             end
@@ -72,6 +69,17 @@ module GCMe
         def stop
           @input_queue.close
           @output_queue.close
+        end
+
+        private
+
+        def send_message(message, logger)
+          mail = Mail::Message.new(message.to_h)
+
+          logger.logger.info("Sending mail: #{message.to_h}")
+
+          mail.delivery_method(:smtp, @options)
+          mail.deliver!
         end
       end
 

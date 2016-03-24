@@ -23,7 +23,7 @@ module GCMe
       new(Hamster::Hash.new(
             db: build_db,
             oauth: build_oauth,
-            mail: build_mail,
+            mail: [build_mail, :logger],
             airbrake: build_airbrake,
             logger: build_logger,
             webhook: [build_webhook, :logger, :db, :slack],
