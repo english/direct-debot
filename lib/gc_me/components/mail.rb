@@ -60,6 +60,7 @@ module GCMe
           Thread.new do
             while message = @input_queue.deq
               logger.logger.info("Got message #{message.to_h}")
+
               send_message(message, logger)
 
               sleep(0.1)
@@ -81,6 +82,9 @@ module GCMe
 
           mail.delivery_method(:smtp, @options)
           mail.deliver!
+        rescue => e
+          logger.logger.error("Failed processing message #{message.to_h}, " \
+                              "#{e.inspect} #{e.message}")
         end
       end
 
