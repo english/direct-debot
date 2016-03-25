@@ -59,6 +59,7 @@ module GCMe
 
           Thread.new do
             while message = @input_queue.deq
+              logger.logger.info("Got message #{message.to_h}")
               send_message(message, logger)
 
               sleep(0.1)
