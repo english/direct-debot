@@ -76,7 +76,7 @@ module GCMe
         private
 
         def send_message(message, logger)
-          mail = Mail::Message.new(message.to_h)
+          mail = ::Mail::Message.new(message.to_h)
 
           logger.logger.info("Sending mail: #{message.to_h}")
 
