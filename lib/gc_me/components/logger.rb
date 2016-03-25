@@ -1,11 +1,15 @@
 require 'logger'
 require 'fileutils'
+require 'forwardable'
 
 module GCMe
   module Components
     # Configures logging
     class Logger
       attr_reader :logger
+
+      extend Forwardable
+      def_delegators :logger, :debug, :info, :warn, :error, :fatal, :unknown
 
       def initialize(path)
         @path = path

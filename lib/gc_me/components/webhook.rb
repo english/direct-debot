@@ -45,7 +45,7 @@ module GCMe
       end
 
       def perform_job(message)
-        @logger.logger.info("about to process webhook: #{message}")
+        @logger.info("about to process webhook: #{message}")
 
         GCMe::Jobs::WebhookEvent.call(
           store: GCMe::DB::Store.new(@db.database),

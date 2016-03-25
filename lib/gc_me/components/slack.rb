@@ -37,14 +37,14 @@ module GCMe
       private
 
       def post_form(uri, data)
-        @logger.logger.info("sending slack message: #{data}")
+        @logger.info("sending slack message: #{data}")
 
         request = Net::HTTP::Post.new(uri)
         request.set_form_data(data)
 
         response = send_request(request, uri)
 
-        @logger.logger.info(
+        @logger.info(
           "response from sending slack message: #{response.code} #{response.message}")
       end
 
