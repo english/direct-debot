@@ -9,12 +9,12 @@ require './lib/gc_me/system'
 system = GCMe::System.build
 
 trap(:INT) do
-  system.stop
+  puts 'Received SIGINT, exiting.'
   exit
 end
 
 trap(:TERM) do
-  system.stop
+  puts 'Received SIGTERM, exiting.'
   exit
 end
 
