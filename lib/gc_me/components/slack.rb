@@ -1,60 +1,51 @@
 # frozen_string_literal: true
 
 require 'uri'
+require_relative '../consumer'
 
 module GCMe
   module Components
     # Reads messages from a queue and posts them to slack
     class Slack
-      POST_MESSAGE_URL = URI('https://slack.com/api/chat.postMessage')
-
       attr_reader :input_queue, :slack_bot_api_token
 
-      def initialize(slack_bot_api_token)
+      def initialize(slack_bot_api_token, slack_message_url)
         @slack_bot_api_token = slack_bot_api_token
-        @running             = false
-        @logger              = nil
+        @slack_message_url   = URI(slack_message_url)
         @input_queue         = nil
       end
 
       def start(logger)
-        @logger      = logger
         @input_queue = SizedQueue.new(5)
-
-        thread = Thread.new do
-          while message = @input_queue.deq
-            post_form(POST_MESSAGE_URL, message.put(:token, slack_bot_api_token).to_h)
-          end
-        end
-
-        thread.abort_on_exception = true
+        @thread = Consumer.call(@input_queue, logger) { |message|
+          process_message(message)
+        }
       end
 
       def stop
         @input_queue.close
+        @thread.join
       end
 
       private
 
-      def post_form(uri, data)
-        @logger.info("sending slack message: #{data}")
-
-        request = Net::HTTP::Post.new(uri)
-        request.set_form_data(data)
-
-        response = send_request(request, uri)
-
-        @logger.info(
-          "response from sending slack message: #{response.code} #{response.message}")
+      def process_message(message)
+        HTTP.post(@slack_message_url, message.put(:token, slack_bot_api_token).to_h)
       end
 
-      def send_request(request, uri)
-        Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
-          http.open_timeout = 1
-          http.read_timeout = 1
-          http.ssl_timeout  = 1
+      # HTTP interface
+      module HTTP
+        def self.post(uri, data)
+          request = Net::HTTP::Post.new(uri)
+          request.set_form_data(data)
 
-          http.request(request)
+          Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+            http.open_timeout = 1
+            http.read_timeout = 1
+            http.ssl_timeout  = 1
+
+            http.request(request)
+          end
         end
       end
     end

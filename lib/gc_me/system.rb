@@ -75,7 +75,8 @@ module GCMe
     end
 
     private_class_method def self.build_slack
-      GCMe::Components::Slack.new(Prius.get(:slack_bot_api_token))
+      GCMe::Components::Slack.new(Prius.get(:slack_bot_api_token),
+                                  Prius.get(:slack_message_url))
     end
 
     private_class_method def self.build_web_server

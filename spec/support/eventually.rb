@@ -11,7 +11,7 @@ module Eventually
         nil # keep Rubocop happy
       end
 
-      fail Timeout::Eror if (Time.now - start_time) > (timeout * 1000)
+      fail Timeout::Error if (Time.now - start_time) > (timeout * 1000)
       sleep(sleep_time)
     end
   end
