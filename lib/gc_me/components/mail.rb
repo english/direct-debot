@@ -2,6 +2,7 @@
 
 require 'mail'
 require 'hamster'
+require_relative '../consumer'
 
 module GCMe
   module Components
@@ -16,22 +17,19 @@ module GCMe
           @output_queue = nil
         end
 
-        def start(_)
+        def start(logger)
           @input_queue  = SizedQueue.new(5)
           @output_queue = SizedQueue.new(5)
 
-          Thread.new do
-            while message = @input_queue.deq
-              @output_queue << message
-
-              sleep(0.1)
-            end
-          end
+          @thread = Consumer.call(@input_queue, logger) { |message|
+            @output_queue << message
+          }
         end
 
         def stop
           @input_queue.close
           @output_queue.close
+          @thread.join
         end
       end
 
@@ -57,34 +55,18 @@ module GCMe
           @input_queue  = SizedQueue.new(5)
           @output_queue = SizedQueue.new(5)
 
-          Thread.new do
-            while message = @input_queue.deq
-              logger.info("Got message #{message.to_h}")
+          @thread = Consumer.call(@input_queue, logger) { |message|
+            mail = ::Mail::Message.new(message.to_h)
+            mail.delivery_method(:smtp, @options)
 
-              send_message(message, logger)
-
-              sleep(0.1)
-            end
-          end
+            mail.deliver!
+          }
         end
 
         def stop
           @input_queue.close
           @output_queue.close
-        end
-
-        private
-
-        def send_message(message, logger)
-          mail = ::Mail::Message.new(message.to_h)
-
-          logger.info("Sending mail: #{message.to_h}")
-
-          mail.delivery_method(:smtp, @options)
-          mail.deliver!
-        rescue => e
-          logger.error("Failed processing message #{message.to_h}, " \
-                       "#{e.inspect} #{e.message}")
+          @thread.join
         end
       end
 
