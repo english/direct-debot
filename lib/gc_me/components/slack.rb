@@ -7,11 +7,12 @@ module GCMe
   module Components
     # Reads messages from a queue and posts them to slack
     class Slack
-      attr_reader :input_queue, :slack_bot_api_token
+      attr_reader :input_queue, :slack_bot_api_token, :slack_token
 
-      def initialize(slack_bot_api_token, slack_message_url)
+      def initialize(slack_bot_api_token, slack_message_url, slack_token)
         @slack_bot_api_token = slack_bot_api_token
         @slack_message_url   = URI(slack_message_url)
+        @slack_token         = slack_token
         @input_queue         = nil
       end
 

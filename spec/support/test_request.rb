@@ -16,10 +16,11 @@ class TestRequest
   def initialize(app, system)
     @app = Rack::MockRequest.new(app)
     @system = system
+    @slack_token = Prius.get(:slack_token)
   end
 
   def post(path, params)
-    @app.post(host + path, params: { token: slack_token, **DEFAULT_PARAMS, **params })
+    @app.post(host + path, params: { token: @slack_token, **DEFAULT_PARAMS, **params })
   end
 
   def get(path)
@@ -30,9 +31,5 @@ class TestRequest
 
   def host
     @system.fetch(:web_server).host.to_s
-  end
-
-  def slack_token
-    @system.fetch(:web_server).slack_token
   end
 end

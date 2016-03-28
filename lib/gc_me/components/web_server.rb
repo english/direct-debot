@@ -10,20 +10,20 @@ module GCMe
   module Components
     # Controls starting and stopping the Rack web server
     class WebServer
-      attr_reader :host, :environment, :slack_token, :rack_app
+      attr_reader :host, :rack_app, :environment
 
-      def initialize(thread_count, port, host, environment, slack_token)
+      def initialize(thread_count, port, host, environment, oauth_client)
         @thread_count = thread_count
         @port         = port
         @host         = URI.parse(host)
         @environment  = environment.to_sym
-        @slack_token  = slack_token
+        @oauth_client = oauth_client
       end
 
-      def start(db, oauth, mail, webhook)
+      def start(db, mail, webhook, slack)
         return if @running
 
-        router = GCMe::Application.new(db, oauth, mail, webhook, self)
+        router = GCMe::Application.new(db, mail, webhook, slack, self, @oauth_client)
 
         @rack_app = ::Rack::Builder.new do
           use ::Airbrake::Rack::Middleware

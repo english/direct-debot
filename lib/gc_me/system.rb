@@ -5,9 +5,9 @@ ENV['RACK_ENV'] ||= 'development'
 require 'prius'
 require 'tsort'
 require 'hamster'
+require 'oauth2'
 require_relative 'components/db'
 require_relative 'components/mail'
-require_relative 'components/oauth'
 require_relative 'components/airbrake'
 require_relative 'components/logger'
 require_relative 'components/webhook'
@@ -22,13 +22,12 @@ module GCMe
 
       new(Hamster::Hash.new(
             db: build_db,
-            oauth: build_oauth,
             mail: [build_mail, :logger],
             airbrake: build_airbrake,
             logger: build_logger,
             webhook: [build_webhook, :logger, :db, :slack],
             slack: [build_slack, :logger],
-            web_server: [build_web_server, :db, :oauth, :mail, :webhook]))
+            web_server: [build_web_server, :db, :mail, :webhook, :slack]))
     end
 
     def self.load_config!
@@ -44,13 +43,16 @@ module GCMe
       GCMe::Components::DB.new(Prius.get(:database_url), Prius.get(:thread_count))
     end
 
-    private_class_method def self.build_oauth
-      GCMe::Components::OAuth.new(
-        gc_client_id: Prius.get(:gc_client_id),
-        gc_client_secret: Prius.get(:gc_client_secret),
-        gc_connect_url: Prius.get(:gc_connect_url),
-        gc_connect_authorize_path: Prius.get(:gc_connect_authorize_path),
-        gc_connect_access_token_path: Prius.get(:gc_connect_access_token_path))
+    private_class_method def self.build_oauth_client
+      connection_opts = { request: { timeout: 1 } }
+
+      OAuth2::Client.new(
+        Prius.get(:gc_client_id),
+        Prius.get(:gc_client_secret),
+        site: Prius.get(:gc_connect_url),
+        authorize_url: Prius.get(:gc_connect_authorize_path),
+        token_url: Prius.get(:gc_connect_access_token_path),
+        connection_opts: connection_opts)
     end
 
     private_class_method def self.build_mail
@@ -76,7 +78,8 @@ module GCMe
 
     private_class_method def self.build_slack
       GCMe::Components::Slack.new(Prius.get(:slack_bot_api_token),
-                                  Prius.get(:slack_message_url))
+                                  Prius.get(:slack_message_url),
+                                  Prius.get(:slack_token))
     end
 
     private_class_method def self.build_web_server
@@ -84,7 +87,7 @@ module GCMe
                                       Prius.get(:port),
                                       Prius.get(:host),
                                       Prius.get(:gc_environment),
-                                      Prius.get(:slack_token))
+                                      build_oauth_client)
     end
 
     def initialize(components)

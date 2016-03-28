@@ -20,19 +20,21 @@ module GCMe
     INDEX_PATH                = '/'
     SLACK_MESSAGES_PATH       = '/api/slack/messages'
     GC_CALLBACK_PATH          = '/api/gc/callback'
-    ADD_CUSTOMER_PATH         = '/add-customer'
     ADD_CUSTOMER_SUCCESS_PATH = '/api/gc/add-customer-success'
     GC_WEBHOOKS_PATH          = '/api/gc/webhooks'
+    ADD_CUSTOMER_PATH         = '/add-customer'
 
-    def initialize(db, oauth, mail, webhook, web_server)
+    # rubocop:disable Metrics/ParameterLists
+    def initialize(db, mail, webhook, slack, web_server, oauth)
       @store = DB::Store.new(db.database)
       @host = web_server.host
       @environment = web_server.environment
-      @slack_token = web_server.slack_token
-      @oauth_client = build_oauth_client(oauth)
+      @slack_token = slack.slack_token
       @mail = mail
       @webhook = webhook
+      @oauth_client = build_oauth_client(oauth)
     end
+    # rubocop:enable Metrics/ParameterLists
 
     # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def rack_app
@@ -56,7 +58,7 @@ module GCMe
     def build_oauth_client(oauth)
       redirect_uri = "#{@host}#{GC_CALLBACK_PATH}"
 
-      OAuthClient.new(oauth.client, redirect_uri)
+      OAuthClient.new(oauth, redirect_uri)
     end
 
     def build_slack_messages_handler
