@@ -11,9 +11,4 @@ require 'pry'
 require 'gc_me'
 require 'gc_me/system'
 
-begin
-  system = GCMe::System.build
-  Pry.start
-ensure
-  system.stop
-end
+Pry.start

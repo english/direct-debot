@@ -13,9 +13,11 @@ require_relative 'components/logger'
 require_relative 'components/webhook'
 require_relative 'components/slack'
 require_relative 'components/web_server'
+require_relative 'components/fakes/slack_server'
 
 module GCMe
   # Configures and manages the lifecycle of potentially stateful components.
+  # rubocop:disable Metrics/ClassLength
   class System
     def self.build
       load_config!
@@ -27,6 +29,20 @@ module GCMe
             logger: build_logger,
             webhook: [build_webhook, :logger, :db, :slack],
             slack: [build_slack, :logger],
+            web_server: [build_web_server, :db, :mail, :webhook, :slack]))
+    end
+
+    def self.build_dev
+      load_config!
+
+      new(Hamster::Hash.new(
+            db: build_db,
+            mail: [build_mail, :logger],
+            airbrake: build_airbrake,
+            logger: build_logger,
+            webhook: [build_webhook, :logger, :db, :slack],
+            slack: [build_slack, :logger],
+            fake_slack: [build_fake_slack, :logger],
             web_server: [build_web_server, :db, :mail, :webhook, :slack]))
     end
 
@@ -90,6 +106,10 @@ module GCMe
                                       build_oauth_client)
     end
 
+    private_class_method def self.build_fake_slack
+      GCMe::Components::Fakes::SlackServer.new(Prius.get(:slack_message_url))
+    end
+
     def initialize(components)
       @components = components.map { |(k, v)| [k, Array(v)] }.to_h
     end
@@ -127,6 +147,7 @@ module GCMe
       TSortableHash.new(dependency_map).tsort
     end
   end
+  # rubocop:enable Metrics/ClassLength
 
   # Allows a hash to be sorted in dependency order
   class TSortableHash

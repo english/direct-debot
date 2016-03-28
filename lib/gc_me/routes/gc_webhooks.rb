@@ -3,6 +3,7 @@
 require 'coach'
 require 'openssl'
 require 'json'
+# TODO: Add a json schema
 # require_relative '../middleware/json_schema'
 require_relative '../refinements/hash_dig_strict'
 

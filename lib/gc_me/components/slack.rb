@@ -40,7 +40,7 @@ module GCMe
           request = Net::HTTP::Post.new(uri)
           request.set_form_data(data)
 
-          Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+          Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
             http.open_timeout = 1
             http.read_timeout = 1
             http.ssl_timeout  = 1
