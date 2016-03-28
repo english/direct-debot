@@ -8,19 +8,11 @@ require './lib/gc_me/system'
 
 system = GCMe::System.build
 
-trap(:INT) do
-  puts 'Received SIGINT, exiting.'
-  exit
-end
-
-trap(:TERM) do
-  puts 'Received SIGTERM, exiting.'
-  exit
-end
-
 begin
   system.start
   sleep
+rescue SignalException => e
+  puts "Received signal #{e}. Exiting"
 ensure
   system.stop
 end
