@@ -17,15 +17,17 @@ gem 'rake', '~> 10.4.2'
 gem 'airbrake', '~> 5.0.2'
 gem 'newrelic_rpm', '~> 3.14.1.311'
 
+# so that we can run a console in production
+gem 'pry'
+gem 'pry-byebug'
+gem 'pry-doc'
+
 group :production do
   gem 'pg', '~> 0.18'
 end
 
 group :development, :test do
   gem 'rspec', '~> 3.3'
-  gem 'pry'
-  gem 'pry-byebug'
-  gem 'pry-doc'
   gem 'dotenv', '~> 2.0'
   gem 'sqlite3', '~> 1.3'
 end
