@@ -1,3 +1,5 @@
+require 'airbrake'
+
 module GCMe
   # Starts a consumer for a given queue, processing messages until the queue is closed.
   # Logs and rescues all exceptions.
@@ -16,6 +18,7 @@ module GCMe
       logger.info("consumed message: #{message.inspect}")
     rescue => e
       logger.error("#{e.inspect}: #{e.message}\n#{e.backtrace}")
+      Airbrake.notify(e)
     end
   end
 end
