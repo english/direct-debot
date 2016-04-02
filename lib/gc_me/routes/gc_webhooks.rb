@@ -26,10 +26,6 @@ module GCMe
           queue << event
         end
 
-        # Wait for the queue to be drained
-        # Remove this once a proper peristent background queue is setup
-        sleep 0.01 until queue.empty?
-
         [204, {}, ['']]
       end
 

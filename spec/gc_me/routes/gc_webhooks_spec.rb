@@ -33,22 +33,14 @@ RSpec.describe GCMe::Routes::GCWebhooks do
     let(:signature) { 'adeb7d7dca6adff480d83a0445f05d7bed919115059014e74842668415c67a2b' }
 
     it 'enqueues each event and organisation_id' do
-      messages = []
-
-      worker = Thread.new do
-        while (message = queue.pop)
-          messages << message
-        end
-      end
-
-      worker.abort_on_exception = true
-
       expect(subject).to respond_with_status(204)
 
       expected_messages = [
         { organisation_id: 'OR123', event_id: 'EV123' },
         { organisation_id: 'OR456', event_id: 'EV456' }
       ]
+      messages = queue.size.times.map { queue.pop }
+
       expect(messages).to match_array(expected_messages)
     end
   end
