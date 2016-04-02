@@ -5,7 +5,7 @@ require 'hamster'
 require_relative '../../middleware/get_gc_access_token'
 require_relative '../../refinements/hash_slice'
 
-module GCMe
+module DirectDebot
   module Routes
     module SlackMessages
       # If the message is 'add jane@example.com'
@@ -29,7 +29,7 @@ module GCMe
         # Provides a hash representation of the email message sent to prospective
         # customers
         module AddCustomerMail
-          FROM    = 'noreply@gc-me.test'
+          FROM    = 'noreply@direct-debot.test'
           SUBJECT = 'Setup a direct debit with %s'
           BODY    = '%s wants to setup a direct debit with you. Authorise at %s.'
 

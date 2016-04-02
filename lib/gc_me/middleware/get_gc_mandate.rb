@@ -2,7 +2,7 @@
 
 require 'coach'
 
-module GCMe
+module DirectDebot
   module Middleware
     # Fetches the active GC mandate by customer.
     # If an active mandate doesn't exist, and error message is returned

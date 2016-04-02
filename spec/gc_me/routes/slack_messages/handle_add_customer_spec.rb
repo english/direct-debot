@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require_relative '../../../../lib/gc_me/routes/slack_messages/handle_add_customer'
+require_relative '../../../../lib/direct_debot/routes/slack_messages/handle_add_customer'
 
-RSpec.describe GCMe::Routes::SlackMessages::HandleAddCustomer do
+RSpec.describe DirectDebot::Routes::SlackMessages::HandleAddCustomer do
   subject(:handle_add_customer) do
     context = { request: double(params: params) }
 
     described_class.new(context, null_middleware, mail_queue: mail_queue,
-                                                  host: 'http://gc-me.test')
+                                                  host: 'http://direct-debot.test')
   end
 
   let(:mail_queue) { Queue.new }
@@ -32,7 +32,7 @@ RSpec.describe GCMe::Routes::SlackMessages::HandleAddCustomer do
 
       from, to, subject, body = message.fetch_values(:from, :to, :subject, :body)
 
-      expect(from).to eq('noreply@gc-me.test')
+      expect(from).to eq('noreply@direct-debot.test')
       expect(to).to eq('jane@example.com')
       expect(subject).to eq('Setup a direct debit with Joaquin')
       expect(body).to match(%r{Joaquin.+/add-customer\?user_id=US123})

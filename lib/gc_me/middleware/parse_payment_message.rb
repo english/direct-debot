@@ -3,7 +3,7 @@
 require 'coach'
 require_relative '../payment_message'
 
-module GCMe
+module DirectDebot
   module Middleware
     # Parses the payment request text into a struct of :currency, :pence and :email
     class ParsePaymentMessage < Coach::Middleware

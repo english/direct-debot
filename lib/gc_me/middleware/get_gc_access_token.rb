@@ -2,7 +2,7 @@
 
 require 'coach'
 
-module GCMe
+module DirectDebot
   module Middleware
     # Fetches the gc_access_token from the stored slack user.
     # If the slack user is not already authorised (in the store) then an error response is

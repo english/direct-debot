@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative '../../../lib/gc_me/system'
-require_relative '../../../lib/gc_me/db/store'
+require_relative '../../../lib/direct_debot/system'
+require_relative '../../../lib/direct_debot/db/store'
 require_relative '../../support/transaction'
 
-RSpec.describe GCMe::DB::Store do
-  let(:system) { GCMe::System.build }
+RSpec.describe DirectDebot::DB::Store do
+  let(:system) { DirectDebot::System.build }
 
   around do |example|
     system.start

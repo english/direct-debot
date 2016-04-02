@@ -2,7 +2,7 @@
 
 require 'hamster'
 
-module GCMe
+module DirectDebot
   # Wraps OAuth2::Client with a nicer interface
   class OAuthClient
     def initialize(client, redirect_uri)

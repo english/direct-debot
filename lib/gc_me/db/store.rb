@@ -3,7 +3,7 @@
 require 'securerandom'
 require 'hamster'
 
-module GCMe
+module DirectDebot
   module DB
     # Interface to the database
     class Store

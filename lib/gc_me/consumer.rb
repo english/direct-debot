@@ -1,6 +1,6 @@
 require 'airbrake'
 
-module GCMe
+module DirectDebot
   # Starts a consumer for a given queue, processing messages until the queue is closed.
   # Logs and rescues all exceptions.
   module Consumer

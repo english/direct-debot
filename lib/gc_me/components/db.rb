@@ -2,7 +2,7 @@
 
 require 'sequel'
 
-module GCMe
+module DirectDebot
   module Components
     # Manages connecting and disconnecting to the database at the given connection url
     class DB
@@ -25,7 +25,7 @@ module GCMe
                                          connect_timeout: CONNECT_TIMEOUT,
                                          preconnect: true)
         Sequel.extension(:migration)
-        Sequel::Migrator.run(database, 'lib/gc_me/db/migrations')
+        Sequel::Migrator.run(database, 'lib/direct_debot/db/migrations')
       end
 
       def stop

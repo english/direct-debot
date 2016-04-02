@@ -6,7 +6,7 @@ require_relative '../middleware/get_gc_access_token'
 require_relative '../middleware/build_gc_client'
 require_relative '../refinements/hash_slice'
 
-module GCMe
+module DirectDebot
   module Routes
     # Redirects a potential customer to a new GC redirect flow
     class AddCustomer < Coach::Middleware

@@ -16,15 +16,15 @@ require_relative 'slack_messages/handle_payment'
 require_relative 'slack_messages/handle_list_resources'
 require_relative 'slack_messages/handle_show_resources'
 
-module GCMe
+module DirectDebot
   module Routes
     module SlackMessages
       # Handles Slack messages in the format of
-      #   /gc-me <amount> from <user>
+      #   /direct-debot <amount> from <user>
       # or
-      #   /gc-me authorise
+      #   /direct-debot authorise
       # or
-      #   /gc-me add someone@example.com
+      #   /direct-debot add someone@example.com
       class Handler < Coach::Middleware
         # We should never really see this error since the JSON schema will reject
         # unexpected 'text' requests.

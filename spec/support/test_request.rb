@@ -10,7 +10,7 @@ class TestRequest
     channel_name: 'test',
     user_id: 'U123',
     user_name: 'jamie',
-    command: '/gc-me'
+    command: '/direct-debot'
   }
 
   def initialize(app, system)

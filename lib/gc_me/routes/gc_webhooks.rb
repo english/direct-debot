@@ -7,7 +7,7 @@ require 'json'
 # require_relative '../middleware/json_schema'
 require_relative '../refinements/hash_dig_strict'
 
-module GCMe
+module DirectDebot
   module Routes
     # Handle GC webhooks by:
     #  1. checking the signature of the webhook

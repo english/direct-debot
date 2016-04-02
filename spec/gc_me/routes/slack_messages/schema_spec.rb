@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 require 'json_schema'
-require_relative '../../../../lib/gc_me/routes/slack_messages'
+require_relative '../../../../lib/direct_debot/routes/slack_messages'
 
 RSpec::Matchers.define :validate do |data|
   match { |schema| schema.validate(data).first }
 end
 
-RSpec.describe GCMe::Routes::SlackMessages::Handler::SCHEMA do
+RSpec.describe DirectDebot::Routes::SlackMessages::Handler::SCHEMA do
   let(:valid_params) do
     {
       'token'        => 'gIkuvaNzQIHg97ATvDxqgjtO',
@@ -17,7 +17,7 @@ RSpec.describe GCMe::Routes::SlackMessages::Handler::SCHEMA do
       'channel_name' => 'test',
       'user_id'      => 'U2147483697',
       'user_name'    => 'Steve',
-      'command'      => '/gc-me',
+      'command'      => '/direct-debot',
       'text'         => '£10 from @jane'
     }
   end

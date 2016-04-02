@@ -2,7 +2,7 @@
 
 require 'coach'
 
-module GCMe
+module DirectDebot
   module Middleware
     # Slack will send a `token` along with each request.
     # We can use this to verify that requests have actually came from Slack.

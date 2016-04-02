@@ -3,12 +3,12 @@
 require 'webmock/rspec'
 require_relative '../support/test_request'
 require_relative '../support/transaction'
-require_relative '../../lib/gc_me'
-require_relative '../../lib/gc_me/system'
-require_relative '../../lib/gc_me/db/store'
+require_relative '../../lib/direct_debot'
+require_relative '../../lib/direct_debot/system'
+require_relative '../../lib/direct_debot/db/store'
 
 RSpec.describe 'adding a GoCardless customer' do
-  let(:system) { GCMe::System.build }
+  let(:system) { DirectDebot::System.build }
 
   around do |example|
     system.start
@@ -20,7 +20,7 @@ RSpec.describe 'adding a GoCardless customer' do
     TestRequest.new(system.fetch(:web_server).rack_app, system)
   end
 
-  let(:store) { GCMe::DB::Store.new(system.fetch(:db).database) }
+  let(:store) { DirectDebot::DB::Store.new(system.fetch(:db).database) }
 
   before do
     store.create_user!(slack_user_id: 'U123',

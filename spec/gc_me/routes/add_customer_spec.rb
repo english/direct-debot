@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'gocardless_pro'
-require_relative '../../../lib/gc_me/routes/add_customer'
-require_relative '../../../lib/gc_me/gc_client'
-require_relative '../../../lib/gc_me/db/store'
+require_relative '../../../lib/direct_debot/routes/add_customer'
+require_relative '../../../lib/direct_debot/gc_client'
+require_relative '../../../lib/direct_debot/db/store'
 
-RSpec.describe GCMe::Routes::AddCustomer do
-  let(:store) { instance_double(GCMe::DB::Store) }
+RSpec.describe DirectDebot::Routes::AddCustomer do
+  let(:store) { instance_double(DirectDebot::DB::Store) }
 
   subject(:add_customer) do
     context = { gc_client: gc_client, request: double(params: { user_id: 'US123' }) }
@@ -15,7 +15,9 @@ RSpec.describe GCMe::Routes::AddCustomer do
     described_class.new(context, nil, config)
   end
 
-  let(:gc_client) { instance_double(GCMe::GCClient, create_redirect_flow: redirect_flow) }
+  let(:gc_client) do
+    instance_double(DirectDebot::GCClient, create_redirect_flow: redirect_flow)
+  end
 
   let(:redirect_flow) do
     instance_double(GoCardlessPro::Resources::RedirectFlow,

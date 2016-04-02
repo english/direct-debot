@@ -2,7 +2,7 @@
 
 require 'coach'
 
-module GCMe
+module DirectDebot
   module Middleware
     # Fetches the GC customer by email.
     # If the customer doesn't exist, and error message is returned

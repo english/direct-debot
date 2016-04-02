@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require_relative '../../../lib/gc_me/oauth_client'
-require_relative '../../../lib/gc_me/routes/gc_callback'
-require_relative '../../../lib/gc_me/db/store'
+require_relative '../../../lib/direct_debot/oauth_client'
+require_relative '../../../lib/direct_debot/routes/gc_callback'
+require_relative '../../../lib/direct_debot/db/store'
 require 'hamster'
 
-RSpec.describe GCMe::Routes::GCCallback do
+RSpec.describe DirectDebot::Routes::GCCallback do
   subject(:gc_callback) do
     context = { request: double(params: params) }
 
@@ -13,8 +13,8 @@ RSpec.describe GCMe::Routes::GCCallback do
   end
 
   let(:params) { { 'code' => 'the-code', 'state' => 'slack-user-id' } }
-  let(:oauth_client) { instance_double(GCMe::OAuthClient) }
-  let(:store) { instance_double(GCMe::DB::Store) }
+  let(:oauth_client) { instance_double(DirectDebot::OAuthClient) }
+  let(:store) { instance_double(DirectDebot::DB::Store) }
 
   it 'persists a user with a gc_access_token, organisation_id and slack_user_id' do
     expect(oauth_client).

@@ -2,7 +2,7 @@
 
 require 'coach'
 
-module GCMe
+module DirectDebot
   module Routes
     # Just so we know the app is up and running
     class Index < Coach::Middleware

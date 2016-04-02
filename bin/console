@@ -8,7 +8,7 @@ Bundler.setup(:default, ENV['RACK_ENV'])
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'pry'
-require 'gc_me'
-require 'gc_me/system'
+require 'direct_debot'
+require 'direct_debot/system'
 
 Pry.start

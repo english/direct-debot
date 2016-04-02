@@ -4,18 +4,18 @@ require 'lotus/router'
 require 'coach'
 require 'prius'
 require 'hamster'
-require_relative 'gc_me/routes/index'
-require_relative 'gc_me/routes/slack_messages'
-require_relative 'gc_me/routes/gc_callback'
-require_relative 'gc_me/routes/add_customer'
-require_relative 'gc_me/routes/add_customer_success'
-require_relative 'gc_me/routes/gc_webhooks'
-require_relative 'gc_me/db/store'
-require_relative 'gc_me/oauth_client'
+require_relative 'direct_debot/routes/index'
+require_relative 'direct_debot/routes/slack_messages'
+require_relative 'direct_debot/routes/gc_callback'
+require_relative 'direct_debot/routes/add_customer'
+require_relative 'direct_debot/routes/add_customer_success'
+require_relative 'direct_debot/routes/gc_webhooks'
+require_relative 'direct_debot/db/store'
+require_relative 'direct_debot/oauth_client'
 
 # This is where the magic happens
-module GCMe
-  # Provides the GCMe rack application
+module DirectDebot
+  # Provides the DirectDebot rack application
   class Application
     INDEX_PATH                = '/'
     SLACK_MESSAGES_PATH       = '/api/slack/messages'

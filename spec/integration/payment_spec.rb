@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require 'webmock/rspec'
-require_relative '../../lib/gc_me'
-require_relative '../../lib/gc_me/system'
-require_relative '../../lib/gc_me/db/store'
+require_relative '../../lib/direct_debot'
+require_relative '../../lib/direct_debot/system'
+require_relative '../../lib/direct_debot/db/store'
 require_relative '../support/test_request'
 require_relative '../support/transaction'
 
 RSpec.describe 'creating a payment' do
-  let(:system) { GCMe::System.build }
+  let(:system) { DirectDebot::System.build }
 
   around do |example|
     system.start
@@ -21,7 +21,7 @@ RSpec.describe 'creating a payment' do
   end
 
   before do
-    store = GCMe::DB::Store.new(system.fetch(:db).database)
+    store = DirectDebot::DB::Store.new(system.fetch(:db).database)
     store.create_user!(slack_user_id: 'U123',
                        organisation_id: 'OR123',
                        gc_access_token: 'AT123')

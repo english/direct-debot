@@ -2,7 +2,7 @@ require 'logger'
 require 'fileutils'
 require 'forwardable'
 
-module GCMe
+module DirectDebot
   module Components
     # Configures logging
     class Logger
@@ -19,7 +19,7 @@ module GCMe
         FileUtils.mkdir_p(File.dirname(@path)) if @path
 
         @logger = ::Logger.new(@path || STDOUT).tap do |logger|
-          logger.progname = 'gc-me'
+          logger.progname = 'direct-debot'
         end
       end
 

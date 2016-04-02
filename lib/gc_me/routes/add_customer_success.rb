@@ -5,7 +5,7 @@ require_relative '../middleware/json_schema'
 require_relative '../middleware/build_gc_client'
 require_relative '../refinements/hash_slice'
 
-module GCMe
+module DirectDebot
   module Routes
     # Handle redirect flow completion
     module AddCustomerSuccess

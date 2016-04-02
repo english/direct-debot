@@ -4,7 +4,7 @@ require 'rack'
 require 'puma'
 require 'uri'
 
-module GCMe
+module DirectDebot
   module Components
     module Fakes
       # HTTP server to run in development and pretend to be slack

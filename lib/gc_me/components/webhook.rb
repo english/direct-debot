@@ -5,7 +5,7 @@ require_relative '../consumer'
 require_relative '../jobs/webhook_event'
 require_relative '../db/store'
 
-module GCMe
+module DirectDebot
   module Components
     # Wraps up the Webhook library with a minimal interface.
     class Webhook
@@ -36,8 +36,8 @@ module GCMe
       private
 
       def perform_job(message, database, environment, slack_queue)
-        GCMe::Jobs::WebhookEvent.call(
-          store: GCMe::DB::Store.new(database),
+        DirectDebot::Jobs::WebhookEvent.call(
+          store: DirectDebot::DB::Store.new(database),
           environment: environment,
           slack_queue: slack_queue,
           organisation_id: message.fetch(:organisation_id),

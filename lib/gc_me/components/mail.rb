@@ -4,7 +4,7 @@ require 'mail'
 require 'hamster'
 require_relative '../consumer'
 
-module GCMe
+module DirectDebot
   module Components
     # Wraps up the Mail library with a minimal interface.
     module Mail

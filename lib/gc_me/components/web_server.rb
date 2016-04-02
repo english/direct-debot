@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative '../../gc_me'
+require_relative '../../direct_debot'
 require 'airbrake'
 require 'rack'
 require 'puma'
 require 'uri'
 
-module GCMe
+module DirectDebot
   module Components
     # Controls starting and stopping the Rack web server
     class WebServer
@@ -23,7 +23,7 @@ module GCMe
       def start(db, mail, webhook, slack)
         return if @running
 
-        router = GCMe::Application.new(db, mail, webhook, slack, self, @oauth_client)
+        router = Application.new(db, mail, webhook, slack, self, @oauth_client)
 
         @rack_app = ::Rack::Builder.new do
           use ::Airbrake::Rack::Middleware

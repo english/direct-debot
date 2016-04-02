@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require_relative '../../../../lib/gc_me/routes/slack_messages/handle_authorize'
-require_relative '../../../../lib/gc_me/oauth_client'
+require_relative '../../../../lib/direct_debot/routes/slack_messages/handle_authorize'
+require_relative '../../../../lib/direct_debot/oauth_client'
 
-RSpec.describe GCMe::Routes::SlackMessages::HandleAuthorize do
+RSpec.describe DirectDebot::Routes::SlackMessages::HandleAuthorize do
   subject(:handle_authorize) do
     context = { request: double(params: params) }
 
     described_class.new(context, null_middleware, oauth_client: oauth_client)
   end
 
-  let(:oauth_client) { instance_double(GCMe::OAuthClient) }
+  let(:oauth_client) { instance_double(DirectDebot::OAuthClient) }
 
   context 'when given an authorise message' do
     let(:params) { { 'user_id' => 'slack-user-id', 'text' => 'authorise' } }

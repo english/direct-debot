@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'gocardless_pro'
-require_relative '../../lib/gc_me/gc_client'
+require_relative '../../lib/direct_debot/gc_client'
 
-RSpec.describe GCMe::GCClient do
+RSpec.describe DirectDebot::GCClient do
   def build_customer(attrs)
     instance_double(GoCardlessPro::Resources::Customer, attrs)
   end

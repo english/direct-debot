@@ -3,7 +3,7 @@
 require 'uri'
 require_relative '../consumer'
 
-module GCMe
+module DirectDebot
   module Components
     # Reads messages from a queue and posts them to slack
     class Slack

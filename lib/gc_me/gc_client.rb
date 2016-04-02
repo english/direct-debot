@@ -3,7 +3,7 @@
 require 'hamster'
 require 'gocardless_pro'
 
-module GCMe
+module DirectDebot
   # wrapper around the GoCardlessPro client
   class GCClient
     REDIRECT_FLOW_SESSION_TOKEN = '1'

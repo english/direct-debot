@@ -3,13 +3,13 @@
 require 'webmock/rspec'
 require_relative '../support/test_request'
 require_relative '../support/transaction'
-require_relative '../../lib/gc_me'
-require_relative '../../lib/gc_me/system'
-require_relative '../../lib/gc_me/db/store'
+require_relative '../../lib/direct_debot'
+require_relative '../../lib/direct_debot/system'
+require_relative '../../lib/direct_debot/db/store'
 
 RSpec.describe 'adding a GoCardless customer' do
-  let(:system) { GCMe::System.build }
-  let(:store) { GCMe::DB::Store.new(system.fetch(:db).database) }
+  let(:system) { DirectDebot::System.build }
+  let(:store) { DirectDebot::DB::Store.new(system.fetch(:db).database) }
 
   around do |example|
     system.start
@@ -37,11 +37,11 @@ RSpec.describe 'adding a GoCardless customer' do
 
       mail = system.fetch(:mail).output_queue.pop
 
-      expect(mail[:from]).to eq('noreply@gc-me.test')
+      expect(mail[:from]).to eq('noreply@direct-debot.test')
       expect(mail[:to]).to eq('foo@bar.com')
       expect(mail[:body].to_s).
         to eq('jamie wants to setup a direct debit with you. ' \
-              'Authorise at https://gc-me.test/add-customer?user_id=U123.')
+              'Authorise at https://direct-debot.test/add-customer?user_id=U123.')
     end
   end
 
@@ -50,7 +50,7 @@ RSpec.describe 'adding a GoCardless customer' do
       request_body = {
         redirect_flows: {
           session_token: '1',
-          success_redirect_url: 'https://gc-me.test/api/gc/add-customer-success'
+          success_redirect_url: 'https://direct-debot.test/api/gc/add-customer-success'
         }
       }
 
@@ -60,7 +60,7 @@ RSpec.describe 'adding a GoCardless customer' do
           description: nil,
           session_token: '1',
           scheme: nil,
-          success_redirect_url: 'https://gc-me.test/api/gc/add-customer-success',
+          success_redirect_url: 'https://direct-debot.test/api/gc/add-customer-success',
           redirect_url: 'https://pay.gocardless.com/flow/RE123',
           created_at: '2014-10-22T13:10:06.000Z',
           links: { creditor: 'CR123' }
@@ -92,7 +92,7 @@ RSpec.describe 'adding a GoCardless customer' do
           description: nil,
           session_token: '1',
           scheme: nil,
-          success_redirect_url: 'https://gc-me.test/api/gc/add-customer-success',
+          success_redirect_url: 'https://direct-debot.test/api/gc/add-customer-success',
           redirect_url: 'https://pay.gocardless.com/flow/RE123',
           created_at: '2014-10-22T13:10:06.000Z',
           links: {

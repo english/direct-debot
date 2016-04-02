@@ -5,7 +5,7 @@ require 'net/http'
 require_relative '../gc_client'
 require_relative '../db/store'
 
-module GCMe
+module DirectDebot
   module Jobs
     # Processes a webhook event by fetching the latest event and putting an appropriate
     # message on the slack queue

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative '../../lib/gc_me/payment_message'
+require_relative '../../lib/direct_debot/payment_message'
 
-RSpec.describe GCMe::PaymentMessage do
+RSpec.describe DirectDebot::PaymentMessage do
   it 'parses a string message' do
     message = '£10 from someone@example.com'
 

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative '../../../lib/gc_me/middleware/get_gc_access_token'
-require_relative '../../../lib/gc_me/db/store'
+require_relative '../../../lib/direct_debot/middleware/get_gc_access_token'
+require_relative '../../../lib/direct_debot/db/store'
 
-RSpec.describe GCMe::Middleware::GetGCAccessToken do
+RSpec.describe DirectDebot::Middleware::GetGCAccessToken do
   subject(:route) { described_class.new(context, next_middleware, store: store) }
 
-  let(:store) { instance_double(GCMe::DB::Store) }
+  let(:store) { instance_double(DirectDebot::DB::Store) }
   let(:next_middleware) { null_middleware }
 
   context 'when the slack user exists' do

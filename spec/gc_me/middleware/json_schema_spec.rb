@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative '../../../lib/gc_me/middleware/json_schema'
+require_relative '../../../lib/direct_debot/middleware/json_schema'
 
-RSpec.describe GCMe::Middleware::JSONSchema do
+RSpec.describe DirectDebot::Middleware::JSONSchema do
   subject(:middleware) do
     context = { request: double(params: params) }
 

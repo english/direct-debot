@@ -1,6 +1,6 @@
-require_relative '../../../lib/gc_me/components/logger'
+require_relative '../../../lib/direct_debot/components/logger'
 
-RSpec.describe GCMe::Components::Logger do
+RSpec.describe DirectDebot::Components::Logger do
   let(:tempfile) { Tempfile.new('log') }
 
   subject { described_class.new(tempfile.path) }
@@ -18,8 +18,8 @@ RSpec.describe GCMe::Components::Logger do
 
     first, second, third = File.readlines(tempfile.path)
 
-    expect(first).to  match(/^I, \[.+\]  INFO -- gc-me: info message$/)
-    expect(second).to match(/^D, \[.+\] DEBUG -- gc-me: debug message$/)
-    expect(third).to  match(/^E, \[.+\] ERROR -- gc-me: error message$/)
+    expect(first).to  match(/^I, \[.+\]  INFO -- direct-debot: info message$/)
+    expect(second).to match(/^D, \[.+\] DEBUG -- direct-debot: debug message$/)
+    expect(third).to  match(/^E, \[.+\] ERROR -- direct-debot: error message$/)
   end
 end

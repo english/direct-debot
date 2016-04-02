@@ -3,7 +3,7 @@
 require 'json_schema'
 require 'coach'
 
-module GCMe
+module DirectDebot
   module Middleware
     # validate request against a given json schema
     class JSONSchema < Coach::Middleware

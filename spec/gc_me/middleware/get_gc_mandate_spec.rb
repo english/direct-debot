@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require_relative '../../../lib/gc_me/middleware/get_gc_mandate'
-require_relative '../../../lib/gc_me/gc_client'
-require_relative '../../../lib/gc_me/middleware/parse_payment_message'
+require_relative '../../../lib/direct_debot/middleware/get_gc_mandate'
+require_relative '../../../lib/direct_debot/gc_client'
+require_relative '../../../lib/direct_debot/middleware/parse_payment_message'
 
-RSpec.describe GCMe::Middleware::GetGCMandate do
+RSpec.describe DirectDebot::Middleware::GetGCMandate do
   subject(:route) { described_class.new(context, null_middleware) }
 
   let(:context) { { gc_client: gc_client, gc_customer: customer } }
-  let(:gc_client) { instance_double(GCMe::GCClient) }
+  let(:gc_client) { instance_double(DirectDebot::GCClient) }
   let(:customer) do
     instance_double(GoCardlessPro::Resources::Customer, email: 'someone@example.com')
   end

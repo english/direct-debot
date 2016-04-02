@@ -8,7 +8,7 @@ require_relative '../../middleware/get_gc_customer'
 require_relative '../../middleware/get_gc_mandate'
 require_relative '../../refinements/hash_slice'
 
-module GCMe
+module DirectDebot
   module Routes
     module SlackMessages
       # Assumes that the message text is a 'payment' one and processes it accordingly by

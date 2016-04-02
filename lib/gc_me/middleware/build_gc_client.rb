@@ -4,7 +4,7 @@ require 'coach'
 require_relative 'get_gc_access_token'
 require_relative '../gc_client'
 
-module GCMe
+module DirectDebot
   module Middleware
     # Exposes `gc_client` to middlewares downsteam, allowing for injection if required
     class BuildGCClient < Coach::Middleware

@@ -2,7 +2,7 @@
 
 require 'coach'
 
-module GCMe
+module DirectDebot
   module Routes
     # Groups handlers for slack messages
     module SlackMessages

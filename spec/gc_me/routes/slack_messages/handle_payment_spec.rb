@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
 require 'hamster'
-require_relative '../../../../lib/gc_me/routes/slack_messages/handle_payment'
-require_relative '../../../../lib/gc_me/gc_client'
+require_relative '../../../../lib/direct_debot/routes/slack_messages/handle_payment'
+require_relative '../../../../lib/direct_debot/gc_client'
 
-RSpec.describe GCMe::Routes::SlackMessages::HandlePayment do
+RSpec.describe DirectDebot::Routes::SlackMessages::HandlePayment do
   subject(:route) do
     described_class.new(gc_client: gc_client,
                         payment_message: payment_message,
                         gc_mandate: gc_mandate)
   end
 
-  let(:gc_client) { instance_double(GCMe::GCClient) }
+  let(:gc_client) { instance_double(DirectDebot::GCClient) }
   let(:payment_message) { Hamster::Hash.new(currency: 'GBP', pence: 1) }
   let(:gc_mandate) { double }
 

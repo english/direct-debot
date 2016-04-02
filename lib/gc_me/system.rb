@@ -15,7 +15,7 @@ require_relative 'components/slack'
 require_relative 'components/web_server'
 require_relative 'components/fakes/slack_server'
 
-module GCMe
+module DirectDebot
   # Configures and manages the lifecycle of potentially stateful components.
   # rubocop:disable Metrics/ClassLength
   class System
@@ -56,7 +56,7 @@ module GCMe
     end
 
     private_class_method def self.build_db
-      GCMe::Components::DB.new(Prius.get(:database_url), Prius.get(:thread_count))
+      DirectDebot::Components::DB.new(Prius.get(:database_url), Prius.get(:thread_count))
     end
 
     private_class_method def self.build_oauth_client
@@ -72,42 +72,42 @@ module GCMe
     end
 
     private_class_method def self.build_mail
-      GCMe::Components::Mail.build(
+      DirectDebot::Components::Mail.build(
         delivery_method: Prius.get(:mail_delivery_method),
         user_name: Prius.get(:sendgrid_username),
         password: Prius.get(:sendgrid_password))
     end
 
     private_class_method def self.build_airbrake
-      GCMe::Components::Airbrake.new(Prius.get(:airbrake_project_id),
-                                     Prius.get(:airbrake_api_key))
+      DirectDebot::Components::Airbrake.new(Prius.get(:airbrake_project_id),
+                                            Prius.get(:airbrake_api_key))
     end
 
     private_class_method def self.build_logger
-      GCMe::Components::Logger.new(Prius.get(:log_path))
+      DirectDebot::Components::Logger.new(Prius.get(:log_path))
     end
 
     private_class_method def self.build_webhook
-      GCMe::Components::Webhook.new(Prius.get(:gc_webhook_secret),
-                                    Prius.get(:gc_environment).to_sym)
+      DirectDebot::Components::Webhook.new(Prius.get(:gc_webhook_secret),
+                                           Prius.get(:gc_environment).to_sym)
     end
 
     private_class_method def self.build_slack
-      GCMe::Components::Slack.new(Prius.get(:slack_bot_api_token),
-                                  Prius.get(:slack_message_url),
-                                  Prius.get(:slack_token))
+      DirectDebot::Components::Slack.new(Prius.get(:slack_bot_api_token),
+                                         Prius.get(:slack_message_url),
+                                         Prius.get(:slack_token))
     end
 
     private_class_method def self.build_web_server
-      GCMe::Components::WebServer.new(Prius.get(:thread_count),
-                                      Prius.get(:port),
-                                      Prius.get(:host),
-                                      Prius.get(:gc_environment),
-                                      build_oauth_client)
+      DirectDebot::Components::WebServer.new(Prius.get(:thread_count),
+                                             Prius.get(:port),
+                                             Prius.get(:host),
+                                             Prius.get(:gc_environment),
+                                             build_oauth_client)
     end
 
     private_class_method def self.build_fake_slack
-      GCMe::Components::Fakes::SlackServer.new(Prius.get(:slack_message_url))
+      DirectDebot::Components::Fakes::SlackServer.new(Prius.get(:slack_message_url))
     end
 
     def initialize(components)

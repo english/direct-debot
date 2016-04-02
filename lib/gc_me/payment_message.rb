@@ -3,7 +3,7 @@
 require 'bigdecimal'
 require 'hamster'
 
-module GCMe
+module DirectDebot
   # Parses a 'payment message' from slack, e.g.
   #   PaymentMessage.parse("£10 from someone@example.com")
   #     # => { currency: "£", pence: "1000", email: "someone@exmaple.com" }

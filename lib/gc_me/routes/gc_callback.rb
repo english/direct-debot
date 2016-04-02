@@ -4,7 +4,7 @@ require 'coach'
 require 'json'
 require_relative '../middleware/json_schema'
 
-module GCMe
+module DirectDebot
   module Routes
     # GET https://localhost/callback HTTP/1.1
     #   code=6NJiqXzT7HcgEGsAZXUmaBfB&

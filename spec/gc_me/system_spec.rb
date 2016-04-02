@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../../lib/gc_me/system'
+require_relative '../../lib/direct_debot/system'
 
-RSpec.describe GCMe::System do
+RSpec.describe DirectDebot::System do
   class DB
     def start
     end

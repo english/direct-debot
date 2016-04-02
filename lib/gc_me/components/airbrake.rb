@@ -1,6 +1,6 @@
 require 'airbrake'
 
-module GCMe
+module DirectDebot
   module Components
     # Configures Airbrake exception monitoring
     class Airbrake

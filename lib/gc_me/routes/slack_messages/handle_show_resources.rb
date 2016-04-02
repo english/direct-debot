@@ -6,7 +6,7 @@ require_relative '../../middleware/get_gc_access_token'
 require_relative '../../middleware/build_gc_client'
 require_relative '../../refinements/hash_slice'
 
-module GCMe
+module DirectDebot
   module Routes
     module SlackMessages
       # Show all GC resources

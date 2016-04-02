@@ -1,4 +1,4 @@
-module GCMe
+module DirectDebot
   module Refinements
     # Add ActiveSupport Hash#slice as well as a 'strict' Hash#slice!
     module HashSlice

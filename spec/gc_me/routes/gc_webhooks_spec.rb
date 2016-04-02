@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require_relative '../../../lib/gc_me/routes/gc_webhooks'
-require_relative '../../../lib/gc_me/db/store'
+require_relative '../../../lib/direct_debot/routes/gc_webhooks'
+require_relative '../../../lib/direct_debot/db/store'
 
-RSpec.describe GCMe::Routes::GCWebhooks do
+RSpec.describe DirectDebot::Routes::GCWebhooks do
   subject(:gc_callback) do
     context = {
       request: double(
@@ -26,7 +26,7 @@ RSpec.describe GCMe::Routes::GCWebhooks do
     }
   end
 
-  let(:store) { instance_double(GCMe::DB::Store) }
+  let(:store) { instance_double(DirectDebot::DB::Store) }
   let(:queue) { Queue.new }
 
   context 'when the signature matches' do

@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 require 'hamster'
-require_relative '../../../lib/gc_me/middleware/get_gc_customer'
-require_relative '../../../lib/gc_me/gc_client'
-require_relative '../../../lib/gc_me/payment_message'
+require_relative '../../../lib/direct_debot/middleware/get_gc_customer'
+require_relative '../../../lib/direct_debot/gc_client'
+require_relative '../../../lib/direct_debot/payment_message'
 
-RSpec.describe GCMe::Middleware::GetGCCustomer do
+RSpec.describe DirectDebot::Middleware::GetGCCustomer do
   subject { described_class.new(context, null_middleware) }
 
   let(:context) { { gc_client: gc_client, payment_message: payment_message } }
-  let(:gc_client) { instance_double(GCMe::GCClient) }
+  let(:gc_client) { instance_double(DirectDebot::GCClient) }
   let(:payment_message) do
     Hamster::Hash.new(currency: 'GBP', amount: 1, email: 'someone@example.com')
   end
