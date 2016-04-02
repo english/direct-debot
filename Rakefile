@@ -15,5 +15,5 @@ task deploy: [:rubocop, :test] do
   sh 'git push heroku master'
 
   # block until app has spun up
-  sh 'curl https://gc-me-sandbox.herokuapp.com/'
+  sh 'curl https://direct-debot-sandbox.herokuapp.com/'
 end
