@@ -17,7 +17,7 @@ GIT
       concurrent-ruby (~> 1.0)
 
 PATH
-  remote: ./vendor/gocardless_pro
+  remote: vendor/gocardless_pro
   specs:
     gocardless_pro (1.0.2)
       faraday (>= 0.8.9, < 0.10)
@@ -125,7 +125,7 @@ GEM
     rails-html-sanitizer (1.0.2)
       loofah (~> 2.0)
     rainbow (2.0.0)
-    rake (10.4.2)
+    rake (12.0.0)
     rantly (0.3.2)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
@@ -177,13 +177,16 @@ DEPENDENCIES
   pry-doc
   puma (~> 2.14)
   rack (~> 1.6.4)
-  rake (~> 10.4.2)
+  rake (~> 12.0.0)
   rantly (~> 0.3.2)
   rspec (~> 3.3)
   rubocop!
   sequel (~> 4.27)
   sqlite3 (~> 1.3)
   webmock (~> 1.22)
+
+RUBY VERSION
+   ruby 2.4.1p111
 
 BUNDLED WITH
    1.11.2
