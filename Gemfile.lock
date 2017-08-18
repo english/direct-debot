@@ -17,7 +17,7 @@ GIT
       concurrent-ruby (~> 1.0)
 
 PATH
-  remote: ./vendor/gocardless_pro
+  remote: vendor/gocardless_pro
   specs:
     gocardless_pro (1.0.2)
       faraday (>= 0.8.9, < 0.10)
@@ -112,7 +112,7 @@ GEM
     pry-doc (0.8.0)
       pry (~> 0.9)
       yard (~> 0.8)
-    puma (2.15.3)
+    puma (3.10.0)
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -175,7 +175,7 @@ DEPENDENCIES
   pry
   pry-byebug
   pry-doc
-  puma (~> 2.14)
+  puma (~> 3.10)
   rack (~> 1.6.4)
   rake (~> 10.4.2)
   rantly (~> 0.3.2)
