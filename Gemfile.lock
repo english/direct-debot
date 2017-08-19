@@ -17,7 +17,7 @@ GIT
       concurrent-ruby (~> 1.0)
 
 PATH
-  remote: ./vendor/gocardless_pro
+  remote: vendor/gocardless_pro
   specs:
     gocardless_pro (1.0.2)
       faraday (>= 0.8.9, < 0.10)
@@ -101,7 +101,7 @@ GEM
       ast (~> 2.2)
     pg (0.18.4)
     powerpack (0.1.1)
-    prius (1.0.0)
+    prius (2.0.0)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -171,7 +171,7 @@ DEPENDENCIES
   newrelic_rpm (~> 3.14.1.311)
   oauth2 (~> 1.0)
   pg (~> 0.18)
-  prius (~> 1.0)
+  prius (~> 2.0)
   pry
   pry-byebug
   pry-doc
