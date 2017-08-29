@@ -17,7 +17,7 @@ GIT
       concurrent-ruby (~> 1.0)
 
 PATH
-  remote: ./vendor/gocardless_pro
+  remote: vendor/gocardless_pro
   specs:
     gocardless_pro (1.0.2)
       faraday (>= 0.8.9, < 0.10)
@@ -88,7 +88,7 @@ GEM
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
-    newrelic_rpm (3.14.1.311)
+    newrelic_rpm (4.4.0.336)
     nokogiri (1.6.7.1)
       mini_portile2 (~> 2.0.0.rc2)
     oauth2 (1.0.0)
@@ -168,7 +168,7 @@ DEPENDENCIES
   json_schema (~> 0.7)
   lotus-router (~> 0.4)
   mail (~> 2.6.3)
-  newrelic_rpm (~> 3.14.1.311)
+  newrelic_rpm (~> 4.4.0.336)
   oauth2 (~> 1.0)
   pg (~> 0.18)
   prius (~> 1.0)
