@@ -11,13 +11,13 @@ GIT
 
 GIT
   remote: git://github.com/hamstergem/hamster.git
-  revision: 00b86cfa42594dcbe549fec99b2ff09f45e3a675
+  revision: 97075ced9fd6cb6975d9993b439a6634ce003883
   specs:
-    hamster (2.0.0)
+    hamster (3.0.0)
       concurrent-ruby (~> 1.0)
 
 PATH
-  remote: ./vendor/gocardless_pro
+  remote: vendor/gocardless_pro
   specs:
     gocardless_pro (1.0.2)
       faraday (>= 0.8.9, < 0.10)
@@ -57,7 +57,7 @@ GEM
       actionpack (~> 4.2)
       activesupport (~> 4.2)
     coderay (1.1.0)
-    concurrent-ruby (1.0.0)
+    concurrent-ruby (1.0.5)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     diff-lcs (1.2.5)
