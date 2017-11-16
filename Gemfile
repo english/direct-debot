@@ -13,7 +13,7 @@ gem 'json_schema', '~> 0.7'
 gem 'sequel', '~> 4.27'
 gem 'mail', '~> 2.6.3'
 gem 'hamster', github: 'hamstergem/hamster'
-gem 'rake', '~> 10.4.2'
+gem 'rake', '~> 12.3.0'
 gem 'airbrake', '~> 5.0.2'
 gem 'newrelic_rpm', '~> 3.14.1.311'
 
