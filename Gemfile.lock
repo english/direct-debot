@@ -17,7 +17,7 @@ GIT
       concurrent-ruby (~> 1.0)
 
 PATH
-  remote: ./vendor/gocardless_pro
+  remote: vendor/gocardless_pro
   specs:
     gocardless_pro (1.0.2)
       faraday (>= 0.8.9, < 0.10)
@@ -126,7 +126,7 @@ GEM
       loofah (~> 2.0)
     rainbow (2.0.0)
     rake (10.4.2)
-    rantly (0.3.2)
+    rantly (1.2.0)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
@@ -178,7 +178,7 @@ DEPENDENCIES
   puma (~> 2.14)
   rack (~> 1.6.4)
   rake (~> 10.4.2)
-  rantly (~> 0.3.2)
+  rantly (~> 1.2.0)
   rspec (~> 3.3)
   rubocop!
   sequel (~> 4.27)
