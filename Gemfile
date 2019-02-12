@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 ruby '2.3.0'
 
-gem 'puma', '~> 2.14'
+gem 'puma', '~> 3.12'
 gem 'lotus-router', '~> 0.4'
 gem 'coach', '~> 0.4.0'
 gem 'prius', '~> 1.0'
