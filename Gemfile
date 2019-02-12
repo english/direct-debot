@@ -29,7 +29,7 @@ end
 group :development, :test do
   gem 'rspec', '~> 3.3'
   gem 'dotenv', '~> 2.0'
-  gem 'sqlite3', '~> 1.3'
+  gem 'sqlite3', '~> 1.4'
 end
 
 group :development do
