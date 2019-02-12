@@ -37,6 +37,6 @@ group :development do
 end
 
 group :test do
-  gem 'webmock', '~> 1.22'
+  gem 'webmock', '~> 3.5'
   gem 'rantly', '~> 0.3.2'
 end
