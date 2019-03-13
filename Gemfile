@@ -14,7 +14,7 @@ gem 'sequel', '~> 4.27'
 gem 'mail', '~> 2.6.3'
 gem 'hamster', github: 'hamstergem/hamster'
 gem 'rake', '~> 10.4.2'
-gem 'airbrake', '~> 5.0.2'
+gem 'airbrake', '~> 8.3.2'
 gem 'newrelic_rpm', '~> 3.14.1.311'
 
 # so that we can run a console in production
